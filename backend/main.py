@@ -5,9 +5,11 @@ import os
 app = FastAPI(title="SafeConvert API")
 
 # Configure CORS
+origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, this should be specific
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

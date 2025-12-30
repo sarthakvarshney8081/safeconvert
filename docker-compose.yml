@@ -9,7 +9,8 @@ services:
     volumes:
       - temp_data:/app/temp
     environment:
-      - UPLOAD_DIR=/app/temp
+      - UPLOAD_DIR=${UPLOAD_DIR:-/app/temp}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
 
   frontend:
     build: ./frontend
