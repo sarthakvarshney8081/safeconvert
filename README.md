@@ -25,5 +25,5 @@ SafeConvert is a privacy-focused, self-hosted web platform for file manipulation
 - **Infrastructure**: Docker Compose.
 
 ## Configuration
-- **Frontend Port**: 33333 (Mapped to internal 3000)
+- **Frontend Port**: 3333 (Mapped to internal 3000)
 - **Backend Port**: 8888 (Mapped to internal 8000)
