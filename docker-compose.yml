@@ -19,7 +19,7 @@ services:
       - "3333:3000"
 
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8888
+      - NEXT_PUBLIC_API_URL=/api
 
 volumes:
   temp_data:
