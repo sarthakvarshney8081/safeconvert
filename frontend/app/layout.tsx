@@ -6,7 +6,7 @@ import Navbar from '@/components/ui/Navbar';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'SafeConvert - Self-Hosted File Tools',
+  title: 'SafeConverts - Self-Hosted File Tools',
   description: 'Privacy-focused file conversion and manipulation tools.',
 };
 
@@ -24,7 +24,7 @@ export default function RootLayout({
         </main>
         <footer style={{ background: '#fff', padding: '20px 0', borderTop: '1px solid #eee', textAlign: 'center', color: '#666' }}>
           <div className="container">
-            © {new Date().getFullYear()} SafeConvert. Run locally, keep data private.
+            © {new Date().getFullYear()} <a href="https://SafeConverts.com" style={{ textDecoration: 'none', color: '#666' }}>SafeConverts.com</a>. Run locally, keep data private.
           </div>
         </footer>
       </body>
