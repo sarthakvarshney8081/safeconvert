@@ -52,7 +52,7 @@ export default function WorkflowBuilder() {
             }));
             formData.append('workflow_json', JSON.stringify(workflowPayload));
 
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api';
             const res = await fetch(`${apiUrl}/workflow/run`, {
                 method: 'POST',
                 body: formData,
