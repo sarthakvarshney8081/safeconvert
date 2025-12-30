@@ -1,0 +1,31 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.venv
+env/
+venv/
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Docker
+docker-context/
+
+# Project
+temp/
+coverage/
+.idea/
+.vscode/

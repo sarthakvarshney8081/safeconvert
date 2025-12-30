@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+python-multipart
+pypdf
+pdf2image
+Pillow
+docx2pdf
+pandas
+openpyxl
+reportlab
+pikepdf
+img2pdf
+ocrmypdf
+aiofiles
+python-docx
