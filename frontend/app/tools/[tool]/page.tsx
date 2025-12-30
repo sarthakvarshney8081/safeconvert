@@ -202,7 +202,8 @@ export default function ToolPage({ params }: { params: Promise<{ tool: string }>
             formData.append(key, options[key]);
         });
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8888';
+        // Default to relative /api path which works with Next.js Rewrites (both local and prod)
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api';
         const res = await fetch(`${apiUrl}${config.apiEndpoint}`, {
             method: 'POST',
             body: formData,
