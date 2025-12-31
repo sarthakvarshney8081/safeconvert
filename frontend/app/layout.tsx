@@ -55,7 +55,7 @@ export default function RootLayout({
 
           <div style={{ borderTop: '1px solid #eee', padding: '20px', textAlign: 'center', fontSize: '0.85rem' }}>
             <div className="container">
-              © {new Date().getFullYear()} <a href="https://SafeConverts.com" style={{ textDecoration: 'none', color: 'inherit' }}>SafeConverts.com</a>. Run locally, keep data private.
+              © {new Date().getFullYear()} <a href="https://SafeConverts.com" style={{ textDecoration: 'none', color: 'inherit' }}>SafeConverts.com</a>. Secure, Private, and Open Source.
             </div>
           </div>
         </footer>
