@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'standalone',
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
+
     // Proxy API requests to backend container to keep backend private
     async rewrites() {
         return [
