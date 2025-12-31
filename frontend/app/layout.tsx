@@ -35,13 +35,24 @@ export default function RootLayout({
               </p>
             </div>
 
-            {/* Quick Links */}
+            {/* PDF Tools */}
             <div>
-              <h4 style={{ marginBottom: '15px', color: '#333', fontSize: '1rem' }}>Tools</h4>
+              <h4 style={{ marginBottom: '15px', color: '#333', fontSize: '1rem' }}>PDF Tools</h4>
               <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <li><a href="/tools/merge-pdf">Merge PDF</a></li>
+                <li><a href="/tools/compress-pdf">Compress PDF</a></li>
+                <li><a href="/tools/pdf-to-word">PDF to Word</a></li>
+                <li><a href="/tools/pdf-to-excel">PDF to Excel</a></li>
+              </ul>
+            </div>
+
+            {/* Image Tools */}
+            <div>
+              <h4 style={{ marginBottom: '15px', color: '#333', fontSize: '1rem' }}>Image Tools</h4>
+              <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <li><a href="/tools/compress-image">Compress Image</a></li>
-                <li><a href="/workflow">Workflows</a></li>
+                <li><a href="/tools/image-to-pdf">Image to PDF</a></li>
+                <li><a href="/tools/convert-image">Convert Image</a></li>
               </ul>
             </div>
 
