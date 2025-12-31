@@ -38,23 +38,19 @@ export default function ConvertImageTool() {
 
     return (
         <ToolInterface
-            title="Convert Image (Client-Side Wasm)"
-            description="Convert image formats locally (PNG, JPG, WebP)."
+            title="Convert Image"
+            description="Convert images between formats (PNG, JPG, WebP)."
             accept="image/*"
             apiEndpoint=""
-            onProcess={processImage}
+            processingMode="client"
             optionsComponent={
-                <div>
-                    <label style={{ display: 'block', marginBottom: 10 }}>Target Format</label>
-                    <select name="format" style={{ width: '100%', padding: 8 }}>
-                        <option value="png">PNG</option>
-                        <option value="jpg">JPG</option>
-                        <option value="webp">WebP</option>
-                        <option value="bmp">BMP</option>
-                        <option value="ico">ICO</option>
-                    </select>
-                </div>
+                <select name="format" className="input" style={{ width: '100%', padding: 8 }}>
+                    <option value="png">to PNG</option>
+                    <option value="jpeg">to JPEG</option>
+                    <option value="webp">to WebP</option>
+                </select>
             }
+            onProcess={processImage}
         />
     );
 }

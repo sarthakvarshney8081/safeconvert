@@ -12,8 +12,9 @@ interface ToolInterfaceProps {
     accept: string;
     multiple?: boolean;
     maxFiles?: number;
+    processingMode?: 'client' | 'server';
     optionsComponent?: React.ReactNode;
-    onProcess: (files: File[], options: any) => Promise<Blob>; // Returns downloaded blob
+    onProcess: (files: File[], options: any) => Promise<Blob>;
     resultFileName?: string;
 }
 
@@ -23,6 +24,7 @@ export default function ToolInterface({
     accept,
     multiple = false,
     maxFiles,
+    processingMode = 'server',
     optionsComponent,
     onProcess,
     resultFileName = "result.pdf"
@@ -32,6 +34,7 @@ export default function ToolInterface({
     const [resultUrl, setResultUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
+    // ... (handlers same as before) ...
     const handleFilesSelected = (selectedFiles: File[]) => {
         setFiles(selectedFiles);
         setStatus('ready');
@@ -46,7 +49,6 @@ export default function ToolInterface({
         setError(null);
 
         try {
-            // Collect options from form if any
             const formData = new FormData(e.target as HTMLFormElement);
             const options = Object.fromEntries(formData.entries());
 
@@ -71,7 +73,36 @@ export default function ToolInterface({
     return (
         <div className="container" style={{ maxWidth: 800, padding: '40px 20px' }}>
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                <h1 style={{ marginBottom: 10 }}>{title}</h1>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 10 }}>
+                    <h1 style={{ margin: 0 }}>{title}</h1>
+                    {processingMode === 'client' ? (
+                        <span style={{
+                            fontSize: '0.8rem',
+                            padding: '4px 8px',
+                            borderRadius: 12,
+                            background: '#e3f2fd',
+                            color: '#1565c0',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4
+                        }}>
+                            ⚡ Browser
+                        </span>
+                    ) : (
+                        <span style={{
+                            fontSize: '0.8rem',
+                            padding: '4px 8px',
+                            borderRadius: 12,
+                            background: '#f5f5f5',
+                            color: '#616161',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4
+                        }}>
+                            ☁️ Server
+                        </span>
+                    )}
+                </div>
                 <p style={{ color: '#666' }}>{description}</p>
             </div>
 

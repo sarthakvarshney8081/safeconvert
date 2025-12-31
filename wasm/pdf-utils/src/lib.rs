@@ -46,6 +46,9 @@ pub fn compress_image(image_bytes: &[u8], quality: u8) -> Result<Vec<u8>, JsValu
 
 #[wasm_bindgen]
 pub fn merge_pdfs(files_array: js_sys::Array) -> Result<Vec<u8>, JsValue> {
+    // 0. Setup Panic Hook for debugging
+    console_error_panic_hook::set_once();
+    
     // 1. Create a Master Document
     let mut master_doc = Document::with_version("1.5");
     
@@ -306,7 +309,7 @@ pub fn decrypt_pdf(pdf_bytes: &[u8], password: &str) -> Result<Vec<u8>, JsValue>
 }
 
 #[wasm_bindgen]
-pub fn encrypt_pdf(pdf_bytes: &[u8], password: &str) -> Result<Vec<u8>, JsValue> {
+pub fn encrypt_pdf(_pdf_bytes: &[u8], _password: &str) -> Result<Vec<u8>, JsValue> {
     // Encrypting is complex in lopdf 0.31 (needs manual setup of security handler).
     // For this Wasm Pilot, providing full encryption (RC4/AES) manually is verbose.
     // 

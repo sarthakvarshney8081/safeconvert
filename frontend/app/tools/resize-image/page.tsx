@@ -33,23 +33,18 @@ export default function ResizeImageTool() {
 
     return (
         <ToolInterface
-            title="Resize Image (Client-Side Wasm)"
-            description="Resize images locally. Privacy-First."
+            title="Resize Image"
+            description="Change image dimensions."
             accept="image/*"
             apiEndpoint=""
-            onProcess={processImage}
+            processingMode="client"
             optionsComponent={
                 <div style={{ display: 'flex', gap: 10 }}>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', marginBottom: 5 }}>Width (px)</label>
-                        <input type="number" name="width" defaultValue="800" style={{ width: '100%', padding: 8 }} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', marginBottom: 5 }}>Height (px)</label>
-                        <input type="number" name="height" defaultValue="600" style={{ width: '100%', padding: 8 }} />
-                    </div>
+                    <input type="number" name="width" placeholder="Width" className="input" style={{ flex: 1, padding: 8 }} required />
+                    <input type="number" name="height" placeholder="Height" className="input" style={{ flex: 1, padding: 8 }} required />
                 </div>
             }
+            onProcess={processImage}
         />
     );
 }

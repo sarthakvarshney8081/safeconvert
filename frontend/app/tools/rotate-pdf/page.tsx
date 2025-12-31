@@ -42,21 +42,19 @@ export default function RotatePdfTool() {
 
     return (
         <ToolInterface
-            title="Rotate PDF (Client-Side Wasm)"
-            description="Rotate PDF pages instantly in your browser. Private & Fast. (Powered by Rust)"
+            title="Rotate PDF"
+            description="Rotate PDF pages permanently."
             accept=".pdf"
-            apiEndpoint="" // Not used
-            onProcess={processPdf}
+            apiEndpoint=""
+            processingMode="client"
             optionsComponent={
-                <div>
-                    <label style={{ display: 'block', marginBottom: 10 }}>Rotation Angle</label>
-                    <select name="angle" style={{ width: '100%', padding: 8, borderRadius: 4, border: '1px solid #ddd' }}>
-                        <option value="90">90 Degrees Clockwise</option>
-                        <option value="180">180 Degrees</option>
-                        <option value="270">270 Degrees Clockwise</option>
-                    </select>
-                </div>
+                <select name="angle" className="input" style={{ width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ccc' }}>
+                    <option value="90">90° Clockwise</option>
+                    <option value="180">180°</option>
+                    <option value="270">270° Clockwise</option>
+                </select>
             }
+            onProcess={processPdf}
         />
     );
 }

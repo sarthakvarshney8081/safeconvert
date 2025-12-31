@@ -7,38 +7,32 @@ export default function MergePdfTool() {
     const processPdf = async (files: File[], options: any) => {
         if (files.length < 2) throw new Error("Please select at least 2 files");
 
-        try {
-            // @ts-ignore
-            const wasmModule = await import(
-                /* webpackIgnore: true */
-                '/wasm/safeconvert_wasm.js'
-            );
-            await wasmModule.default();
+        const formData = new FormData();
+        // Backend expects 'files' as a list of UploadFile
+        files.forEach((file) => formData.append('files', file));
 
-            // Convert all files to Uint8Arrays
-            const buffers = await Promise.all(
-                files.map(async (f) => new Uint8Array(await f.arrayBuffer()))
-            );
+        // Use Backend API
+        const response = await fetch('/api/pdf/merge', {
+            method: 'POST',
+            body: formData,
+        });
 
-            // Call Wasm merge
-            // merge_pdfs(array_of_arrays)
-            const resultBytes = wasmModule.merge_pdfs(buffers);
-
-            return new Blob([resultBytes], { type: 'application/pdf' });
-
-        } catch (e: any) {
-            console.error("Wasm Merge Error:", e);
-            throw new Error(`Merge failed: ${e.message}`);
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.detail || "Merge failed");
         }
+        return await response.blob();
     };
 
     return (
         <ToolInterface
-            title="Merge PDF (Client-Side Wasm)"
-            description="Combine multiple PDFs into one document locally."
+            title="Merge PDF"
+            description="Combine multiple PDFs into one document."
             accept=".pdf"
-            apiEndpoint=""
+            multiple={true}
+            apiEndpoint="/api/pdf/merge"
             maxFiles={10}
+            processingMode="server"
             onProcess={processPdf}
         />
     );

@@ -33,23 +33,21 @@ export default function WatermarkPdfTool() {
 
     return (
         <ToolInterface
-            title="Watermark PDF (Client-Side Wasm)"
-            description="Add text watermark to your PDF locally."
+            title="Watermark PDF"
+            description="Add text watermark to your PDF."
             accept=".pdf"
             apiEndpoint=""
-            onProcess={processPdf}
+            processingMode="client"
             optionsComponent={
-                <div>
-                    <label style={{ display: 'block', marginBottom: 5 }}>Watermark Text</label>
-                    <input
-                        type="text"
-                        name="watermarkText"
-                        placeholder="e.g. DRAFT"
-                        defaultValue="CONFIDENTIAL"
-                        style={{ width: '100%', padding: 8 }}
-                    />
-                </div>
+                <input
+                    type="text"
+                    name="text"
+                    placeholder="Watermark Text (e.g. CONFIDENTIAL)"
+                    className="input"
+                    style={{ width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
+                />
             }
+            onProcess={processPdf}
         />
     );
 }

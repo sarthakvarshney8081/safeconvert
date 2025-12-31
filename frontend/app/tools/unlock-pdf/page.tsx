@@ -33,23 +33,21 @@ export default function UnlockPdfTool() {
 
     return (
         <ToolInterface
-            title="Unlock PDF (Client-Side Wasm)"
-            description="Remove password from PDF locally. Files never leave your device."
+            title="Unlock PDF"
+            description="Remove password protection from PDF."
             accept=".pdf"
             apiEndpoint=""
-            onProcess={processPdf}
+            processingMode="client"
             optionsComponent={
-                <div>
-                    <label style={{ display: 'block', marginBottom: 5 }}>Enter Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="PDF Password"
-                        style={{ width: '100%', padding: 8 }}
-                        required
-                    />
-                </div>
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    className="input"
+                    style={{ width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
+                />
             }
+            onProcess={processPdf}
         />
     );
 }

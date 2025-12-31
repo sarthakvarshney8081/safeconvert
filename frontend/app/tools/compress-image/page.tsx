@@ -34,28 +34,18 @@ export default function CompressImageTool() {
 
     return (
         <ToolInterface
-            title="Compress Image (Client-Side Wasm)"
-            description="Reduce image size instantly in your browser. Privacy-First."
+            title="Compress Image"
+            description="Reduce image size without losing quality."
             accept="image/*"
             apiEndpoint=""
-            onProcess={processImage}
+            processingMode="client"
             optionsComponent={
-                <div>
-                    <label style={{ display: 'block', marginBottom: 10 }}>Quality (1-100)</label>
-                    <input
-                        type="range"
-                        name="quality"
-                        min="10"
-                        max="100"
-                        defaultValue="75"
-                        style={{ width: '100%' }}
-                    />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#666' }}>
-                        <span>Small Size</span>
-                        <span>Best Quality</span>
-                    </div>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    <label>Quality:</label>
+                    <input type="range" name="quality" min="1" max="100" defaultValue="75" style={{ flex: 1 }} />
                 </div>
             }
+            onProcess={processImage}
         />
     );
 }

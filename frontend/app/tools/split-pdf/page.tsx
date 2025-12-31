@@ -34,23 +34,22 @@ export default function SplitPdfTool() {
 
     return (
         <ToolInterface
-            title="Split PDF (Client-Side Wasm)"
-            description="Extract pages from PDF locally. No upload."
+            title="Split PDF"
+            description="Extract specific pages from your PDF."
             accept=".pdf"
             apiEndpoint=""
-            onProcess={processPdf}
+            processingMode="client"
             optionsComponent={
-                <div style={{ display: 'flex', gap: 10 }}>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', marginBottom: 5 }}>Start Page</label>
-                        <input type="number" name="start" min="1" defaultValue="1" style={{ width: '100%', padding: 8 }} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                        <label style={{ display: 'block', marginBottom: 5 }}>End Page</label>
-                        <input type="number" name="end" min="1" defaultValue="1" style={{ width: '100%', padding: 8 }} />
-                    </div>
-                </div>
+                <input
+                    type="text"
+                    name="pages"
+                    placeholder="e.g. 1-3, 5"
+                    className="input"
+                    style={{ width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
+                    defaultValue="all"
+                />
             }
+            onProcess={processPdf}
         />
     );
 }
