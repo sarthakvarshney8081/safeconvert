@@ -19,7 +19,7 @@ export default function RotatePdfTool() {
             // @ts-ignore
             const wasmModule = await import(
                 /* webpackIgnore: true */
-                '/wasm/safeconvert_pdf_wasm.js'
+                '/wasm/safeconvert_wasm.js'
             );
 
             await wasmModule.default(); // init() function is default export for 'web' target usually

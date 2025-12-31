@@ -1,5 +1,5 @@
 [package]
-name = "safeconvert-pdf-wasm"
+name = "safeconvert-wasm"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,4 +11,6 @@ wasm-bindgen = "0.2"
 lopdf = "0.31.0"
 getrandom = { version = "0.2", features = ["js"] }
 js-sys = "0.3"
+image = { version = "0.24", default-features = false, features = ["jpeg", "png", "webp", "bmp"] }
+
 
