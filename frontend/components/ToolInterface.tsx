@@ -11,6 +11,7 @@ interface ToolInterfaceProps {
     apiEndpoint: string;
     accept: string;
     multiple?: boolean;
+    maxFiles?: number;
     optionsComponent?: React.ReactNode;
     onProcess: (files: File[], options: any) => Promise<Blob>; // Returns downloaded blob
     resultFileName?: string;
@@ -21,6 +22,7 @@ export default function ToolInterface({
     description,
     accept,
     multiple = false,
+    maxFiles,
     optionsComponent,
     onProcess,
     resultFileName = "result.pdf"
@@ -81,6 +83,7 @@ export default function ToolInterface({
                                 onFilesSelected={handleFilesSelected}
                                 accept={accept}
                                 multiple={multiple}
+                                maxFiles={maxFiles}
                             />
                         </div>
 

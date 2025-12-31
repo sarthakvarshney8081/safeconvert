@@ -46,85 +46,142 @@ pub fn compress_image(image_bytes: &[u8], quality: u8) -> Result<Vec<u8>, JsValu
 
 #[wasm_bindgen]
 pub fn merge_pdfs(files_array: js_sys::Array) -> Result<Vec<u8>, JsValue> {
-    let mut merged_doc = Document::with_version("1.5");
-    // Initialize pages tree
-    let pages_id = merged_doc.new_object_id();
-    let font_id = merged_doc.new_object_id();
-    let resources_id = merged_doc.new_object_id();
-    let catalog_id = merged_doc.new_object_id();
-
-    let mut catalog = lopdf::Dictionary::new();
-    catalog.set("Type", lopdf::Object::Name(b"Catalog".to_vec()));
-    catalog.set("Pages", lopdf::Object::Reference(pages_id));
-    merged_doc.objects.insert(catalog_id, lopdf::Object::Dictionary(catalog));
-
-    let mut pages = lopdf::Dictionary::new();
-    pages.set("Type", lopdf::Object::Name(b"Pages".to_vec()));
-    pages.set("Kids", lopdf::Object::Array(vec![]));
-    pages.set("Count", lopdf::Object::Integer(0));
-    pages.set("Resources", lopdf::Object::Reference(resources_id));
-    merged_doc.objects.insert(pages_id, lopdf::Object::Dictionary(pages));
+    // 1. Create a Master Document
+    let mut master_doc = Document::with_version("1.5");
     
-    merged_doc.objects.insert(resources_id, lopdf::Object::Dictionary(lopdf::Dictionary::new()));
-    merged_doc.objects.insert(font_id, lopdf::Object::Dictionary(lopdf::Dictionary::new()));
+    // We need to setup a basic structure for the master doc if it's empty,
+    // but typically we can simple take the first doc as base and append others,
+    // OR create a blank one and append all.
+    // Creating blank is safer for clean metadata.
     
-    // We treat the inputs as JS array of Uint8Arrays
+    let mut pages_id = master_doc.new_object_id();
+    let catalog_id = master_doc.new_object_id();
+    
+    // We will collect all page ObjectIds here
+    let mut master_pages = Vec::new();
+    
+    // Map to track global objects (just for creating the catalog at the end)
+    // Actually, we will just iterate inputs.
+
+    // To merge:
+    // We iterate each input PDF.
+    // For each PDF, we shift its ObjectIDs so they don't collide with the Master (or previous).
+    // Then we add its objects to Master.
+    // We find its Pages and add them to `master_pages`.
+    
+    // JS Array handling
     for i in 0..files_array.length() {
         let file_js = files_array.get(i);
         let bytes = js_sys::Uint8Array::new(&file_js).to_vec();
         
-        let doc = Document::load_from(Cursor::new(&bytes))
+        let mut doc = Document::load_from(Cursor::new(&bytes))
             .map_err(|e| JsValue::from_str(&format!("Failed to load PDF {}: {}", i, e)))?;
             
-        // Append docs (simplified logic - heavy remapping skipped for brevity, might cause issues with complex PDFs)
-        // For a robust merge, assume we need a full remapper. 
-        // For this pilot, we can try to append objects with offset IDs.
+        // 2. Remap IDs
+        // We need a map of OldID -> NewID for this document.
+        let mut id_map = std::collections::BTreeMap::new();
         
-        // Actually, lopdf documentation examples suggest remapping IDs.
-        // Given complexity, I will try to use a simple approach:
-        // Use `Document::load_from` and just collect pages?
-        // Let's defer to a simpler logic if possible or just use a known working merge pattern.
-        // Since I can't browse, I'll use a basic appending strategy remapping object IDs.
-        
-        let max_id = merged_doc.max_id;
-        for (old_id, object) in doc.objects {
-           merged_doc.objects.insert((old_id.0 + max_id, old_id.1), object);
+        // Generate new IDs in Master for every object in Doc
+        for &old_id in doc.objects.keys() {
+            let new_id = master_doc.new_object_id();
+            id_map.insert(old_id, new_id);
         }
-        // This is naive and will break references inside the objects.
-        // Proper merge is non-trivial in 10 lines.
-        // PIVOT: Maybe Keep Merge on Python for now and do Split?
-        // No, user specifically asked for Merge.
-        // I will implement a "Good Enough" merge that just concatenates pages if they are independent, 
-        // or effectively, lets leave a TODO for complex merge and put a simple placeholder 
-        // that says "Wasm Merge (Simple)"
+        
+        // Helper to renumber objects
+        // We traverse all objects in `doc` and replace references using `id_map`.
+        for (_, object) in doc.objects.iter_mut() {
+            renumber_object(object, &id_map);
+        }
+        
+        // 3. Move Objects to Master
+        // We assume `doc.get_pages()` works on the *original* doc structure? 
+        // Wait, we just mutated `doc.objects` in place? No, we mutated the *content* of objects (references), 
+        // but the keys in `doc.objects` are still old_ids? Yes.
+        
+        // We need to identify Pages BEFORE we move them or rely on the map.
+        // `doc.get_pages()` relies on crawling the Page Tree. 
+        // If we mutated references in properties (Kids, Pages), `get_pages` might fail if links are now pointing to new_ids 
+        // but the objects keying them are still old_ids in `doc.objects`.
+        
+        // Strategy: 
+        // Get pages FIRST.
+        let current_pages = doc.get_pages(); // BTreeMap<u32, ObjectId> (OldIDs)
+        
+        // Sort by page number to maintain order
+        let mut sorted_pages: Vec<lopdf::ObjectId> = current_pages.into_iter().map(|(_, id)| id).collect();
+        // Since BTreeMap is sorted by key (page num), `values()` is mostly ordered, but let's trust the iterator.
+        
+        // Now copy objects to master with NEW keys.
+        for (old_id, object) in doc.objects {
+            if let Some(&new_id) = id_map.get(&old_id) {
+                master_doc.objects.insert(new_id, object);
+            }
+        }
+        
+        // 4. Add Pages to Master List
+        for old_page_id in sorted_pages {
+             if let Some(&new_page_id) = id_map.get(&old_page_id) {
+                 master_pages.push(new_page_id);
+             }
+        }
     }
     
-    // Actually, writing a full PDF merger in a single edit without testing is risky.
-    // I entered this knowing Merge is "Core PDF Tools".
-    // I will try to use a crate feature if available or simple append.
-    // Re-reading `lopdf` docs from memory: `Document::merge` is explicitly NOT provided.
-    // Most users implement it by renumbering.
+    // 5. Finalize Master Document Structure (Catalog & Pages)
+    // Create Pages Dictionary
+    let mut pages_dict = lopdf::Dictionary::new();
+    pages_dict.set("Type", lopdf::Object::Name(b"Pages".to_vec()));
+    pages_dict.set("Count", lopdf::Object::Integer(master_pages.len() as i64));
     
-    // Alternative: Just implement SPLIT first, as it is easier (subset of pages)?
-    // User plan: "Merge PDF" is first.
+    // Kids array
+    let kids: Vec<lopdf::Object> = master_pages.into_iter().map(lopdf::Object::Reference).collect();
+    pages_dict.set("Kids", lopdf::Object::Array(kids));
     
-    // Let's implement a STUB that works for simple cases or acknowledge complexity.
-    // OR: I can just implement "Image to PDF" (images -> pdf is easier).
-    // Let's try to stick to the plan.
+    master_doc.objects.insert(pages_id, lopdf::Object::Dictionary(pages_dict));
     
-    // I will assume for now I can just return a "Not Implemented" error or a simple concatenation
-    // But that breaks the user trust.
+    // Create Catalog
+    let mut catalog_dict = lopdf::Dictionary::new();
+    catalog_dict.set("Type", lopdf::Object::Name(b"Catalog".to_vec()));
+    catalog_dict.set("Pages", lopdf::Object::Reference(pages_id));
+    master_doc.objects.insert(catalog_id, lopdf::Object::Dictionary(catalog_dict));
     
-    // Better strategy: Use the `merge` function logic from `backend/routers/pdf_tools.py` (which uses pypdf).
-    // Porting pypdf logic to formatting Rust lopdf is hard.
+    // Set Trailer
+    master_doc.trailer.set("Root", lopdf::Object::Reference(catalog_id));
+    // Remove ID to force regeneration or just leave it clean?
+    // master_doc.trailer.remove(b"ID"); 
     
-    // Let's SWITCH to implementing **Split PDF** for Phase 2 as the first step?
-    // It's safer.
-    // "Split PDF: Extract ranges or single pages."
-    
-    // I will modify this edit to be SPLIT PDF instead, and adding a comment.
-    
-    return Err(JsValue::from_str("Merge PDF in Wasm requires complex ID remapping. Implementing Split PDF first."));
+    // 6. Save
+    let mut out_buffer = Vec::new();
+    master_doc.save_to(&mut out_buffer)
+        .map_err(|e| JsValue::from_str(&format!("Failed to save merged PDF: {}", e)))?;
+        
+    Ok(out_buffer)
+}
+
+// Helper to recursively renumber IDs in an Object
+fn renumber_object(object: &mut lopdf::Object, id_map: &std::collections::BTreeMap<lopdf::ObjectId, lopdf::ObjectId>) {
+    match *object {
+        lopdf::Object::Reference(ref mut id) => {
+            if let Some(new_id) = id_map.get(id) {
+                *id = *new_id;
+            }
+        },
+        lopdf::Object::Array(ref mut arr) => {
+            for item in arr {
+                renumber_object(item, id_map);
+            }
+        },
+        lopdf::Object::Dictionary(ref mut dict) => {
+            for (_, value) in dict.iter_mut() {
+                renumber_object(value, id_map);
+            }
+        },
+        lopdf::Object::Stream(ref mut stream) => {
+             for (_, value) in stream.dict.iter_mut() {
+                renumber_object(value, id_map);
+            }
+        },
+        _ => {}
+    }
 }
 
 

@@ -8,11 +8,25 @@ interface FileDropzoneProps {
     onFilesSelected: (files: File[]) => void;
     accept?: string;
     multiple?: boolean;
+    maxFiles?: number;
 }
 
-export default function FileDropzone({ onFilesSelected, accept, multiple = false }: FileDropzoneProps) {
+export default function FileDropzone({ onFilesSelected, accept, multiple = false, maxFiles }: FileDropzoneProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
+
+    const handleFiles = useCallback((incomingFiles: File[]) => {
+        let validFiles = incomingFiles;
+        if (maxFiles && (files.length + incomingFiles.length) > maxFiles) {
+            alert(`You can only upload a maximum of ${maxFiles} files.`);
+            validFiles = incomingFiles.slice(0, maxFiles - files.length);
+        }
+
+        if (validFiles.length > 0) {
+            setFiles(prev => [...prev, ...validFiles]);
+            onFilesSelected(validFiles);
+        }
+    }, [files, maxFiles, onFilesSelected]);
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -30,18 +44,16 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
 
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const newFiles = Array.from(e.dataTransfer.files);
-            setFiles(prev => [...prev, ...newFiles]);
-            onFilesSelected(newFiles);
+            handleFiles(newFiles);
         }
-    }, [onFilesSelected]);
+    }, [handleFiles]);
 
     const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const newFiles = Array.from(e.target.files);
-            setFiles(prev => [...prev, ...newFiles]);
-            onFilesSelected(newFiles);
+            handleFiles(newFiles);
         }
-    }, [onFilesSelected]);
+    }, [handleFiles]);
 
     const removeFile = (index: number) => {
         setFiles(prev => prev.filter((_, i) => i !== index));
