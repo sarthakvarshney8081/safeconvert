@@ -62,3 +62,51 @@ async def convert_format(
     except Exception as e:
         if temp_file: cleanup_file(temp_file)
         raise HTTPException(status_code=500, detail=f"Conversion failed: {str(e)}")
+
+import subprocess
+
+@router.post("/png-to-svg")
+async def png_to_svg(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...)
+):
+    temp_file = None
+    bmp_path = None
+    try:
+        temp_file = await save_upload_file(file)
+        
+        # 1. Convert to BMP (Potrace requires BMP)
+        img = Image.open(temp_file)
+        # Ensure black and white / grayscale for best tracing? Potrace handles it but simplified is better.
+        # But let's just convert to BMP first.
+        bmp_filename = f"temp_{uuid.uuid4()}.bmp"
+        bmp_path = os.path.join(UPLOAD_DIR, bmp_filename)
+        img.save(bmp_path)
+
+        # 2. Run Potrace
+        svg_filename = f"vectorized_{uuid.uuid4()}.svg"
+        svg_path = os.path.join(UPLOAD_DIR, svg_filename)
+        
+        # -s for SVG, -o output
+        cmd = ["potrace", bmp_path, "-s", "-o", svg_path]
+        
+        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        # Cleanup temp BMP immediately
+        if os.path.exists(bmp_path):
+            os.remove(bmp_path)
+
+        background_tasks.add_task(cleanup_file, temp_file)
+        background_tasks.add_task(cleanup_file, svg_path)
+        
+        return FileResponse(svg_path, filename=f"{os.path.splitext(file.filename)[0]}.svg", media_type="image/svg+xml")
+
+    except subprocess.CalledProcessError as e:
+        if temp_file: cleanup_file(temp_file)
+        if bmp_path and os.path.exists(bmp_path): os.remove(bmp_path)
+        print(f"Potrace error: {e.stderr.decode()}")
+        raise HTTPException(status_code=500, detail="Vectorization failed")
+    except Exception as e:
+        if temp_file: cleanup_file(temp_file)
+        if bmp_path and os.path.exists(bmp_path): os.remove(bmp_path)
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")

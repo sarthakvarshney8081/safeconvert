@@ -46,6 +46,16 @@ export default function RootLayout({
               </ul>
             </div>
 
+            {/* Edit Tools */}
+            <div>
+              <h4 style={{ marginBottom: '15px', color: '#333', fontSize: '1rem' }}>Edit Tools</h4>
+              <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <li><a href="/tools/page-numbers">Page Numbers</a></li>
+                <li><a href="/tools/crop-pdf">Crop PDF</a></li>
+                <li><a href="/tools/rotate-pdf">Rotate PDF</a></li>
+              </ul>
+            </div>
+
             {/* Image Tools */}
             <div>
               <h4 style={{ marginBottom: '15px', color: '#333', fontSize: '1rem' }}>Image Tools</h4>
@@ -53,6 +63,7 @@ export default function RootLayout({
                 <li><a href="/tools/compress-image">Compress Image</a></li>
                 <li><a href="/tools/image-to-pdf">Image to PDF</a></li>
                 <li><a href="/tools/convert-image">Convert Image</a></li>
+                <li><a href="/tools/png-to-svg">PNG to SVG</a></li>
               </ul>
             </div>
 

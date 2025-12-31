@@ -6,7 +6,11 @@ import ToolInterface from '@/components/ToolInterface';
 export default function CropPdfTool() {
     const processFile = async (files: File[], options: any) => {
         // @ts-ignore
-        const wasm = await import('../../../public/wasm/safeconvert_wasm');
+        // @ts-ignore
+        const wasm = await import(
+            /* webpackIgnore: true */
+            '/wasm/safeconvert_wasm.js'
+        );
         await wasm.default();
 
         const file = files[0];

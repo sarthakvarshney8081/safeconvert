@@ -41,6 +41,7 @@ export default function Home() {
     { title: 'Compress Image', description: 'Reduce image size.', icon: Minimize2, href: '/tools/compress-image', color: '#448AFF' },
     { title: 'Resize Image', description: 'Change dimensions.', icon: Minimize2, href: '/tools/resize-image', color: '#795548' },
     { title: 'Convert Image', description: 'Change format.', icon: ImageIcon, href: '/tools/convert-image', color: '#009688' },
+    { title: 'PNG to SVG', description: 'Vectorize images.', icon: Scan, href: '/tools/png-to-svg', color: '#FF5722' },
   ];
 
   return (
@@ -80,6 +81,26 @@ export default function Home() {
           {imageTools.map((tool, i) => (
             <ToolCard key={i} {...tool} />
           ))}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 60 }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 20, color: '#333', borderBottom: '2px solid #eee', paddingBottom: 10 }}>Edit & Security (Wasm ⚡)</h2>
+        <div className="grid grid-cols-4" style={{ gap: 20 }}>
+          <ToolCard
+            title="Add Page Numbers"
+            description="Number pages instantly."
+            icon={FileType}
+            href="/tools/page-numbers"
+            color="#00BCD4"
+          />
+          <ToolCard
+            title="Crop PDF"
+            description="Trim margins."
+            icon={Scissors}
+            href="/tools/crop-pdf"
+            color="#8BC34A"
+          />
         </div>
       </div>
 
