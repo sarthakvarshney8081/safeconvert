@@ -16,6 +16,7 @@ export default function RotatePdfTool() {
             // Dynamic import from public/wasm
             // Note: We use a fixed path consistent with Dockerfile output
             // webpackIgnore tells Next.js not to try bundling this at build time
+            // @ts-ignore
             const wasmModule = await import(
                 /* webpackIgnore: true */
                 '/wasm/safeconvert_pdf_wasm.js'
