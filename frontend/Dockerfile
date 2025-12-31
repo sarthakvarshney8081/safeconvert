@@ -1,7 +1,7 @@
 # Stage 0: Wasm Builder
-FROM rust:alpine AS wasm-builder
+FROM rust:slim AS wasm-builder
 WORKDIR /wasm
-RUN apk add --no-cache musl-dev curl
+RUN apt-get update && apt-get install -y curl pkg-config libssl-dev build-essential
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 # Context is root, so copy wasm folder
 COPY wasm/pdf-utils ./
