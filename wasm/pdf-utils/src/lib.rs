@@ -1,6 +1,9 @@
 use wasm_bindgen::prelude::*;
 use lopdf::Document;
 use std::io::Cursor;
+use vtracer::{Config, convert};
+use visioncortex::ColorImage;
+
 
 #[wasm_bindgen]
 pub fn rotate_pdf(pdf_bytes: &[u8], angle: i32) -> Result<Vec<u8>, JsValue> {
@@ -797,7 +800,9 @@ pub fn compress_pdf(pdf_bytes: &[u8], options_str: &str) -> Result<Vec<u8>, JsVa
                                         rgb_data.push((g * 255.0) as u8);
                                         rgb_data.push((b * 255.0) as u8);
                                     }
-                                 } else {
+                // ... existing code ...
+
+
                                      for chunk in data.chunks(4) {
                                         if chunk.len() < 4 { break; }
                                          rgb_data.push(chunk[0]);
@@ -864,4 +869,33 @@ pub fn compress_pdf(pdf_bytes: &[u8], options_str: &str) -> Result<Vec<u8>, JsVa
         .map_err(|e| JsValue::from_str(&format!("Failed to save compressed PDF: {}", e)))?;
         
     Ok(out_buffer)
+}
+
+#[wasm_bindgen]
+pub fn bitmap_to_svg(image_bytes: &[u8]) -> Result<String, JsValue> {
+    let img = image::load_from_memory(image_bytes)
+        .map_err(|e| JsValue::from_str(&format!("Failed to load image: {}", e)))?;
+
+    let width = img.width() as usize;
+    let height = img.height() as usize;
+    let img_rgba = img.into_rgba8();
+    let pixels = img_rgba.into_raw(); // Vec<u8>
+
+    // Visioncortex ColorImage takes Vec<u8> (RGBA assumed)
+    let color_image = ColorImage {
+        pixels,
+        width,
+        height,
+    };
+
+    let config = Config::default();
+    
+    // vtracer::convert returns Result<SvgFile, ...>
+    let svg = convert(color_image, config)
+        .map_err(|e| JsValue::from_str(&format!("Vectorization failed: {}", e)))?;
+
+    // SvgFile implements Display or to_string?
+    // Compiler suggested using conversion method.
+    // We try to_string() as per common Rust pattern or SvgFile API.
+    Ok(svg.to_string())
 }

@@ -13,5 +13,7 @@ getrandom = { version = "0.2", features = ["js"] }
 js-sys = "0.3"
 image = { version = "0.24", default-features = false, features = ["jpeg", "png", "webp", "bmp"] }
 console_error_panic_hook = "0.1"
+vtracer = "0.6"
+visioncortex = "0.8"
 
 
