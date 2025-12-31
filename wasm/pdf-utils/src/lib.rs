@@ -1,3 +1,7 @@
+use wasm_bindgen::prelude::*;
+use lopdf::Document;
+use std::io::Cursor;
+
 #[wasm_bindgen]
 pub fn rotate_pdf(pdf_bytes: &[u8], angle: i32) -> Result<Vec<u8>, JsValue> {
     let mut doc = Document::load_from(Cursor::new(pdf_bytes))
