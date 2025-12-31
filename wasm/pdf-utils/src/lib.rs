@@ -272,3 +272,173 @@ pub fn encrypt_pdf(pdf_bytes: &[u8], password: &str) -> Result<Vec<u8>, JsValue>
     // Attempting basic encryption or returning error.
     return Err(JsValue::from_str("Client-side Encryption is not yet fully supported in this Wasm module. Please use the backend tool (Python) for robust encryption."));
 }
+
+#[wasm_bindgen]
+pub fn watermark_pdf(pdf_bytes: &[u8], text: &str) -> Result<Vec<u8>, JsValue> {
+    let mut doc = Document::load_from(Cursor::new(pdf_bytes))
+        .map_err(|e| JsValue::from_str(&format!("Failed to load PDF: {}", e)))?;
+
+    // We need to add a font resource to each page or globally.
+    // For simplicity, we'll try to use a standard font /Helvetica.
+    // We strictly need to add it to the Resources dictionary of the page.
+    // 
+    // Plan:
+    // 1. Create a Stream Object with the watermark content.
+    // 2. Add it to the document.
+    // 3. For each page, append this Stream's ID to the "Contents" array.
+    // 4. Update "Resources" -> "Font" -> "F1" -> Reference(StandardFont).
+
+    // Let's construct a simple content stream (PDF operators)
+    // q = save state, BT = begin text, Tf = set font, Tm = set matrix (rotate/scale), Td = move, Tj = show text, ET = end text, Q = restore
+    // Rotation 45 deg (0.707 0.707 -0.707 0.707 0 0) approximately.
+    // Font /F1 size 48.
+    // Position 100 100 (bottom left-ish).
+    // Note: PDF syntax (()) for string escape?
+    
+    // Creating the watermark stream content
+    // We'll put it in the center-ish?
+    let content = format!(
+        "q 0.5 0.5 0.5 rg /F1 48 Tf 1 0 0 1 100 100 Tm ( {} ) Tj Q", 
+        text.replace("(", "\\(").replace(")", "\\)") // Simple escape
+    );
+    
+    let stream = lopdf::Stream::new(lopdf::Dictionary::new(), content.as_bytes().to_vec());
+    let stream_id = doc.add_object(stream);
+
+    // Get pages
+    let pages = doc.get_pages();
+    
+    for (_, page_id) in pages {
+        // 1. Append Content Stream
+        if let Ok(page) = doc.get_object_mut(page_id) {
+            if let Ok(dict) = page.as_dict_mut() {
+                // Handle "Contents"
+                match dict.get_mut(b"Contents") {
+                    Ok(obj) => {
+                        // If array, push. If reference, convert to array [ref, new_ref].
+                        if let Ok(arr) = obj.as_array_mut() {
+                            arr.push(lopdf::Object::Reference(stream_id));
+                        } else if let Ok(r) = obj.as_reference() {
+                            // Turn single reference into array
+                            dict.set("Contents", lopdf::Object::Array(vec![
+                                lopdf::Object::Reference(r),
+                                lopdf::Object::Reference(stream_id)
+                            ]));
+                        }
+                    },
+                    Err(_) => {
+                        // No contents, set new
+                        dict.set("Contents", lopdf::Object::Reference(stream_id));
+                    }
+                }
+                
+                // 2. Add Font Resource (/F1 -> /Helvetica)
+                // We need to drill down: Resources -> Font -> F1
+                // This is a bit verbose without helpers.
+                 
+                // Check if Resources exists
+                if !dict.has(b"Resources") {
+                     dict.set("Resources", lopdf::Dictionary::new());
+                }
+            }
+        }
+        
+        // Split modify scope to satisfy borrow checker if needed, but here we drill in.
+        // It's cleaner to re-get the object for resources or do it in one pass if the struct allows.
+        // But lopdf access patterns can be tricky.
+        
+        // Let's attempt to add the Font to Resources.
+        if let Ok(page) = doc.get_object_mut(page_id) {
+             if let Ok(dict) = page.as_dict_mut() {
+                 let resources = dict.get_mut(b"Resources").and_then(|o| o.as_dict_mut());
+                 if let Ok(res) = resources {
+                     // Ensure Font dict exists
+                     if !res.has(b"Font") {
+                         res.set("Font", lopdf::Dictionary::new());
+                     }
+                     if let Ok(fonts) = res.get_mut(b"Font").and_then(|o| o.as_dict_mut()) {
+                         // Add F1 if not present.
+                         // Define /F1 -> /Type /Font /Subtype /Type1 /BaseFont /Helvetica
+                         if !fonts.has(b"F1") {
+                             let mut font_dict = lopdf::Dictionary::new();
+                             font_dict.set("Type", lopdf::Object::Name(b"Font".to_vec()));
+                             font_dict.set("Subtype", lopdf::Object::Name(b"Type1".to_vec()));
+                             font_dict.set("BaseFont", lopdf::Object::Name(b"Helvetica".to_vec()));
+                             
+                             // We need to add this font object to the document and reference it, 
+                             // OR direct dictionary if allowed (Direct dict for Type1 is usually okay in Resources).
+                             // Ideally, we add a new object.
+                             
+                             // Let's create a font object ID to be cleaner.
+                             // But we are inside a mutable borrow of doc... deadlock?
+                             // Yes, `doc.add_object` needs `&mut doc`.
+                             // So we cannot do `doc.add_object` inside the loop over pages (if iterating doc).
+                             // We already got page_ids (keys) in `pages` variable (copied/cloned?).
+                             // `doc.get_pages()` returns BTreeMap. We are iterating that.
+                             // But we need to mutate `doc` to add the font object.
+                         }
+                     }
+                 }
+             }
+        }
+    }
+    
+    // To solve borrowing: 
+    // 1. Create Font Object FIRST.
+    let mut font_dict = lopdf::Dictionary::new();
+    font_dict.set("Type", lopdf::Object::Name(b"Font".to_vec()));
+    font_dict.set("Subtype", lopdf::Object::Name(b"Type1".to_vec()));
+    font_dict.set("BaseFont", lopdf::Object::Name(b"Helvetica".to_vec()));
+    let font_id = doc.add_object(font_dict);
+    
+    // 2. Iterate pages and link Font + Content
+    let pages = doc.get_pages(); // re-get or reuse keys
+    for (_, page_id) in pages {
+        if let Ok(page) = doc.get_object_mut(page_id) {
+            if let Ok(dict) = page.as_dict_mut() {
+                // Add Content Stream reference
+                 match dict.get_mut(b"Contents") {
+                    Ok(obj) => {
+                        if let Ok(arr) = obj.as_array_mut() {
+                            arr.push(lopdf::Object::Reference(stream_id));
+                        } else if let Ok(r) = obj.as_reference() {
+                            dict.set("Contents", lopdf::Object::Array(vec![
+                                lopdf::Object::Reference(r),
+                                lopdf::Object::Reference(stream_id)
+                            ]));
+                        }
+                    },
+                    Err(_) => {
+                        dict.set("Contents", lopdf::Object::Reference(stream_id));
+                    }
+                }
+                
+                // Add Font Resource Reference
+                // Ensure Resources dict exists
+                if !dict.has(b"Resources") {
+                     dict.set("Resources", lopdf::Dictionary::new());
+                }
+                
+                 if let Ok(res_obj) = dict.get_mut(b"Resources") {
+                     if let Ok(res) = res_obj.as_dict_mut() {
+                         if !res.has(b"Font") {
+                             res.set("Font", lopdf::Dictionary::new());
+                         }
+                         if let Ok(fonts_obj) = res.get_mut(b"Font") {
+                             if let Ok(fonts) = fonts_obj.as_dict_mut() {
+                                 // Map "F1" to our font_id
+                                 fonts.set("F1", lopdf::Object::Reference(font_id));
+                             }
+                         }
+                     }
+                 }
+            }
+        }
+    }
+
+    let mut out_buffer = Vec::new();
+    doc.save_to(&mut out_buffer)
+        .map_err(|e| JsValue::from_str(&format!("Failed to save watermarked PDF: {}", e)))?;
+
+    Ok(out_buffer)
+}
