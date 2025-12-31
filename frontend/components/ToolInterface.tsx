@@ -16,6 +16,14 @@ interface ToolInterfaceProps {
     optionsComponent?: React.ReactNode;
     onProcess?: (files: File[], options: any) => Promise<Blob>; // Now optional
     resultFileName?: string;
+    icon?: any;
+    extraOptions?: {
+        name: string;
+        label: string;
+        type: 'select' | 'text' | 'number';
+        defaultValue?: string;
+        options?: { label: string; value: string }[];
+    }[];
 }
 
 export default function ToolInterface({
@@ -26,16 +34,19 @@ export default function ToolInterface({
     maxFiles,
     processingMode = 'server',
     optionsComponent,
-    apiEndpoint, // Destructure this
+    apiEndpoint,
     onProcess,
-    resultFileName = "result.pdf"
+    resultFileName = "result.pdf",
+    icon: Icon,
+    extraOptions
 }: ToolInterfaceProps) {
     const [status, setStatus] = useState<'idle' | 'ready' | 'processing' | 'completed' | 'error'>('idle');
     const [files, setFiles] = useState<File[]>([]);
     const [resultUrl, setResultUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // ... (handlers same as before) ...
+    // ... (handlers) ...
+
     const handleFilesSelected = (selectedFiles: File[]) => {
         setFiles(selectedFiles);
         setStatus('ready');
@@ -58,17 +69,13 @@ export default function ToolInterface({
             if (onProcess) {
                 blob = await onProcess(files, options);
             } else if (apiEndpoint) {
-                // Default API Handler
                 const apiFormData = new FormData();
-                files.forEach(f => apiFormData.append('file', f)); // 'file' or 'files'? Backend routers usually expect 'file'.
-                // If backend expects 'files', this needs adjustment. 
-                // Existing routers like /api/office-to-pdf use `file: UploadFile`.
-                // /api/merge-pdf uses `files: List[UploadFile]`.
-                // Single file tools use `file`.
-
-                // Let's assume single file for these simple tools (pdf-to-excel etc).
-                // If multiple is true, we might need a different key.
-                // Assuming 'file' for now as most new tools are single file.
+                // Handle multiple files if multiple=true
+                if (multiple) {
+                    files.forEach(f => apiFormData.append('files', f)); // Changed to 'files' for multiple
+                } else {
+                    apiFormData.append('file', files[0]);
+                }
 
                 Object.entries(options).forEach(([k, v]) => {
                     apiFormData.append(k, v as string);
@@ -107,35 +114,16 @@ export default function ToolInterface({
 
     return (
         <div className="container" style={{ maxWidth: 800, padding: '40px 20px' }}>
+            {/* ... Header ... */}
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 10 }}>
+                    {Icon && <Icon size={40} className="text-primary" />}
                     <h1 style={{ margin: 0 }}>{title}</h1>
+                    {/* ... Badges ... */}
                     {processingMode === 'client' ? (
-                        <span style={{
-                            fontSize: '0.8rem',
-                            padding: '4px 8px',
-                            borderRadius: 12,
-                            background: '#e3f2fd',
-                            color: '#1565c0',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4
-                        }}>
-                            ⚡ Browser
-                        </span>
+                        <span style={{ fontSize: '0.8rem', padding: '4px 8px', borderRadius: 12, background: '#e3f2fd', color: '#1565c0', display: 'inline-flex', alignItems: 'center', gap: 4 }}>⚡ Browser</span>
                     ) : (
-                        <span style={{
-                            fontSize: '0.8rem',
-                            padding: '4px 8px',
-                            borderRadius: 12,
-                            background: '#f5f5f5',
-                            color: '#616161',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4
-                        }}>
-                            ☁️ Server
-                        </span>
+                        <span style={{ fontSize: '0.8rem', padding: '4px 8px', borderRadius: 12, background: '#f5f5f5', color: '#616161', display: 'inline-flex', alignItems: 'center', gap: 4 }}>☁️ Server</span>
                     )}
                 </div>
                 <p style={{ color: '#666' }}>{description}</p>
@@ -155,9 +143,41 @@ export default function ToolInterface({
 
                         {status === 'ready' && (
                             <div style={{ animation: 'fadeIn 0.3s ease' }}>
-                                {optionsComponent && (
+                                {/* Dynamic Extra Options */}
+                                {extraOptions && (
                                     <div style={{ marginBottom: 30, padding: 20, background: '#f5f5f7', borderRadius: 8 }}>
                                         <h3 style={{ marginBottom: 15, fontSize: '1rem' }}>Options</h3>
+                                        <div style={{ display: 'grid', gap: 15 }}>
+                                            {extraOptions.map((opt) => (
+                                                <div key={opt.name}>
+                                                    <label style={{ display: 'block', marginBottom: 5, fontWeight: 500, fontSize: '0.9rem' }}>{opt.label}</label>
+                                                    {opt.type === 'select' ? (
+                                                        <select
+                                                            name={opt.name}
+                                                            defaultValue={opt.defaultValue}
+                                                            style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #ddd', background: '#fff' }}
+                                                        >
+                                                            {opt.options?.map(o => (
+                                                                <option key={o.value} value={o.value}>{o.label}</option>
+                                                            ))}
+                                                        </select>
+                                                    ) : (
+                                                        <input
+                                                            type={opt.type}
+                                                            name={opt.name}
+                                                            defaultValue={opt.defaultValue}
+                                                            style={{ width: '100%', padding: '8px 12px', borderRadius: 6, border: '1px solid #ddd' }}
+                                                        />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {optionsComponent && (
+                                    <div style={{ marginBottom: 30, padding: 20, background: '#f5f5f7', borderRadius: 8 }}>
+                                        <h3 style={{ marginBottom: 15, fontSize: '1rem' }}>More Options</h3>
                                         {optionsComponent}
                                     </div>
                                 )}

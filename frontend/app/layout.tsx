@@ -56,6 +56,15 @@ export default function RootLayout({
               </ul>
             </div>
 
+            {/* GIF Tools */}
+            <div>
+              <h4 style={{ marginBottom: '15px', color: '#333', fontSize: '1rem' }}>GIF Tools</h4>
+              <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <li><a href="/tools/video-to-gif">Video to GIF</a></li>
+                <li><a href="/tools/gif-maker">GIF Maker</a></li>
+              </ul>
+            </div>
+
             {/* Legal */}
             <div>
               <h4 style={{ marginBottom: '15px', color: '#333', fontSize: '1rem' }}>Legal</h4>

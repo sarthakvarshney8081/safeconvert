@@ -7,7 +7,8 @@ import {
   Shield,
   Unlock,
   Scan,
-  Minimize2
+  Minimize2,
+  Video
 } from 'lucide-react';
 import ToolCard from '@/components/ui/ToolCard';
 
@@ -79,6 +80,26 @@ export default function Home() {
           {imageTools.map((tool, i) => (
             <ToolCard key={i} {...tool} />
           ))}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 60 }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 20, color: '#333', borderBottom: '2px solid #eee', paddingBottom: 10 }}>GIF & Video Tools</h2>
+        <div className="grid grid-cols-4" style={{ gap: 20 }}>
+          <ToolCard
+            title="Video to GIF"
+            description="Convert MP4 to animated GIF."
+            icon={Video}
+            href="/tools/video-to-gif"
+            color="#E91E63"
+          />
+          <ToolCard
+            title="GIF Maker"
+            description="Images to animated GIF."
+            icon={ImageIcon}
+            href="/tools/gif-maker"
+            color="#9C27B0"
+          />
         </div>
       </div>
     </div>
