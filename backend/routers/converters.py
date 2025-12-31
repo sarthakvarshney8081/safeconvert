@@ -125,3 +125,108 @@ async def convert_pdf_to_image(background_tasks: BackgroundTasks, file: UploadFi
         if temp_file: cleanup_file(temp_file)
         shutil.rmtree(output_dir, ignore_errors=True)
         raise HTTPException(status_code=500, detail=f"PDF to Image failed: {str(e)}")
+
+@router.post("/pdf-to-excel")
+async def convert_pdf_to_excel(
+    background_tasks: BackgroundTasks, 
+    file: UploadFile = File(...)
+):
+    import pdfplumber
+    import pandas as pd
+    
+    temp_file = None
+    output_filename = f"excel_{uuid.uuid4()}.xlsx"
+    output_path = os.path.join(UPLOAD_DIR, output_filename)
+    
+    try:
+        temp_file = await save_upload_file(file)
+        
+        # Strategy: Extract tables from all pages and merge into one sheet or multiple?
+        # Let's merge into one big DataFrame for simplicity, or separate sheets.
+        # "One sheet per page" is safer.
+        
+        with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
+            with pdfplumber.open(temp_file) as pdf:
+                has_tables = False
+                for i, page in enumerate(pdf.pages):
+                     tables = page.extract_tables()
+                     if tables:
+                         has_tables = True
+                         for j, table in enumerate(tables):
+                             df = pd.DataFrame(table[1:], columns=table[0])
+                             # Clean data?
+                             sheet_name = f"Page_{i+1}_Table_{j+1}"
+                             # limit sheet name len
+                             df.to_excel(writer, sheet_name=sheet_name[:30], index=False)
+                
+                if not has_tables:
+                     # fallback: Create empty with specific message
+                     df = pd.DataFrame(["No tables found in PDF"], columns=["Status"])
+                     df.to_excel(writer, sheet_name="Result", index=False)
+
+        background_tasks.add_task(cleanup_file, temp_file)
+        # cleanup output later
+        
+        return FileResponse(output_path, filename="converted_tables.xlsx", media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+    except Exception as e:
+        if temp_file: cleanup_file(temp_file)
+        if os.path.exists(output_path): cleanup_file(output_path)
+        raise HTTPException(status_code=500, detail=f"PDF to Excel failed: {str(e)}")
+
+@router.post("/pdf-to-ppt")
+async def convert_pdf_to_ppt(
+    background_tasks: BackgroundTasks, 
+    file: UploadFile = File(...)
+):
+    from pdf2image import convert_from_path
+    from pptx import Presentation
+    from pptx.util import Inches
+    
+    temp_file = None
+    output_filename = f"ppt_{uuid.uuid4()}.pptx"
+    output_path = os.path.join(UPLOAD_DIR, output_filename)
+    
+    try:
+        temp_file = await save_upload_file(file)
+        
+        # Strategy: Convert PDF pages to Images -> Slides
+        # Best for visual fidelity.
+        
+        images = convert_from_path(temp_file)
+        prs = Presentation()
+        
+        # Standard 16:9 
+        prs.slide_width = Inches(13.333)
+        prs.slide_height = Inches(7.5)
+        
+        for i, image in enumerate(images):
+            # Create blank slide
+            blank_slide_layout = prs.slide_layouts[6] 
+            slide = prs.slides.add_slide(blank_slide_layout)
+            
+            # Save temp image
+            img_path = os.path.join(UPLOAD_DIR, f"slide_{uuid.uuid4()}.png")
+            image.save(img_path)
+            
+            # Add image to slide
+            left = top = Inches(0)
+            # Fit to slide height?
+            # Ideally we check aspect ratio.
+            # For simplicity, fit breadth.
+            slide.shapes.add_picture(img_path, left, top, width=prs.slide_width)
+            
+            # Cleanup temp image immediately
+            if os.path.exists(img_path):
+                os.remove(img_path)
+
+        prs.save(output_path)
+
+        background_tasks.add_task(cleanup_file, temp_file)
+        
+        return FileResponse(output_path, filename="presentation.pptx", media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation")
+
+    except Exception as e:
+        if temp_file: cleanup_file(temp_file)
+        if os.path.exists(output_path): cleanup_file(output_path)
+        raise HTTPException(status_code=500, detail=f"PDF to PPT failed: {str(e)}")

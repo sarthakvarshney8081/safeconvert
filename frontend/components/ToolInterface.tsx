@@ -8,13 +8,13 @@ import styles from './ToolInterface.module.css';
 interface ToolInterfaceProps {
     title: string;
     description: string;
-    apiEndpoint: string;
+    apiEndpoint?: string;
     accept: string;
     multiple?: boolean;
     maxFiles?: number;
     processingMode?: 'client' | 'server';
     optionsComponent?: React.ReactNode;
-    onProcess: (files: File[], options: any) => Promise<Blob>;
+    onProcess?: (files: File[], options: any) => Promise<Blob>; // Now optional
     resultFileName?: string;
 }
 
@@ -26,6 +26,7 @@ export default function ToolInterface({
     maxFiles,
     processingMode = 'server',
     optionsComponent,
+    apiEndpoint, // Destructure this
     onProcess,
     resultFileName = "result.pdf"
 }: ToolInterfaceProps) {
@@ -52,7 +53,41 @@ export default function ToolInterface({
             const formData = new FormData(e.target as HTMLFormElement);
             const options = Object.fromEntries(formData.entries());
 
-            const blob = await onProcess(files, options);
+            let blob: Blob;
+
+            if (onProcess) {
+                blob = await onProcess(files, options);
+            } else if (apiEndpoint) {
+                // Default API Handler
+                const apiFormData = new FormData();
+                files.forEach(f => apiFormData.append('file', f)); // 'file' or 'files'? Backend routers usually expect 'file'.
+                // If backend expects 'files', this needs adjustment. 
+                // Existing routers like /api/office-to-pdf use `file: UploadFile`.
+                // /api/merge-pdf uses `files: List[UploadFile]`.
+                // Single file tools use `file`.
+
+                // Let's assume single file for these simple tools (pdf-to-excel etc).
+                // If multiple is true, we might need a different key.
+                // Assuming 'file' for now as most new tools are single file.
+
+                Object.entries(options).forEach(([k, v]) => {
+                    apiFormData.append(k, v as string);
+                });
+
+                const response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    body: apiFormData,
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || "Server error");
+                }
+                blob = await response.blob();
+            } else {
+                throw new Error("Tool configuration error: No processor defined.");
+            }
+
             const url = URL.createObjectURL(blob);
             setResultUrl(url);
             setStatus('completed');

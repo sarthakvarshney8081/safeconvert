@@ -50,6 +50,7 @@ export default function CompressImageTool() {
                 </div>
             }
             onProcess={processImage}
+            resultFileName="compressed-image.jpg"
         />
     );
 }

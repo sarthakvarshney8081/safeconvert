@@ -1,42 +1,71 @@
-from fastapi import APIRouter, UploadFile, File, Form, BackgroundTasks, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
-from core.processor import save_upload_file, cleanup_file, UPLOAD_DIR
+import pytesseract
+from pdf2image import convert_from_path
+from PIL import Image
 import os
-import uuid
-import ocrmypdf
+from core.processor import save_upload_file, cleanup_file
+import pypdf
 
-router = APIRouter(prefix="/ocr", tags=["ocr"])
+router = APIRouter(prefix="/ocr", tags=["OCR"])
 
-@router.post("/scan-to-pdf")
-async def ocr_pdf(
-    background_tasks: BackgroundTasks,
-    file: UploadFile = File(...), 
-    lang: str = Form("eng")
-):
-    temp_file = None
+@router.post("/scan-pdf")
+async def perform_ocr(background_tasks: BackgroundTasks, file: UploadFile = File(...), lang: str = "eng"):
+    """
+    Perform OCR on a PDF or Image and return a searchable PDF.
+    Uses pytesseract.image_to_pdf_or_hocr
+    """
+    temp_file = await save_upload_file(file)
+    output_pdf = temp_file + "_ocr.pdf"
+    
     try:
-        temp_file = await save_upload_file(file)
+        # Check if file is image or PDF
+        content_type = file.content_type
         
-        output_filename = f"ocr_{uuid.uuid4()}.pdf"
-        output_path = os.path.join(UPLOAD_DIR, output_filename)
+        if "image" in content_type:
+            # Simple Image to PDF OCR
+            pdf_bytes = pytesseract.image_to_pdf_or_hocr(temp_file, extension='pdf', lang=lang)
+            with open(output_pdf, "wb") as f:
+                f.write(pdf_bytes)
+                
+        elif "pdf" in content_type:
+            # PDF to PDF (OCR) - Convert pages to images then OCR them
+            # This is complex (ocrmypdf is better but we use bare tesseract for now)
+            # Strategy: Convert PDF pages to images -> OCR each -> Merge
+            # Easier: Use ocrmypdf if installed (it was in requirements logic but Tesseract is available)
+            # Fallback manual pipelne:
+            
+            # Since ocrmypdf might not be in path or complicated, let's use a simpler approach for 'Scan to PDF'
+            # Assume input is Scanned Image-only PDF.
+            images = convert_from_path(temp_file)
+            
+            from pypdf import PdfWriter, PdfReader
+            import io
+            
+            writer = PdfWriter()
+            
+            for img in images:
+                pdf_bytes = pytesseract.image_to_pdf_or_hocr(img, extension='pdf', lang=lang)
+                # Load this page
+                page_reader = PdfReader(io.BytesIO(pdf_bytes))
+                writer.add_page(page_reader.pages[0])
+                
+            writer.write(output_pdf)
+            
+        else:
+             raise HTTPException(status_code=400, detail="Unsupported file format")
+
+        background_tasks.add_task(cleanup_file, temp_file)
         
-        # Run OCR
-        # Note: 'force_ocr=True' ensures rasterizing if needed, or 'skip_text=True' if we text already exists
-        # 'deskew=True' corrects rotation
-        ocrmypdf.ocr(
-            temp_file, 
-            output_path, 
-            language=lang, 
-            deskew=True,
-            force_ocr=True
+        return FileResponse(
+            output_pdf, 
+            filename="ocr_result.pdf",
+            media_type="application/pdf"
         )
         
-        background_tasks.add_task(cleanup_file, temp_file)
-        return FileResponse(output_path, filename="ocr_document.pdf", media_type="application/pdf")
-
     except Exception as e:
-        if temp_file: cleanup_file(temp_file)
-        # Check if it was "PriorOcrFoundError" - we might want to return the original or skip
-        if "PriorOcrFoundError" in str(e):
-             raise HTTPException(status_code=400, detail="Document already contains text (OCR).")
-        raise HTTPException(status_code=500, detail=f"OCR failed: {str(e)}")
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
+        if os.path.exists(output_pdf):
+             os.remove(output_pdf)
+        raise HTTPException(status_code=500, detail=str(e))

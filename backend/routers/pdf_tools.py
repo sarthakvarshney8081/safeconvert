@@ -121,3 +121,71 @@ async def rotate_pdf(
     except Exception as e:
         if temp_file: cleanup_file(temp_file)
         raise HTTPException(status_code=500, detail=f"Rotate failed: {str(e)}")
+
+@router.post("/compress")
+async def compress_pdf(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    level: str = Form("ebook") # screen, ebook, printer, prepress
+):
+    import subprocess
+    
+    temp_file = None
+    output_path = None
+    
+    try:
+        temp_file = await save_upload_file(file)
+        
+        # internal gs preset name
+        # /screen (72 dpi) - Strong
+        # /ebook (150 dpi) - Basic
+        # /printer (300 dpi) - High Quality
+        # /prepress - Max Quality
+        
+        gs_setting = "/ebook"
+        if level == "strong" or level == "screen" or level == "email":
+            gs_setting = "/screen"
+        elif level == "basic" or level == "ebook":
+            gs_setting = "/ebook"
+        elif level == "printer":
+            gs_setting = "/printer"
+        elif level == "prepress":
+            gs_setting = "/prepress"
+
+        output_filename = f"compressed_{uuid.uuid4()}.pdf"
+        output_path = os.path.join(UPLOAD_DIR, output_filename)
+
+        # Ghostscript command
+        # gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=output.pdf input.pdf
+        
+        cmd = [
+            "gs",
+            "-sDEVICE=pdfwrite",
+            "-dCompatibilityLevel=1.4",
+            f"-dPDFSETTINGS={gs_setting}",
+            "-dNOPAUSE",
+            "-dQUIET",
+            "-dBATCH",
+            f"-sOutputFile={output_path}",
+            temp_file
+        ]
+        
+        # Run subprocess
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            raise Exception(f"Ghostscript error: {result.stderr}")
+            
+        # Verify output exists
+        if not os.path.exists(output_path):
+             raise Exception("Ghostscript failed to generate output file")
+
+        background_tasks.add_task(cleanup_file, temp_file)
+        # We rely on cron cleanup for output, or we can't easily clean it up after FileResponse unless we use a custom iterator
+        
+        return FileResponse(output_path, filename=f"compressed_{level}.pdf", media_type="application/pdf")
+
+    except Exception as e:
+        if temp_file: cleanup_file(temp_file)
+        if output_path and os.path.exists(output_path): cleanup_file(output_path)
+        raise HTTPException(status_code=500, detail=f"Compression failed: {str(e)}")

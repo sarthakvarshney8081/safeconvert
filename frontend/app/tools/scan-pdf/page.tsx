@@ -1,0 +1,36 @@
+"use client";
+
+import React from 'react';
+import ToolInterface from '@/components/ToolInterface';
+
+export default function ScanPdfTool() {
+    const processFile = async (files: File[], options: any) => {
+        const formData = new FormData();
+        formData.append('file', files[0]);
+        // Default to English for now. later we can add language selector to options
+        formData.append('lang', 'eng');
+
+        const response = await fetch('/api/ocr/scan-pdf', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.detail || "OCR processing failed");
+        }
+        return await response.blob();
+    };
+
+    return (
+        <ToolInterface
+            title="Scan to PDF (OCR)"
+            description="Convert scanned images or PDFs into searchable, selectable text documents."
+            accept=".pdf,.png,.jpg,.jpeg"
+            apiEndpoint="/api/ocr/scan-pdf"
+            onProcess={processFile}
+            resultFileName="searchable.pdf"
+            processingMode="server"
+        />
+    );
+}

@@ -7,7 +7,7 @@ export default function WatermarkPdfTool() {
     const processPdf = async (files: File[], options: any) => {
         if (files.length === 0) throw new Error("No file");
         const file = files[0];
-        const text = options.watermarkText || "CONFIDENTIAL";
+        const text = options.text || "CONFIDENTIAL";
 
         try {
             // @ts-ignore

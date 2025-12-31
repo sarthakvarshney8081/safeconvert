@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
 app.router.lifespan_context = lifespan
 
 # Import Routers
-from routers import pdf_tools, converters, image_tools, security, ocr, workflow
+from routers import pdf_tools, converters, image_tools, security, ocr, workflow, office_tools, pdf_extra, convert_from_pdf, optimize
 
 app.include_router(pdf_tools.router)
 app.include_router(converters.router)
@@ -63,3 +63,7 @@ app.include_router(image_tools.router)
 app.include_router(security.router)
 app.include_router(ocr.router)
 app.include_router(workflow.router)
+app.include_router(office_tools.router)
+app.include_router(pdf_extra.router)
+app.include_router(convert_from_pdf.router)
+app.include_router(optimize.router)

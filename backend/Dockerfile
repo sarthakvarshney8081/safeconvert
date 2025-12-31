@@ -11,7 +11,9 @@ RUN apt-get update && apt-get install -y \
     poppler-utils \
     tesseract-ocr \
     libreoffice \
+    libreoffice-java-common \
     ghostscript \
+    default-jre \
     ffmpeg \
     libsm6 \
     libxext6 \

@@ -13,3 +13,7 @@ img2pdf
 ocrmypdf
 aiofiles
 python-docx
+pdf2docx
+pytesseract
+pdfplumber
+python-pptx
