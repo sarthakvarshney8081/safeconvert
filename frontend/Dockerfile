@@ -1,5 +1,5 @@
 # Stage 0: Wasm Builder
-FROM rust:1.75-alpine AS wasm-builder
+FROM rust:alpine AS wasm-builder
 WORKDIR /wasm
 RUN apk add --no-cache musl-dev curl
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
