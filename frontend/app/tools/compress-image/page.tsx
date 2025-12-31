@@ -40,9 +40,13 @@ export default function CompressImageTool() {
             apiEndpoint=""
             processingMode="client"
             optionsComponent={
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                    <label>Quality:</label>
-                    <input type="range" name="quality" min="1" max="100" defaultValue="75" style={{ flex: 1 }} />
+                <div style={{ padding: 10 }}>
+                    <label style={{ display: 'block', marginBottom: 10 }}>Quality: 75%</label>
+                    <input type="range" name="quality" min="1" max="100" defaultValue="75" style={{ width: '100%' }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#666', marginTop: 5 }}>
+                        <span>Smaller File</span>
+                        <span>Better Quality</span>
+                    </div>
                 </div>
             }
             onProcess={processImage}

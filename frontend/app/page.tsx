@@ -102,12 +102,13 @@ export default function Home() {
   return (
     <div className="container" style={{ padding: '60px 20px' }}>
       <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '20px', background: 'linear-gradient(45deg, #6200EE, #03DAC6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          Every tool you need
+        <h1 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: 20, background: 'linear-gradient(45deg, #2563eb, #7c3aed)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          SafeConvert
         </h1>
-        <p style={{ fontSize: '1.25rem', color: '#666', maxWidth: 600, margin: '0 auto' }}>
-          Fully self-hosted, privacy-first file conversion and manipulation tools.
-          Your files never leave your server.
+        <p style={{ fontSize: '1.25rem', color: '#666', maxWidth: 600, margin: '0 auto 40px' }}>
+          Premium PDF and Image tools. 100% Privacy-Focused.
+          <br />
+          No sign-up required.
         </p>
       </div>
 

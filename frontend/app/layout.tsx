@@ -22,13 +22,14 @@ export default function RootLayout({
         <main style={{ flex: 1, paddingBottom: 40 }}>
           {children}
         </main>
+
         <footer style={{ background: '#fff', borderTop: '1px solid #eee', color: '#666', marginTop: 'auto' }}>
           <div className="container" style={{ padding: '40px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px' }}>
             {/* Branding Column */}
             <div>
               <h3 style={{ marginBottom: '15px', color: '#333' }}>SafeConverts</h3>
               <p style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>
-                Privacy-first, open-source file manipulation tools running entirely on your own infrastructure.
+                Premium tools for privacy-conscious users.
               </p>
             </div>
 
@@ -55,7 +56,11 @@ export default function RootLayout({
 
           <div style={{ borderTop: '1px solid #eee', padding: '20px', textAlign: 'center', fontSize: '0.85rem' }}>
             <div className="container">
-              © {new Date().getFullYear()} <a href="https://SafeConverts.com" style={{ textDecoration: 'none', color: 'inherit' }}>SafeConverts.com</a>. Secure, Private, and Open Source.
+              <p style={{ marginBottom: 10 }}>&copy; {new Date().getFullYear()} SafeConverts. All rights reserved.</p>
+              <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: '0.9rem' }}>
+                Made with <span style={{ color: '#e25555' }}>❤</span> in <span style={{ fontWeight: 600, color: '#333' }}>India</span> <span style={{ fontSize: '1.2rem' }}>🇮🇳</span>
+              </p>
+              <p style={{ fontSize: '0.8rem', marginTop: 5, color: '#aaa' }}>Secure. Private. Local.</p>
             </div>
           </div>
         </footer>

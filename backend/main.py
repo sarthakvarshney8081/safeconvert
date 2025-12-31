@@ -27,24 +27,32 @@ import asyncio
 import time
 import shutil
 from core.processor import UPLOAD_DIR
+from contextlib import asynccontextmanager
 
 async def periodic_cleanup():
     while True:
-        await asyncio.sleep(3600) # Every hour
-        now = time.time()
         try:
-            for f in os.listdir(UPLOAD_DIR):
-                fpath = os.path.join(UPLOAD_DIR, f)
-                # Delete files older than 1 hour
-                if os.stat(fpath).st_mtime < now - 3600:
-                    if os.path.isfile(fpath): os.remove(fpath)
-                    elif os.path.isdir(fpath): shutil.rmtree(fpath)
+            # Run cleanup every 15 minutes
+            await asyncio.sleep(900)
+            now = time.time()
+            if os.path.exists(UPLOAD_DIR):
+                for filename in os.listdir(UPLOAD_DIR):
+                    file_path = os.path.join(UPLOAD_DIR, filename)
+                    # Delete if older than 20 minutes (1200 seconds)
+                    if os.path.isfile(file_path):
+                        if os.stat(file_path).st_mtime < now - 1200:
+                            os.remove(file_path)
+                            print(f"Cleaned up {filename}")
         except Exception as e:
             print(f"Cleanup error: {e}")
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Start periodic cleanup task
     asyncio.create_task(periodic_cleanup())
+    yield
+
+app.router.lifespan_context = lifespan
 
 # Import Routers
 from routers import pdf_tools, converters, image_tools, security, ocr, workflow

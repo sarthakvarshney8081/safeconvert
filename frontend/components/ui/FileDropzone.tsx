@@ -17,9 +17,19 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
 
     const handleFiles = useCallback((incomingFiles: File[]) => {
         let validFiles = incomingFiles;
+
+        // 1. Max Files Check
         if (maxFiles && (files.length + incomingFiles.length) > maxFiles) {
             alert(`You can only upload a maximum of ${maxFiles} files.`);
             validFiles = incomingFiles.slice(0, maxFiles - files.length);
+        }
+
+        // 2. Max File Size Check (20MB)
+        const MAX_SIZE = 20 * 1024 * 1024; // 20MB in bytes
+        const oversizeFiles = validFiles.filter(f => f.size > MAX_SIZE);
+        if (oversizeFiles.length > 0) {
+            alert(`Some files are too large! Max file size is 20MB.\nSkipped: ${oversizeFiles.map(f => f.name).join(', ')}`);
+            validFiles = validFiles.filter(f => f.size <= MAX_SIZE);
         }
 
         if (validFiles.length > 0) {

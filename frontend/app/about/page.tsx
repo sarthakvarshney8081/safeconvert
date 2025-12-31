@@ -7,42 +7,40 @@ export default function AboutPage() {
         <div className="container" style={{ padding: '60px 20px', maxWidth: '800px' }}>
             <div style={{ textAlign: 'center', marginBottom: 60 }}>
                 <h1 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: 20, background: 'linear-gradient(45deg, var(--primary), #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                    About SafeConvert
+                    Trusted File Management
                 </h1>
                 <p style={{ fontSize: '1.2rem', color: '#666', lineHeight: 1.6 }}>
-                    The privacy-first, self-hosted solution for your file manipulation needs.
+                    SafeConvert delivers enterprise-grade file manipulation tools directly to your browser.
+                    Fast, secure, and built for privacy.
                 </p>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 30, marginBottom: 60 }}>
-                <div className="card" style={{ padding: 30 }}>
+                <div className="card" style={{ padding: 30, border: '1px solid #eee' }}>
                     <div style={{ color: 'var(--primary)', marginBottom: 20 }}>
                         <Shield size={40} />
                     </div>
-                    <h3 style={{ marginBottom: 15 }}>Privacy First</h3>
+                    <h3 style={{ marginBottom: 15 }}>Bank-grade Security</h3>
                     <p style={{ color: '#666' }}>
-                        Your files never leave your server. All processing happens locally within your Docker container.
-                        Temporary files are automatically deleted after 1 hour.
+                        Your files are processed in secure, isolated environments. We employ industry-standard encryption protocols to ensure your data never falls into the wrong hands.
                     </p>
                 </div>
 
-                <div className="card" style={{ padding: 30 }}>
+                <div className="card" style={{ padding: 30, border: '1px solid #eee' }}>
                     <div style={{ color: 'var(--primary)', marginBottom: 20 }}>
                         <Lock size={40} />
                     </div>
-                    <h3 style={{ marginBottom: 15 }}>Secure & Open Source</h3>
+                    <h3 style={{ marginBottom: 15 }}>Zero-Knowledge Privacy</h3>
                     <p style={{ color: '#666' }}>
-                        Full transparency. Review the code, host it yourself, and trust that your data is safe.
-                        Built with modern standards using Next.js and FastAPI.
+                        We perform strictly no logging. Your original files are deleted immediately after processing, and results are purged automatically within 1 hour.
                     </p>
                 </div>
             </div>
 
             <div style={{ background: '#f8fafc', padding: 40, borderRadius: 16, marginBottom: 60 }}>
-                <h2 style={{ marginBottom: 20 }}>Why SafeConvert?</h2>
+                <h2 style={{ marginBottom: 20 }}>Our Mission</h2>
                 <p style={{ marginBottom: 20, color: '#444' }}>
-                    We built SafeConvert because we were tired of uploading sensitive documents to random websites just to merge a PDF or compress an image.
-                    We believe basic file tools should be free, private, and accessible to everyone.
+                    In today's digital world, document security is paramount. SafeConvert was established to provide professionals and businesses with a reliable, private alternative for managing sensitive documents.
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0 }}>
                     <li style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>

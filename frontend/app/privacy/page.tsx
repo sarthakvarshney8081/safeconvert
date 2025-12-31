@@ -8,43 +8,55 @@ export const metadata = {
 export default function PrivacyPage() {
     return (
         <div className="container" style={{ maxWidth: 800, padding: '60px 20px' }}>
-            <h1 style={{ marginBottom: 30 }}>Privacy Policy</h1>
-            <p style={{ color: '#666', marginBottom: 40 }}>Last Updated: {new Date().toLocaleDateString()}</p>
+            <div style={{ textAlign: 'center', marginBottom: 50 }}>
+                <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 10 }}>Privacy Policy</h1>
+                <p style={{ color: '#666' }}>Last Updated: {new Date().toLocaleDateString()}</p>
+            </div>
 
-            <section style={{ marginBottom: 40 }}>
-                <h2>1. Overview</h2>
-                <p>SafeConverts ("we", "our") is a privacy-first, self-hosted file manipulation tool. We respect your data and have designed our system to ensure your files remain your own.</p>
-            </section>
+            <div style={{ background: '#fff', padding: 40, borderRadius: 12, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #f0f0f0' }}>
+                <section style={{ marginBottom: 30, borderBottom: '1px solid #eee', paddingBottom: 30 }}>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>1. Commitment to Privacy</h2>
+                    <p style={{ lineHeight: 1.7, color: '#555' }}>
+                        At SafeConvert, your privacy is our absolute priority. We have engineered our systems to minimize data retention and ensure that you retain full control over your documents. We do not track, sell, or share your personal information.
+                    </p>
+                </section>
 
-            <section style={{ marginBottom: 40 }}>
-                <h2>2. Data Collection & Usage</h2>
-                <p>We only collect the files you explicitly upload for the purpose of processing (e.g., converting, merging, or editing). We do not collect personal identifiers, cookies, or tracking data.</p>
-            </section>
+                <section style={{ marginBottom: 30, borderBottom: '1px solid #eee', paddingBottom: 30 }}>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>2. Data Handling & Security</h2>
+                    <p style={{ lineHeight: 1.7, color: '#555', marginBottom: 10 }}>
+                        Our data processing pipeline is automated and secure:
+                    </p>
+                    <ul style={{ listStyle: 'none', padding: 0 }}>
+                        <li style={{ marginBottom: 10, paddingLeft: 20, borderLeft: '3px solid var(--primary)' }}>
+                            <strong style={{ color: '#333' }}>Encryption:</strong> All file transfers are encrypted using industry-standard TLS protocols.
+                        </li>
+                        <li style={{ marginBottom: 10, paddingLeft: 20, borderLeft: '3px solid var(--primary)' }}>
+                            <strong style={{ color: '#333' }}>Isolation:</strong> Each processing task runs in an isolated container environment.
+                        </li>
+                    </ul>
+                </section>
 
-            <section style={{ marginBottom: 40 }}>
-                <h2>3. Data Retention (Auto-Deletion)</h2>
-                <p>Our system operates on a strict zero-retention policy for long-term storage:</p>
-                <ul style={{ listStyle: 'disc', paddingLeft: 20, marginTop: 10 }}>
-                    <li><strong>Input Files:</strong> Original files uploaded by you are deleted <strong>automatically immediately</strong> after the processing task is complete.</li>
-                    <li><strong>Output Files:</strong> Processed results are kept for <strong>1 hour</strong> to allow you to download them. After 1 hour, a rigorous automated cleanup script permanently deletes them from the server.</li>
-                </ul>
-            </section>
+                <section style={{ marginBottom: 30, borderBottom: '1px solid #eee', paddingBottom: 30 }}>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>3. Automated Deletion Policy</h2>
+                    <p style={{ lineHeight: 1.7, color: '#555' }}>
+                        We adhere to a strict retention policy to protect your sensitive information:
+                    </p>
+                    <ul style={{ background: '#f8fafc', padding: 20, borderRadius: 8, marginTop: 15, listStyle: 'disc', listStylePosition: 'inside' }}>
+                        <li style={{ marginBottom: 8, color: '#444' }}><strong>Immediately:</strong> Original uploads are deleted as soon as processing starts.</li>
+                        <li style={{ color: '#444' }}><strong>Within 20 Minutes:</strong> All processed output files are permanently purged from our servers.</li>
+                    </ul>
+                </section>
 
-            <section style={{ marginBottom: 40 }}>
-                <h2>4. Server Location & Security</h2>
-                <p>Your data is processed on secure servers. We use HTTPS encryption for all data in transit. Your files are isolated in temporary storage volumes and are never accessed by human personnel.</p>
-            </section>
-
-            <section style={{ marginBottom: 40 }}>
-                <h2>5. Your Rights</h2>
-                <p>Under the Digital Personal Data Protection Act, 2023, you have the right to grievance redressal. Since we do not permanently store your data, "Right to Erasure" is fulfilled automatically by our system design.</p>
-            </section>
-
-            <section style={{ marginBottom: 40 }}>
-                <h2>6. Contact Us</h2>
-                <p>If you have any questions or grievances regarding this policy, please contact us at:</p>
-                <p><strong>Email:</strong> support@safeconverts.com</p>
-            </section>
+                <section style={{ marginBottom: 30 }}>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>4. Grievance Officer</h2>
+                    <p style={{ lineHeight: 1.7, color: '#555', marginBottom: 20 }}>
+                        In compliance with the Information Technology Act, 2000 and rules made thereunder, you may contact our Grievance Officer for any concerns:
+                    </p>
+                    <div style={{ background: '#f8fafc', padding: 20, borderRadius: 8 }}>
+                        <p><strong>Email:</strong> privacy@safeconverts.com</p>
+                    </div>
+                </section>
+            </div>
         </div>
     );
 }
