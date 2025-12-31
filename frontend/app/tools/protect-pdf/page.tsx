@@ -17,7 +17,7 @@ export default function ProtectPdfTool() {
         formData.append('password', options.password || '');
 
         // Use Python Backend
-        const response = await fetch('/api/pdf/protect', { // Need to verify this endpoint exists!
+        const response = await fetch('/api/security/protect', {
             method: 'POST',
             body: formData,
         });
@@ -34,7 +34,7 @@ export default function ProtectPdfTool() {
             title="Protect PDF"
             description="Encrypt your PDF with a password (Server-side)."
             accept=".pdf"
-            apiEndpoint="/api/pdf/protect" // This logic is handled by onProcess, but used for fallback
+            apiEndpoint="/api/security/protect"
             onProcess={processPdf}
             optionsComponent={
                 <div>
