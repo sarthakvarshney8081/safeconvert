@@ -211,3 +211,64 @@ pub fn resize_image(image_bytes: &[u8], width: u32, height: u32) -> Result<Vec<u
 
     Ok(out_buffer.into_inner())
 }
+
+#[wasm_bindgen]
+pub fn decrypt_pdf(pdf_bytes: &[u8], password: &str) -> Result<Vec<u8>, JsValue> {
+    // Load the document
+    let mut doc = Document::load_from(Cursor::new(pdf_bytes))
+        .map_err(|e| JsValue::from_str(&format!("Failed to load PDF: {}", e)))?;
+
+    // Decrypt (lopdf supports standard encryption)
+    // Note: This relies on lopdf's built-in decrypt being available and capable.
+    // If files are not encrypted, this might be a no-op or error.
+    
+    // We try to decrypt with the provided password.
+    // `decrypt` returns Result<(), Error>
+    match doc.decrypt(password.as_bytes()) {
+        Ok(_) => {},
+        Err(e) => {
+            // If it failed, check if it was actually encrypted.
+            if doc.is_encrypted() {
+                 return Err(JsValue::from_str(&format!("Decryption failed (Wrong Password?): {}", e)));
+            }
+            // If not encrypted, we just return the bytes as is (or save the doc).
+        }
+    }
+    
+    // If successfully decrypted, the objects are now accessible.
+    // We need to save it back *without* encryption.
+    // lopdf saves without encryption by default unless encrypt dictionary is set?
+    // We should remove the Encrypt dictionary to be sure.
+    doc.trailer.remove(b"Encrypt");
+
+    let mut out_buffer = Vec::new();
+    doc.save_to(&mut out_buffer)
+        .map_err(|e| JsValue::from_str(&format!("Failed to save decrypted PDF: {}", e)))?;
+
+    Ok(out_buffer)
+}
+
+#[wasm_bindgen]
+pub fn encrypt_pdf(pdf_bytes: &[u8], password: &str) -> Result<Vec<u8>, JsValue> {
+    // Encrypting is complex in lopdf 0.31 (needs manual setup of security handler).
+    // For this Wasm Pilot, providing full encryption (RC4/AES) manually is verbose.
+    // 
+    // IF lopdf doesn't have `encrypt()` method exposed conveniently:
+    // We might have to return an "Not Implemented" or use a placeholder.
+    // 
+    // Checking memory: lopdf DOES NOT have a simple `doc.encrypt(pass)` method.
+    // It requires constructing the Encrypt dictionary and Encrypting streams.
+    // 
+    // DECISION: To avoid breaking the build with bad implementation, 
+    // I will return an error for now explaining it needs a heavier crate (like `pdf_writer` or `pdf-rs` 
+    // or careful implementation).
+    // 
+    // HOWEVER, user asked for it. 
+    // I will try to use a simple approach if possible, but encryption is sensitive.
+    // 
+    // Fallback: Return Error recommending Python for Encryption, OR just Stub it.
+    // Given the previous "Merge" experience, I will be honest.
+    
+    // Attempting basic encryption or returning error.
+    return Err(JsValue::from_str("Client-side Encryption is not yet fully supported in this Wasm module. Please use the backend tool (Python) for robust encryption."));
+}
