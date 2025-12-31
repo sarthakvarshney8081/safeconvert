@@ -3,21 +3,24 @@ FROM rust:1.75-alpine AS wasm-builder
 WORKDIR /wasm
 RUN apk add --no-cache musl-dev curl
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-COPY ../wasm/pdf-utils ./
+# Context is root, so copy wasm folder
+COPY wasm/pdf-utils ./
 # Build for web target (generates .js and .wasm)
 RUN wasm-pack build --target web --out-dir ./pkg
 
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
 WORKDIR /app
-COPY package.json package-lock.json* ./
+# Context is root, so copy frontend package files
+COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm ci
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+# Copy frontend source files
+COPY frontend/ .
 # Copy compiled Wasm to public directory so it can be served
 COPY --from=wasm-builder /wasm/pkg ./public/wasm
 RUN npm run build

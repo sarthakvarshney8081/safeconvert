@@ -13,7 +13,9 @@ services:
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
 
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     image: varshneysarthak/safeconvert-frontend:latest
     ports:
       - "3333:3000"
