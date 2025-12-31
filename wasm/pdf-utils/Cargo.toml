@@ -1,11 +1,6 @@
-[package]
-name = "safeconvert-pdf-wasm"
-version = "0.1.0"
-edition = "2021"
-
-[lib]
-crate-type = ["cdylib"]
-
 [dependencies]
 wasm-bindgen = "0.2"
-lopdf = "0.29"
+lopdf = "0.31.0"
+getrandom = { version = "0.2", features = ["js"] }
+js-sys = "0.3"
+
