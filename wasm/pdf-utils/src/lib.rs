@@ -127,22 +127,87 @@ pub fn merge_pdfs(files_array: js_sys::Array) -> Result<Vec<u8>, JsValue> {
     return Err(JsValue::from_str("Merge PDF in Wasm requires complex ID remapping. Implementing Split PDF first."));
 }
 
+
+#[wasm_bindgen]
+pub fn convert_image(image_bytes: &[u8], format: &str) -> Result<Vec<u8>, JsValue> {
+    let img = image::load_from_memory(image_bytes)
+        .map_err(|e| JsValue::from_str(&format!("Failed to load image: {}", e)))?;
+
+    let mut out_buffer = Cursor::new(Vec::new());
+    
+    let output_format = match format {
+        "png" => image::ImageOutputFormat::Png,
+        "jpeg" | "jpg" => image::ImageOutputFormat::Jpeg(85), // Default quality
+        "webp" => image::ImageOutputFormat::WebP,
+        "bmp" => image::ImageOutputFormat::Bmp,
+        _ => return Err(JsValue::from_str("Unsupported output format")),
+    };
+
+    img.write_to(&mut out_buffer, output_format)
+        .map_err(|e| JsValue::from_str(&format!("Failed to convert image: {}", e)))?;
+
+    Ok(out_buffer.into_inner())
+}
+
 #[wasm_bindgen]
 pub fn split_pdf(pdf_bytes: &[u8], start_page: u32, end_page: u32) -> Result<Vec<u8>, JsValue> {
-     let doc = Document::load_from(Cursor::new(pdf_bytes))
+    // Basic Split: Load doc, prune undefined pages, save.
+    // Note: start_page is 1-indexed (from UI usually), ensure we handle 0-indexed logic if needed.
+    // Let's assume input is 1-indexed.
+    
+    let mut doc = Document::load_from(Cursor::new(pdf_bytes))
         .map_err(|e| JsValue::from_str(&format!("Failed to load PDF: {}", e)))?;
-        
-     let mut new_doc = Document::with_version("1.5");
-     let pages = doc.get_pages();
-     // ... logic to copy specific pages ...
-     // This is also non-trivial without remapping if pages share resources.
-     
-     // Note to User: PDF manipulation at object level is complex.
-     // Maybe I should stick to Image Compression (Phase 3) which is ready?
-     // The user DID blocked the Image Compression commit.
-     
-     // I will stick to Image Compression (already written) and just try to push it again with explanation?
-     // User: "Phase 2: Core PDF Tools (Next)".
-     
-     return Err(JsValue::from_str("PDF Split/Merge logic is complex to port in one step."));
+
+    // Validate range
+    let pages = doc.get_pages();
+    let total_pages = pages.len() as u32;
+    if start_page < 1 || end_page > total_pages || start_page > end_page {
+         return Err(JsValue::from_str(&format!("Invalid page range: {}-{} (Total: {})", start_page, end_page, total_pages)));
+    }
+    
+    // Collect IDs of pages to KEEP
+    // Pages are usually stored by Object ID in the page tree.
+    // doc.get_pages() returns BTreeMap<u32, ObjectId> where key is page number (1-indexed).
+    
+    let mut pages_to_delete = Vec::new();
+    for (page_num, _) in pages {
+        if page_num < start_page || page_num > end_page {
+            pages_to_delete.push(page_num);
+        }
+    }
+    
+    // Delete unwanted pages
+    doc.delete_pages(&pages_to_delete);
+    // Prune objects not used? `doc.prune_objects()` available in newer lopdf?
+    // 0.31.0 has `prune_objects` but sometimes it is finicky. 
+    // `doc.save_to` generally writes accessible objects. 
+    // However, without pruning, the file size might remain large (containing hidden pages).
+    // Let's try basic `prune_objects()` if available, or just save.
+    
+    doc.prune_objects(); 
+
+    let mut out_buffer = Vec::new();
+    doc.save_to(&mut out_buffer)
+         .map_err(|e| JsValue::from_str(&format!("Failed to save split PDF: {}", e)))?;
+
+     Ok(out_buffer)
+}
+
+#[wasm_bindgen]
+pub fn resize_image(image_bytes: &[u8], width: u32, height: u32) -> Result<Vec<u8>, JsValue> {
+    let img = image::load_from_memory(image_bytes)
+        .map_err(|e| JsValue::from_str(&format!("Failed to load image: {}", e)))?;
+
+    // Use fast resizing (Nearest) or High Quality (Lanczos3)?
+    // FilterType::Lanczos3 is best for quality/downscaling.
+    let resized = img.resize_exact(width, height, image::imageops::FilterType::Lanczos3);
+
+    let mut out_buffer = Cursor::new(Vec::new());
+    // Default to JPEG for output to save size, or match input?
+    // Let's output PNG to support transparency if present? Or JPEG for photos.
+    // For simplicity, let's output PNG (lossless-ish).
+    resized.write_to(&mut out_buffer, image::ImageOutputFormat::Png)
+        .map_err(|e| JsValue::from_str(&format!("Failed to save resized image: {}", e)))?;
+
+    Ok(out_buffer.into_inner())
 }

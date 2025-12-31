@@ -82,6 +82,20 @@ export default function Home() {
       href: '/tools/scan-pdf',
       icon: Scan,
       color: '#607D8B'
+    },
+    {
+      title: 'Convert Image',
+      description: 'Convert between PNG, JPG, WebP locally.',
+      href: '/tools/convert-image',
+      icon: ImageIcon,
+      color: '#009688'
+    },
+    {
+      title: 'Resize Image',
+      description: 'Resize dimensions of your images.',
+      href: '/tools/resize-image',
+      icon: Minimize2,
+      color: '#795548'
     }
   ];
 
