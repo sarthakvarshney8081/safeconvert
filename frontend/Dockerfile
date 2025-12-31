@@ -1,3 +1,12 @@
+# Stage 0: Wasm Builder
+FROM rust:1.75-alpine AS wasm-builder
+WORKDIR /wasm
+RUN apk add --no-cache musl-dev curl
+RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+COPY ../wasm/pdf-utils ./
+# Build for web target (generates .js and .wasm)
+RUN wasm-pack build --target web --out-dir ./pkg
+
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
 WORKDIR /app
@@ -9,6 +18,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Copy compiled Wasm to public directory so it can be served
+COPY --from=wasm-builder /wasm/pkg ./public/wasm
 RUN npm run build
 
 # Stage 3: Runner
