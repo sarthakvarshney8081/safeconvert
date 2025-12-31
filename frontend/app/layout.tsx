@@ -27,7 +27,9 @@ export default function RootLayout({
           <div className="container" style={{ padding: '40px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px' }}>
             {/* Branding Column */}
             <div>
-              <h3 style={{ marginBottom: '15px', color: '#333' }}>SafeConverts</h3>
+              <div style={{ marginBottom: '15px' }}>
+                <img src="/logo.svg" alt="SafeConverts" style={{ height: '40px', maxWidth: '100%' }} />
+              </div>
               <p style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>
                 Premium tools for privacy-conscious users.
               </p>
