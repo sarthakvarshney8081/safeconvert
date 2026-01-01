@@ -15,6 +15,7 @@ interface ToolInterfaceProps {
     processingMode?: 'client' | 'server';
     optionsComponent?: React.ReactNode;
     onProcess?: (files: File[], options: any) => Promise<Blob>; // Now optional
+    onFileSelect?: (file: File) => Promise<void> | void; // Callback when file is chosen
     resultFileName?: string;
     icon?: any;
     extraOptions?: {
@@ -24,6 +25,9 @@ interface ToolInterfaceProps {
         defaultValue?: string;
         options?: { label: string; value: string }[];
     }[];
+    children?: React.ReactNode;
+    isProcessing?: boolean;
+    hideSubmitButton?: boolean;
 }
 
 export default function ToolInterface({
@@ -36,9 +40,13 @@ export default function ToolInterface({
     optionsComponent,
     apiEndpoint,
     onProcess,
+    onFileSelect,
     resultFileName = "result.pdf",
     icon: Icon,
-    extraOptions
+    extraOptions,
+    children,
+    isProcessing = false,
+    hideSubmitButton = false
 }: ToolInterfaceProps) {
     const [status, setStatus] = useState<'idle' | 'ready' | 'processing' | 'completed' | 'error'>('idle');
     const [files, setFiles] = useState<File[]>([]);
@@ -51,6 +59,9 @@ export default function ToolInterface({
         setFiles(selectedFiles);
         setStatus('ready');
         setError(null);
+        if (onFileSelect && selectedFiles.length > 0) {
+            onFileSelect(selectedFiles[0]);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -141,6 +152,13 @@ export default function ToolInterface({
                             />
                         </div>
 
+                        {/* Custom Children Content (e.g. Editors) */}
+                        {children && status !== 'idle' && (
+                            <div style={{ marginBottom: 30, animation: 'fadeIn 0.3s ease' }}>
+                                {children}
+                            </div>
+                        )}
+
                         {status === 'ready' && (
                             <div style={{ animation: 'fadeIn 0.3s ease' }}>
                                 {/* Dynamic Extra Options */}
@@ -182,13 +200,15 @@ export default function ToolInterface({
                                     </div>
                                 )}
 
-                                <button type="submit" className="btn btn-primary" style={{ width: '100%', fontSize: '1.1rem' }}>
-                                    {title}
-                                </button>
+                                {!hideSubmitButton && (
+                                    <button type="submit" className="btn btn-primary" style={{ width: '100%', fontSize: '1.1rem' }}>
+                                        {title}
+                                    </button>
+                                )}
                             </div>
                         )}
                     </form>
-                ) : status === 'processing' ? (
+                ) : status === 'processing' || isProcessing ? (
                     <div style={{ textAlign: 'center', padding: 40 }}>
                         <Loader2 size={48} className={styles.spin} style={{ color: 'var(--primary)', marginBottom: 20 }} />
                         <h3>Processing your files...</h3>

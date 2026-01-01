@@ -1,3 +1,4 @@
+
 import {
   FileStack,
   Scissors,
@@ -8,7 +9,9 @@ import {
   Unlock,
   Scan,
   Minimize2,
-  Video
+  Video,
+  Hash,
+  PenTool
 } from 'lucide-react';
 import ToolCard from '@/components/ui/ToolCard';
 
@@ -89,10 +92,16 @@ export default function Home() {
         <div className="grid grid-cols-4" style={{ gap: 20 }}>
           <ToolCard
             title="Add Page Numbers"
-            description="Number pages instantly."
-            icon={FileType}
+            description="Insert page numbers with custom positioning."
+            icon={Hash}
             href="/tools/page-numbers"
-            color="#00BCD4"
+          />
+          <ToolCard
+            title="Sign PDF"
+            description="Add digital signatures to your documents."
+            icon={PenTool}
+            href="/tools/sign-pdf"
+            badge="Client-Side"
           />
           <ToolCard
             title="Crop PDF"

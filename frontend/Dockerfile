@@ -6,14 +6,14 @@ RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 # Context is root, so copy wasm folder
 COPY wasm/pdf-utils ./
 # Build for web target (generates .js and .wasm)
-RUN wasm-pack build --target web --out-dir ./pkg
+RUN wasm-pack build --verbose --target web --out-dir ./pkg
 
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
 WORKDIR /app
 # Context is root, so copy frontend package files
 COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm ci
+RUN npm install
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder

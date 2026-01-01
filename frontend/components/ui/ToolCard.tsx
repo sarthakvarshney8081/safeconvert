@@ -7,11 +7,27 @@ interface ToolCardProps {
     href: string;
     icon: LucideIcon;
     color?: string;
+    badge?: string;
 }
 
-export default function ToolCard({ title, description, href, icon: Icon, color = 'var(--primary)' }: ToolCardProps) {
+export default function ToolCard({ title, description, href, icon: Icon, color = 'var(--primary)', badge }: ToolCardProps) {
     return (
-        <Link href={href} className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', textDecoration: 'none', color: 'inherit' }}>
+        <Link href={href} className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', textDecoration: 'none', color: 'inherit', position: 'relative' }}>
+            {badge && (
+                <span style={{
+                    position: 'absolute',
+                    top: 12,
+                    right: 12,
+                    background: '#e3f2fd',
+                    color: '#1565c0',
+                    fontSize: '0.75rem',
+                    padding: '2px 8px',
+                    borderRadius: '12px',
+                    fontWeight: 500
+                }}>
+                    {badge}
+                </span>
+            )}
             <div style={{
                 width: 48,
                 height: 48,
