@@ -6,7 +6,7 @@
   --background: #F5F5F7;
   --surface: #FFFFFF;
   --error: #B00020;
-  
+
   --on-primary: #FFFFFF;
   --on-secondary: #000000;
   --on-background: #000000;
@@ -14,17 +14,17 @@
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  
+
   /* Spacing & Radius */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 16px;
   --radius-xl: 24px;
-  
+
   /* Shadows */
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -42,7 +42,12 @@ body {
   flex-direction: column;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
   letter-spacing: -0.025em;
 }
@@ -97,13 +102,54 @@ a {
   gap: 20px;
 }
 
-.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
-.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-cols-1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
 
 @media (max-width: 768px) {
-  .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4 {
     grid-template-columns: 1fr;
   }
+}
+
+/* Footer Improvements */
+.footer-link {
+  transition: all 0.2s ease;
+  color: #666;
+  font-weight: 400;
+  display: inline-block;
+}
+
+.footer-link:hover {
+  color: var(--primary);
+  transform: translateX(3px);
+}
+
+.footer-section-title {
+  color: #111;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footer-bottom {
+  background: #fcfcfc;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
