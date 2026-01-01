@@ -11,7 +11,10 @@ type Result<T> = std::result::Result<T, JsValue>;
 pub fn crop_pdf(pdf_bytes: &[u8], x: f32, y: f32, width: f32, height: f32, page_limit: i32) -> Result<Vec<u8>> {
     let mut doc = Document::load_from(Cursor::new(pdf_bytes)).map_err(|e| JsValue::from_str(&e.to_string()))?;
     let mb = vec![Object::Real(x), Object::Real(y), Object::Real(x + width), Object::Real(y + height)];
-    for (_, pid) in doc.get_pages() {
+    for (pn, pid) in doc.get_pages() {
+        if page_limit != -1 && (pn as i32 - 1) != page_limit {
+            continue;
+        }
         if let Ok(po) = doc.get_object_mut(pid) {
             if let Ok(pd) = po.as_dict_mut() {
                 pd.set("MediaBox", Object::Array(mb.clone()));
@@ -24,9 +27,12 @@ pub fn crop_pdf(pdf_bytes: &[u8], x: f32, y: f32, width: f32, height: f32, page_
 }
 
 #[wasm_bindgen]
-pub fn rotate_pdf(pdf_bytes: &[u8], angle: i32) -> Result<Vec<u8>> {
+pub fn rotate_pdf(pdf_bytes: &[u8], angle: i32, page_limit: i32) -> Result<Vec<u8>> {
     let mut doc = Document::load_from(Cursor::new(pdf_bytes)).map_err(|e| JsValue::from_str(&e.to_string()))?;
-    for (_, pid) in doc.get_pages() {
+    for (pn, pid) in doc.get_pages() {
+        if page_limit != -1 && (pn as i32 - 1) != page_limit {
+            continue;
+        }
         if let Ok(po) = doc.get_object_mut(pid) {
             if let Ok(pd) = po.as_dict_mut() {
                 let rot = match pd.get(b"Rotate") { Ok(o) => o.as_i64().unwrap_or(0), Err(_) => 0 };
@@ -112,38 +118,43 @@ pub fn add_image_overlay(
     image_dict.set("BitsPerComponent", Object::Integer(8));
     let iid = doc.add_object(Stream::new(image_dict, rgb.into_raw()));
     
-    let page_id = *doc.get_pages().get(&(page_index as u32 + 1)).ok_or_else(|| JsValue::from_str("Page not found"))?;
-    
-    // Check Rotation
-    let rotation = doc.get_object(page_id).and_then(|o| o.as_dict()).and_then(|d| d.get(b"Rotate")).and_then(|o| o.as_i64()).unwrap_or(0);
-    
-    // Rotation Adjustment
-    // matrix: a b c d e f -> aX+cY+e, bX+dY+f
-    // Default: width 0 0 height x y
-    let matrix = match rotation % 360 {
-        90 => format!("0 {} -{} 0 {} {}", width, height, x + width, y),
-        180 => format!("-{} 0 0 -{} {} {}", width, height, x + width, y + height),
-        270 => format!("0 -{} {} 0 {} {}", width, height, x, y + height),
-        _ => format!("{} 0 0 {} {} {}", width, height, x, y),
+    let pages = doc.get_pages();
+    let pids: Vec<ObjectId> = if page_index == -1 {
+        pages.values().cloned().collect()
+    } else {
+        vec![*pages.get(&(page_index as u32 + 1)).ok_or_else(|| JsValue::from_str("Page not found"))?]
     };
 
-    let xname = format!("ImgSig{}", iid.0);
-    let op = format!("q {} cm /{} Do Q", matrix, xname);
-    let cid = doc.add_object(Stream::new(Dictionary::new(), op.as_bytes().to_vec()));
+    for page_id in pids {
+        // Check Rotation
+        let rotation = doc.get_object(page_id).and_then(|o| o.as_dict()).and_then(|d| d.get(b"Rotate")).and_then(|o| o.as_i64()).unwrap_or(0);
+        
+        // matrix: a b c d e f -> aX+cY+e, bX+dY+f
+        let matrix = match rotation % 360 {
+            90 => format!("0 {} -{} 0 {} {}", width, height, x + width, y),
+            180 => format!("-{} 0 0 -{} {} {}", width, height, x + width, y + height),
+            270 => format!("0 -{} {} 0 {} {}", width, height, x, y + height),
+            _ => format!("{} 0 0 {} {} {}", width, height, x, y),
+        };
 
-    if let Ok(po) = doc.get_object_mut(page_id) {
-        if let Ok(pd) = po.as_dict_mut() {
-            if !pd.has(b"Resources") { pd.set("Resources", Object::Dictionary(Dictionary::new())); }
-            if let Ok(res) = pd.get_mut(b"Resources").and_then(|o| o.as_dict_mut()) {
-                if !res.has(b"XObject") { res.set("XObject", Object::Dictionary(Dictionary::new())); }
-                if let Ok(xo) = res.get_mut(b"XObject").and_then(|o| o.as_dict_mut()) { xo.set(xname, Object::Reference(iid)); }
-            }
-            match pd.get_mut(b"Contents") {
-                Ok(obj) => {
-                    if let Ok(arr) = obj.as_array_mut() { arr.push(Object::Reference(cid)); }
-                    else if let Ok(r) = obj.as_reference() { pd.set("Contents", Object::Array(vec![Object::Reference(r), Object::Reference(cid)])); }
-                },
-                Err(_) => { pd.set("Contents", Object::Reference(cid)); }
+        let xname = format!("ImgSig{}", iid.0);
+        let op = format!("q {} cm /{} Do Q", matrix, xname);
+        let cid = doc.add_object(Stream::new(Dictionary::new(), op.as_bytes().to_vec()));
+
+        if let Ok(po) = doc.get_object_mut(page_id) {
+            if let Ok(pd) = po.as_dict_mut() {
+                if !pd.has(b"Resources") { pd.set("Resources", Object::Dictionary(Dictionary::new())); }
+                if let Ok(res) = pd.get_mut(b"Resources").and_then(|o| o.as_dict_mut()) {
+                    if !res.has(b"XObject") { res.set("XObject", Object::Dictionary(Dictionary::new())); }
+                    if let Ok(xo) = res.get_mut(b"XObject").and_then(|o| o.as_dict_mut()) { xo.set(xname, Object::Reference(iid)); }
+                }
+                match pd.get_mut(b"Contents") {
+                    Ok(obj) => {
+                        if let Ok(arr) = obj.as_array_mut() { arr.push(Object::Reference(cid)); }
+                        else if let Ok(r) = obj.as_reference() { pd.set("Contents", Object::Array(vec![Object::Reference(r), Object::Reference(cid)])); }
+                    },
+                    Err(_) => { pd.set("Contents", Object::Reference(cid)); }
+                }
             }
         }
     }
@@ -195,7 +206,7 @@ pub fn reorder_pages(pdf_bytes: &[u8], page_order: Vec<u32>) -> Result<Vec<u8>> 
 }
 
 #[wasm_bindgen]
-pub fn watermark_pdf(pdf_bytes: &[u8], text: &str) -> Result<Vec<u8>> {
+pub fn watermark_pdf(pdf_bytes: &[u8], text: &str, page_limit: i32) -> Result<Vec<u8>> {
     let mut doc = Document::load_from(Cursor::new(pdf_bytes)).map_err(|e| JsValue::from_str(&e.to_string()))?;
     let mut fd = Dictionary::new();
     fd.set("Type", Object::Name(b"Font".to_vec()));
@@ -205,6 +216,9 @@ pub fn watermark_pdf(pdf_bytes: &[u8], text: &str) -> Result<Vec<u8>> {
     
     let pages = doc.get_pages();
     for (&pn, &pid) in &pages {
+        if page_limit != -1 && (pn as i32 - 1) != page_limit {
+            continue;
+        }
         let mb = doc.get_object(pid).and_then(|o| o.as_dict()).and_then(|d| d.get(b"MediaBox")).and_then(|o| o.as_array())
              .map(|a| a.iter().map(|o| obj_to_f64(o)).collect::<Vec<f64>>()).unwrap_or(vec![0.0, 0.0, 595.0, 842.0]);
         let w = mb.get(2).unwrap_or(&595.0) - mb.get(0).unwrap_or(&0.0);

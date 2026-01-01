@@ -19,7 +19,9 @@ export default function SignPdfTool() {
     const [currPageIndex, setCurrPageIndex] = useState<number>(1);
     const [numPages, setNumPages] = useState<number>(0);
     const [pdfDimensions, setPdfDimensions] = useState({ w: 0, h: 0 });
-    const [zoom, setZoom] = useState(1.0);
+    const [zoom, setZoom] = useState(100); // UI percentage (100 = Fit)
+    const [baseScale, setBaseScale] = useState(1.0); // The scale that makes it fit (100%)
+    const containerRef = useRef<HTMLDivElement>(null);
     const [isProcessing, setIsProcessing] = useState(false);
 
     // Signature State
@@ -59,10 +61,9 @@ export default function SignPdfTool() {
         if (!pdf) return;
         try {
             const page = await pdf.getPage(pageNum);
-            const scaleFactor = 2.0; // High quality render
-            const viewport = page.getViewport({ scale: scaleFactor });
-            const baseViewport = page.getViewport({ scale: 1.0 });
-            setPdfDimensions({ w: baseViewport.width, h: baseViewport.height });
+            const points = page.getViewport({ scale: 1.0 });
+            const viewport = page.getViewport({ scale: 2.0 }); // High quality render
+            setPdfDimensions({ w: points.width, h: points.height });
 
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
@@ -77,6 +78,14 @@ export default function SignPdfTool() {
             }).promise;
 
             setImgSrc(canvas.toDataURL('image/png'));
+
+            // Auto-fit Logic: Calculate the baseScale that makes the PDF fit the container width
+            if (containerRef.current) {
+                const containerWidth = containerRef.current.clientWidth - 120; // 60px padding * 2
+                const newBaseScale = containerWidth / (points.width || 600);
+                setBaseScale(newBaseScale);
+                setZoom(100); // Reset to 100% (Fit)
+            }
         } catch (error) {
             console.error("Render error:", error);
         }
@@ -155,13 +164,13 @@ export default function SignPdfTool() {
             const jpegUrl = tempCanvas.toDataURL('image/jpeg', 0.95);
             const imgBytes = new Uint8Array(await (await fetch(jpegUrl)).arrayBuffer());
 
-            // COORDINATE MAPPING (Rendered @ 2x)
-            const sf = 2.0;
-            const pdfX = completedCrop.x / sf;
-            const pdfW = completedCrop.width / sf;
-            const pdfH = completedCrop.height / sf;
+            // COORDINATE MAPPING (Current Scale)
+            const currentScale = baseScale * (zoom / 100);
+            const pdfX = completedCrop.x / currentScale;
+            const pdfW = completedCrop.width / currentScale;
+            const pdfH = completedCrop.height / currentScale;
             // PDF Y is bottom-up
-            const pdfY = pdfDimensions.h - ((completedCrop.y + completedCrop.height) / sf);
+            const pdfY = pdfDimensions.h - ((completedCrop.y + completedCrop.height) / currentScale);
 
             const processedPdf = wasm.add_image_overlay(pdfBytes, imgBytes, pdfX, pdfY, pdfW, pdfH, currPageIndex - 1);
             const blob = new Blob([processedPdf], { type: 'application/pdf' });
@@ -309,8 +318,8 @@ export default function SignPdfTool() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                     <span style={{ fontSize: '0.9rem', fontWeight: '500', color: '#666' }}>Zoom:</span>
-                                    <input type="range" min="0.5" max="2.0" step="0.1" value={zoom} onChange={e => setZoom(parseFloat(e.target.value))} style={{ width: '100px' }} />
-                                    <span style={{ fontSize: '0.9rem', color: '#aaa', width: '40px' }}>{Math.round(zoom * 100)}%</span>
+                                    <input type="range" min="10" max="300" step="5" value={zoom} onChange={e => setZoom(parseFloat(e.target.value))} style={{ width: '100px' }} />
+                                    <span style={{ fontSize: '0.9rem', color: '#aaa', width: '45px' }}>{zoom}%</span>
                                 </div>
                                 <button
                                     type="button"
@@ -325,19 +334,21 @@ export default function SignPdfTool() {
                         </div>
 
                         {/* Interactive PDF Map */}
-                        <div style={{
-                            background: '#1a1a1a',
-                            borderRadius: '24px',
-                            padding: '60px',
-                            minHeight: '700px',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'flex-start',
-                            overflow: 'auto',
-                            boxShadow: 'inset 0 0 40px rgba(0,0,0,0.5)',
-                            position: 'relative'
-                        }}>
-                            <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease' }}>
+                        <div
+                            ref={containerRef}
+                            style={{
+                                background: '#1a1a1a',
+                                borderRadius: '24px',
+                                padding: '60px',
+                                height: '700px',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'flex-start',
+                                overflow: 'auto',
+                                boxShadow: 'inset 0 0 40px rgba(0,0,0,0.5)',
+                                position: 'relative'
+                            }}>
+                            <div>
                                 <ReactCrop
                                     crop={crop}
                                     onChange={(c) => setCrop(c)}
@@ -345,7 +356,16 @@ export default function SignPdfTool() {
                                     style={{ maxWidth: 'none' }}
                                 >
                                     <div style={{ position: 'relative' }}>
-                                        <img src={imgSrc} style={{ maxWidth: 'none', display: 'block', boxShadow: '0 10px 50px rgba(0,0,0,0.8)' }} alt="PDF Preview" />
+                                        <img
+                                            src={imgSrc}
+                                            style={{
+                                                width: (pdfDimensions.w * baseScale * (zoom / 100)) || '100%',
+                                                maxWidth: 'none',
+                                                display: 'block',
+                                                boxShadow: '0 10px 50px rgba(0,0,0,0.8)'
+                                            }}
+                                            alt="PDF Preview"
+                                        />
 
                                         {/* Crop Tool Overlay */}
                                         {completedCrop && (

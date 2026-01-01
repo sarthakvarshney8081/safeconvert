@@ -18,7 +18,8 @@ export default function CropPdfTool() {
     const [scope, setScope] = useState<'all' | 'current'>('all');
 
     // Zoom State
-    const [zoom, setZoom] = useState(1.0);
+    const [zoom, setZoom] = useState(100); // UI percentage (100 = Fit)
+    const [baseScale, setBaseScale] = useState(1.0); // The scale that makes it fit (100%)
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Fix worker source for Next.js
@@ -39,8 +40,9 @@ export default function CropPdfTool() {
         if (!pdf) return;
         try {
             const page = await pdf.getPage(pageNum);
+            const points = page.getViewport({ scale: 1.0 });
             const viewport = page.getViewport({ scale: 2.0 }); // High res
-            setPdfDimensions({ w: page.getViewport({ scale: 1.0 }).width, h: page.getViewport({ scale: 1.0 }).height });
+            setPdfDimensions({ w: points.width, h: points.height });
 
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
@@ -55,6 +57,14 @@ export default function CropPdfTool() {
             }).promise;
 
             setImgSrc(canvas.toDataURL('image/png'));
+
+            // Auto-fit Logic: Calculate the baseScale that makes the PDF fit the container width
+            if (containerRef.current) {
+                const containerWidth = containerRef.current.clientWidth - 80;
+                const newBaseScale = containerWidth / points.width;
+                setBaseScale(newBaseScale);
+                setZoom(100); // Reset to 100% (Fit)
+            }
         } catch (error) {
             console.error("Error rendering page:", error);
         }
@@ -131,11 +141,11 @@ export default function CropPdfTool() {
         // The rendered image width = viewport.width (which was PDF width * 2)
         // So scale factor is exactly 2.0
 
-        const scaleFactor = 2.0;
+        const currentScale = baseScale * (zoom / 100);
 
-        const x = completedCrop.x / scaleFactor;
-        const width = completedCrop.width / scaleFactor;
-        const height = completedCrop.height / scaleFactor;
+        const x = completedCrop.x / currentScale;
+        const width = completedCrop.width / currentScale;
+        const height = completedCrop.height / currentScale;
 
         // PDF Y is from bottom.
         // y (top) = 0.
@@ -143,7 +153,7 @@ export default function CropPdfTool() {
         // PDF Y = (Total Height) - ((y / scale) + (height / scale)) ? No.
         // PDF Y = (Total Height) - ((y + height) / scale).
 
-        const y = pdfDimensions.h - ((completedCrop.y + completedCrop.height) / scaleFactor);
+        const y = pdfDimensions.h - ((completedCrop.y + completedCrop.height) / currentScale);
 
         // Scope (-1 for all, or specific index 0-based)
         const pageLimit = scope === 'all' ? -1 : (currPageIndex - 1);
@@ -158,13 +168,17 @@ export default function CropPdfTool() {
 
     const handleZoomIn = (e: React.MouseEvent) => {
         e.preventDefault();
-        setZoom(prev => Math.min(prev + 0.2, 3.0));
+        setZoom(prev => Math.min(prev + 5, 300));
     };
 
     const handleZoomOut = (e: React.MouseEvent) => {
         e.preventDefault();
-        setZoom(prev => Math.max(prev - 0.2, 0.5));
+        setZoom(prev => Math.max(prev - 5, 10));
     };
+
+    // Calculate actual display width based on zoom
+    const currentScale = baseScale * (zoom / 100);
+    const displayWidth = pdfDimensions.w * currentScale;
 
     return (
         <ToolInterface
@@ -175,47 +189,49 @@ export default function CropPdfTool() {
             resultFileName="cropped.pdf"
             processingMode="client"
             onFileSelect={handleFileSelect}
+            optionsTitle="Crop your PDF here"
             optionsComponent={
-                <div style={{ display: 'flex', gap: 20, alignItems: 'start', flexDirection: 'column-reverse' }}>
+                <div style={{ display: 'flex', gap: 20, alignItems: 'start', flexDirection: 'column' }}>
                     {/* Toolbar */}
                     {imgSrc && (
                         <div style={{
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 15,
-                            padding: 15,
+                            padding: '20px',
                             background: '#fff',
-                            borderRadius: 8,
-                            border: '1px solid #ddd',
+                            borderRadius: '12px',
+                            border: '1px solid #eee',
                             alignSelf: 'stretch',
-                            zIndex: 10
+                            zIndex: 10,
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                         }}>
                             {/* Page Nav */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                                    <button type="button" disabled={currPageIndex <= 1} onClick={() => changePage(-1)} style={{ padding: '5px 10px' }}>&lt;</button>
-                                    <span>Page {currPageIndex} of {numPages}</span>
-                                    <button type="button" disabled={currPageIndex >= numPages} onClick={() => changePage(1)} style={{ padding: '5px 10px' }}>&gt;</button>
+                                <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
+                                    <button type="button" disabled={currPageIndex <= 1} onClick={() => changePage(-1)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #ddd', background: '#fff', cursor: 'pointer' }}>&larr;</button>
+                                    <span style={{ fontWeight: 600 }}>Page {currPageIndex} <span style={{ color: '#999', fontWeight: 400 }}>/ {numPages}</span></span>
+                                    <button type="button" disabled={currPageIndex >= numPages} onClick={() => changePage(1)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #ddd', background: '#fff', cursor: 'pointer' }}>&rarr;</button>
                                 </div>
 
-                                {/* Zoom */}
-                                <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
-                                    <button type="button" onClick={handleZoomOut} style={{ padding: '5px 10px', background: '#f5f5f5', border: '1px solid #ccc', borderRadius: 4 }}>−</button>
-                                    <span style={{ fontSize: '0.9rem' }}>{Math.round(zoom * 100)}%</span>
-                                    <button type="button" onClick={handleZoomIn} style={{ padding: '5px 10px', background: '#f5f5f5', border: '1px solid #ccc', borderRadius: 4 }}>+</button>
+                                { /* Zoom controls - Adjusted so that Auto-Fit = 100% */}
+                                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                                    <button type="button" onClick={handleZoomOut} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f7', border: 'none', borderRadius: '50%', cursor: 'pointer' }}>−</button>
+                                    <span style={{ fontSize: '0.9rem', width: 45, textAlign: 'center', fontWeight: 500 }}>{zoom}%</span>
+                                    <button type="button" onClick={handleZoomIn} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f7', border: 'none', borderRadius: '50%', cursor: 'pointer' }}>+</button>
                                 </div>
                             </div>
 
                             {/* Scope Selection */}
-                            <div style={{ borderTop: '1px solid #eee', paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                <label style={{ fontWeight: 500, color: '#333' }}>Crop Scope:</label>
-                                <div style={{ display: 'flex', gap: 20 }}>
-                                    <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
-                                        <input type="radio" checked={scope === 'all'} onChange={() => setScope('all')} />
+                            <div style={{ borderTop: '1px solid #eee', paddingTop: 15, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                <label style={{ fontWeight: 600, color: '#333', fontSize: '0.9rem' }}>Apply crop to:</label>
+                                <div style={{ display: 'flex', gap: 24 }}>
+                                    <label style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer', fontSize: '0.95rem' }}>
+                                        <input type="radio" checked={scope === 'all'} onChange={() => setScope('all')} style={{ width: 18, height: 18, accentColor: 'var(--primary)' }} />
                                         All Pages
                                     </label>
-                                    <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
-                                        <input type="radio" checked={scope === 'current'} onChange={() => setScope('current')} />
+                                    <label style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer', fontSize: '0.95rem' }}>
+                                        <input type="radio" checked={scope === 'current'} onChange={() => setScope('current')} style={{ width: 18, height: 18, accentColor: 'var(--primary)' }} />
                                         Current Page Only
                                     </label>
                                 </div>
@@ -227,39 +243,51 @@ export default function CropPdfTool() {
                         <div
                             ref={containerRef}
                             style={{
-                                border: '1px solid #333',
-                                background: '#333',
-                                padding: 40,
-                                borderRadius: 8,
+                                border: '1px solid #eee',
+                                background: '#1a1a1b',
+                                padding: '40px',
+                                borderRadius: '16px',
                                 overflow: 'auto',
                                 width: '100%',
-                                maxHeight: '600px',
+                                maxHeight: '700px',
                                 display: 'flex',
                                 justifyContent: 'center',
-                                alignItems: 'flex-start'
+                                alignItems: 'flex-start',
+                                userSelect: 'none',
+                                boxShadow: 'inset 0 0 20px rgba(0,0,0,0.2)'
                             }}
                         >
-                            <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', transition: 'transform 0.2s ease' }}>
+                            <div>
                                 <ReactCrop
                                     crop={crop}
                                     onChange={(c) => setCrop(c)}
                                     onComplete={(c) => setCompletedCrop(c)}
                                     style={{ maxWidth: 'none' }}
                                 >
-                                    <img src={imgSrc} style={{ maxWidth: 'none', display: 'block', boxShadow: '0 4px 20px rgba(0,0,0,0.5)' }} alt="PDF Preview" />
+                                    <img
+                                        src={imgSrc}
+                                        style={{
+                                            width: displayWidth || '100%',
+                                            maxWidth: 'none',
+                                            display: 'block',
+                                            boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                                            borderRadius: '4px'
+                                        }}
+                                        alt="PDF Preview"
+                                    />
                                 </ReactCrop>
                             </div>
                         </div>
                     ) : (
-                        <div style={{ padding: 60, textAlign: 'center', background: '#f8f9fa', borderRadius: 12, border: '2px dashed #e9ecef', color: '#adb5bd' }}>
-                            <p style={{ marginBottom: 10, fontSize: '1.1rem', fontWeight: 500 }}>No PDF Selected</p>
-                            <p style={{ fontSize: '0.9rem' }}>Upload a file to begin cropping</p>
+                        <div style={{ padding: 80, textAlign: 'center', background: '#fff', borderRadius: 20, border: '2px dashed #eee', color: '#999', width: '100%' }}>
+                            <p style={{ marginBottom: 10, fontSize: '1.2rem', fontWeight: 600 }}>No PDF Loaded</p>
+                            <p style={{ fontSize: '0.95rem' }}>Your PDF preview will appear here</p>
                         </div>
                     )}
 
-                    <div style={{ background: '#e3f2fd', padding: 15, borderRadius: 8, fontSize: '0.9rem', color: '#0d47a1', display: 'flex', gap: 10, alignItems: 'center' }}>
-                        <span>💡</span>
-                        <span>Drag handles to select area. Use controls above to change pages or apply to one page only.</span>
+                    <div style={{ background: '#e3f2fd', padding: '16px 20px', borderRadius: '12px', fontSize: '0.95rem', color: '#1565c0', display: 'flex', gap: 12, alignItems: 'center', width: '100%' }}>
+                        <span style={{ fontSize: '1.2rem' }}>💡</span>
+                        <span style={{ lineHeight: 1.5 }}><b>Pro Tip:</b> Drag handles on the image to select the crop area. Use the zoom controls above to adjust visibility.</span>
                     </div>
                 </div>
             }

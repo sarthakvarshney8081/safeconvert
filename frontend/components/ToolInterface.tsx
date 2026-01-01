@@ -14,6 +14,7 @@ interface ToolInterfaceProps {
     maxFiles?: number;
     processingMode?: 'client' | 'server';
     optionsComponent?: React.ReactNode;
+    optionsTitle?: string;
     onProcess?: (files: File[], options: any) => Promise<Blob>; // Now optional
     onFileSelect?: (file: File) => Promise<void> | void; // Callback when file is chosen
     resultFileName?: string;
@@ -38,6 +39,7 @@ export default function ToolInterface({
     maxFiles,
     processingMode = 'server',
     optionsComponent,
+    optionsTitle,
     apiEndpoint,
     onProcess,
     onFileSelect,
@@ -195,7 +197,7 @@ export default function ToolInterface({
 
                                 {optionsComponent && (
                                     <div style={{ marginBottom: 30, padding: 20, background: '#f5f5f7', borderRadius: 8 }}>
-                                        <h3 style={{ marginBottom: 15, fontSize: '1rem' }}>More Options</h3>
+                                        <h3 style={{ marginBottom: 15, fontSize: '1rem' }}>{optionsTitle || "More Options"}</h3>
                                         {optionsComponent}
                                     </div>
                                 )}

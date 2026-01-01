@@ -30,7 +30,7 @@ export default function RotatePdfTool() {
             const arrayBuffer = await file.arrayBuffer();
             const uint8Array = new Uint8Array(arrayBuffer);
 
-            const resultBytes = wasmModule.rotate_pdf(uint8Array, angle);
+            const resultBytes = wasmModule.rotate_pdf(uint8Array, angle, -1);
 
             return new Blob([resultBytes], { type: 'application/pdf' });
 

@@ -20,8 +20,8 @@ export default function WatermarkPdfTool() {
             const arrayBuffer = await file.arrayBuffer();
             const uint8Array = new Uint8Array(arrayBuffer);
 
-            // watermark_pdf(bytes, text)
-            const resultBytes = wasmModule.watermark_pdf(uint8Array, text);
+            // watermark_pdf(bytes, text, page_limit)
+            const resultBytes = wasmModule.watermark_pdf(uint8Array, text, -1);
 
             return new Blob([resultBytes], { type: 'application/pdf' });
 
