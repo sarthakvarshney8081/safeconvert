@@ -23,6 +23,11 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY frontend/ .
 # Copy compiled Wasm to public directory so it can be served
 COPY --from=wasm-builder /wasm/pkg ./public/wasm
+
+# Accept GA ID as build argument
+ARG NEXT_PUBLIC_GA_ID
+ENV NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID
+
 RUN npm run build
 
 # Stage 3: Runner

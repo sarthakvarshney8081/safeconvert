@@ -10,7 +10,7 @@ import os
 import uuid
 from pypdf import PdfWriter, PdfReader
 
-router = APIRouter(prefix="/pdf", tags=["pdf"])
+router = APIRouter(tags=["pdf"])
 
 @router.post("/merge")
 async def merge_pdfs(background_tasks: BackgroundTasks, files: list[UploadFile] = File(...)):
