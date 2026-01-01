@@ -24,6 +24,7 @@ services:
 
     environment:
       - NEXT_PUBLIC_API_URL=/api
+      - NEXT_PUBLIC_CLARITY_ID=${NEXT_PUBLIC_CLARITY_ID}
 
 volumes:
   temp_data:
