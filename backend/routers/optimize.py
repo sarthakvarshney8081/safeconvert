@@ -56,3 +56,45 @@ async def compress_pdf(background_tasks: BackgroundTasks, file: UploadFile = Fil
         if os.path.exists(output_path):
             os.remove(output_path)
         raise HTTPException(status_code=500, detail=str(e))
+@router.post("/repair")
+async def repair_pdf(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+    """
+    Repair PDF using Ghostscript (re-distilling).
+    """
+    temp_file = await save_upload_file(file)
+    output_path = temp_file + "_repaired.pdf"
+    
+    try:
+        # GS command to rewrite PDF (often fixes corruption)
+        cmd = [
+            "gs",
+            "-o", output_path,
+            "-sDEVICE=pdfwrite",
+            "-dPDFSETTINGS=/prepress",
+            "-dNOPAUSE",
+            "-dQUIET",
+            "-dBATCH",
+            temp_file
+        ]
+        
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            print(f"Ghostscript Repair Error: {result.stderr}")
+            # Try falback? sometimes /prepress fails on bad files. 
+            # Retrying with simple rewrite might work better or worse.
+            raise HTTPException(status_code=500, detail="Repair failed")
+            
+        background_tasks.add_task(cleanup_file, temp_file)
+        background_tasks.add_task(cleanup_file, output_path)
+        
+        return FileResponse(
+            output_path, 
+            filename=f"repaired_{file.filename}",
+            media_type="application/pdf"
+        )
+        
+    except Exception as e:
+        if os.path.exists(temp_file): cleanup_file(temp_file)
+        if os.path.exists(output_path): cleanup_file(output_path)
+        raise HTTPException(status_code=500, detail=str(e))

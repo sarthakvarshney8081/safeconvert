@@ -16,7 +16,7 @@ interface ToolInterfaceProps {
     processingMode?: 'client' | 'server';
     optionsComponent?: React.ReactNode;
     optionsTitle?: string;
-    onProcess?: (files: File[], options: any) => Promise<Blob>; // Now optional
+    onProcess?: (files: File[], options: any) => Promise<Blob | { blob: Blob; fileName?: string }>; // Enhanced signature
     onFileSelect?: (file: File) => Promise<void> | void; // Callback when file is chosen
     resultFileName?: string;
     icon?: any;
@@ -54,6 +54,7 @@ export default function ToolInterface({
     const [status, setStatus] = useState<'idle' | 'ready' | 'processing' | 'completed' | 'error'>('idle');
     const [files, setFiles] = useState<File[]>([]);
     const [resultUrl, setResultUrl] = useState<string | null>(null);
+    const [dynamicFileName, setDynamicFileName] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     // ... (handlers) ...
@@ -62,6 +63,7 @@ export default function ToolInterface({
         setFiles(selectedFiles);
         setStatus('ready');
         setError(null);
+        setDynamicFileName(null);
         if (onFileSelect && selectedFiles.length > 0) {
             onFileSelect(selectedFiles[0]);
         }
@@ -79,9 +81,16 @@ export default function ToolInterface({
             const options = Object.fromEntries(formData.entries());
 
             let blob: Blob;
+            let finalName = resultFileName;
 
             if (onProcess) {
-                blob = await onProcess(files, options);
+                const result = await onProcess(files, options);
+                if (result instanceof Blob) {
+                    blob = result;
+                } else {
+                    blob = result.blob;
+                    if (result.fileName) finalName = result.fileName;
+                }
             } else if (apiEndpoint) {
                 const apiFormData = new FormData();
                 // Handle multiple files if multiple=true
@@ -102,8 +111,23 @@ export default function ToolInterface({
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    throw new Error(errorText || "Server error");
+                    try {
+                        const jsonError = JSON.parse(errorText);
+                        throw new Error(jsonError.detail || "Server error");
+                    } catch {
+                        throw new Error(errorText || "Server error");
+                    }
                 }
+
+                // Try to get filename from Content-Disposition header
+                const disposition = response.headers.get('Content-Disposition');
+                if (disposition) {
+                    const filenameMatch = disposition.match(/filename="?([^"]+)"?/);
+                    if (filenameMatch && filenameMatch[1]) {
+                        finalName = filenameMatch[1];
+                    }
+                }
+
                 blob = await response.blob();
             } else {
                 throw new Error("Tool configuration error: No processor defined.");
@@ -111,6 +135,7 @@ export default function ToolInterface({
 
             const url = URL.createObjectURL(blob);
             setResultUrl(url);
+            setDynamicFileName(finalName);
             setStatus('completed');
         } catch (err: any) {
             console.error(err);
@@ -241,7 +266,7 @@ export default function ToolInterface({
                         <p style={{ color: '#666', marginBottom: 30 }}>Your files have been processed successfully.</p>
 
                         <div style={{ display: 'flex', gap: 20, justifyContent: 'center' }}>
-                            <a href={resultUrl} download={resultFileName} className="btn btn-primary">
+                            <a href={resultUrl} download={dynamicFileName || resultFileName} className="btn btn-primary">
                                 Download File
                             </a>
                             <button onClick={handleReset} className="btn" style={{ background: '#f5f5f7' }}>

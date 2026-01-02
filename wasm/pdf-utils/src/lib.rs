@@ -360,8 +360,7 @@ pub fn decrypt_pdf(bytes: &[u8], p: &str) -> Result<Vec<u8>> {
     Ok(out)
 }
 
-#[wasm_bindgen]
-pub fn encrypt_pdf(_bytes: &[u8], _p: &str) -> Result<Vec<u8>> { Err(JsValue::from_str("Not supported")) }
+
 
 #[wasm_bindgen]
 pub fn split_pdf(pdf_bytes: &[u8], start: u32, end: u32) -> Result<Vec<u8>> {

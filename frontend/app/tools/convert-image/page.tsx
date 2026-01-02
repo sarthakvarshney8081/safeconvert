@@ -7,6 +7,11 @@ export default function ConvertImageTool() {
     const processImage = async (files: File[], options: any) => {
         if (files.length === 0) throw new Error("No file");
         const file = files[0];
+        const validTypes = ['image/png', 'image/jpeg', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            alert("Only PNG, JPG, and WebP formats are allowed!");
+            throw new Error("Invalid format");
+        }
         const targetFormat = options.format || 'png';
 
         try {
@@ -28,7 +33,10 @@ export default function ConvertImageTool() {
             if (targetFormat === 'bmp') mimeType = 'image/bmp';
             if (targetFormat === 'ico') mimeType = 'image/x-icon';
 
-            return new Blob([resultBytes], { type: mimeType });
+            return {
+                blob: new Blob([resultBytes], { type: mimeType }),
+                fileName: `converted.${targetFormat === 'jpeg' ? 'jpg' : targetFormat}`
+            };
 
         } catch (e: any) {
             console.error("Wasm Error:", e);

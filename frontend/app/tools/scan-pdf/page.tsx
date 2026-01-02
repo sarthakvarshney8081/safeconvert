@@ -8,7 +8,7 @@ export default function ScanPdfTool() {
         const formData = new FormData();
         formData.append('file', files[0]);
         // Default to English for now. later we can add language selector to options
-        formData.append('lang', 'eng');
+        formData.append('lang', options.lang || 'eng');
 
         const response = await fetch('/api/ocr/scan-pdf', {
             method: 'POST',
@@ -30,6 +30,18 @@ export default function ScanPdfTool() {
             apiEndpoint="/api/ocr/scan-pdf"
             onProcess={processFile}
             resultFileName="searchable.pdf"
+            optionsComponent={
+                <div>
+                    <label style={{ display: 'block', marginBottom: 5 }}>Document Language</label>
+                    <select name="lang" style={{ width: '100%', padding: 8, borderRadius: 4, border: '1px solid #ddd' }}>
+                        <option value="eng">English</option>
+                        <option value="hin">Hindi</option>
+                        <option value="fra">French</option>
+                        <option value="deu">German</option>
+                        <option value="spa">Spanish</option>
+                    </select>
+                </div>
+            }
             processingMode="server"
         />
     );

@@ -9,7 +9,7 @@ export default function PdfToExcelTool() {
             title="PDF to Excel"
             description="Convert PDF tables to Excel spreadsheets."
             accept=".pdf"
-            apiEndpoint="/api/convert/pdf-to-excel"
+            apiEndpoint="/api/convert-from-pdf/to-excel"
             resultFileName="spreadsheet.xlsx"
         />
     );

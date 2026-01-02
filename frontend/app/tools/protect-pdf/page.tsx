@@ -4,19 +4,13 @@ import React from 'react';
 import ToolInterface from '@/components/ToolInterface';
 
 export default function ProtectPdfTool() {
-    // Wasm Encryption is currently deferred/complex.
-    // We will use the backend API (Python) for now, as it uses reliable pypdf/pikepdf encryption.
-    // OR we can try Wasm, but `encrypt_pdf` returns an error currently.
-    // 
-    // To provide a working tool, we will point to the API endpoint for now, 
-    // similar to how we handled "Image to PDF".
+    const [showPassword, setShowPassword] = React.useState(false);
 
     const processPdf = async (files: File[], options: any) => {
         const formData = new FormData();
-        files.forEach((file) => formData.append('file', file)); // Backend expects 'file' for single
+        files.forEach((file) => formData.append('file', file));
         formData.append('password', options.password || '');
 
-        // Use Python Backend
         const response = await fetch('/api/security/protect', {
             method: 'POST',
             body: formData,
@@ -39,13 +33,32 @@ export default function ProtectPdfTool() {
             optionsComponent={
                 <div>
                     <label style={{ display: 'block', marginBottom: 5 }}>Set Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="New Password"
-                        style={{ width: '100%', padding: 8 }}
-                        required
-                    />
+                    <div style={{ position: 'relative' }}>
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="New Password"
+                            style={{ width: '100%', padding: '8px 40px 8px 8px', borderRadius: 4, border: '1px solid #ccc' }}
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            style={{
+                                position: 'absolute',
+                                right: 5,
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontSize: '1.2rem',
+                                color: '#666'
+                            }}
+                        >
+                            {showPassword ? "👁️" : "👁️‍🗨️"}
+                        </button>
+                    </div>
                 </div>
             }
         />

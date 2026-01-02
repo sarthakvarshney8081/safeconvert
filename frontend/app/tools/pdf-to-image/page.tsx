@@ -9,7 +9,7 @@ export default function PdfToImageTool() {
         formData.append('file', files[0]);
         formData.append('format', options.format || 'png');
 
-        const response = await fetch('/api/pdf-extra/to-image', {
+        const response = await fetch(`/api/convert/pdf-to-image?fmt=${options.format || 'png'}`, {
             method: 'POST',
             body: formData,
         });
@@ -26,7 +26,7 @@ export default function PdfToImageTool() {
             title="PDF to Image"
             description="Convert PDF pages into high-quality images (PNG/JPG)."
             accept=".pdf"
-            apiEndpoint="/api/pdf-extra/to-image"
+            apiEndpoint="/api/convert/pdf-to-image"
             onProcess={processFile}
             resultFileName="images.zip"
             processingMode="server"

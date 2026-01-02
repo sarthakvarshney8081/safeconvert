@@ -7,7 +7,7 @@ Pillow
 docx2pdf
 pandas
 openpyxl
-reportlab
+
 pikepdf
 img2pdf
 ocrmypdf

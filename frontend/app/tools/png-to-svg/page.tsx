@@ -26,7 +26,7 @@ export default function PngToSvgTool() {
 
     return (
         <ToolInterface
-            title="PNG to SVG (Wasm)"
+            title="PNG to SVG"
             description="Convert raster images to Vector SVG instantly in browser."
             accept="image/*"
             onProcess={processFile}

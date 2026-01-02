@@ -7,7 +7,7 @@ import os
 from core.processor import save_upload_file, cleanup_file
 import pypdf
 
-router = APIRouter(prefix="/ocr", tags=["OCR"])
+router = APIRouter(tags=["OCR"])
 
 @router.post("/scan-pdf")
 async def perform_ocr(background_tasks: BackgroundTasks, file: UploadFile = File(...), lang: str = "eng"):

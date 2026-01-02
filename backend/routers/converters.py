@@ -12,7 +12,7 @@ import subprocess
 import zipfile
 import shutil
 
-router = APIRouter(prefix="/convert", tags=["convert"])
+router = APIRouter(tags=["convert"])
 
 @router.post("/office-to-pdf")
 async def convert_office(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
@@ -72,8 +72,28 @@ async def convert_image_to_pdf(background_tasks: BackgroundTasks, files: list[Up
         output_path = os.path.join(UPLOAD_DIR, output_filename)
         
         # Convert
+        # img2pdf requires direct image bytes or paths.
+        # But it fails on RGBA. We should convert to RGB via Pillow if needed.
+        from PIL import Image
+        
+        valid_pdfs = []
+        for path in image_paths:
+             try:
+                 img = Image.open(path)
+                 if img.mode == 'RGBA':
+                     # Convert to RGB
+                     rgb_path = path + "_rgb.jpg"
+                     img.convert('RGB').save(rgb_path, "JPEG")
+                     valid_pdfs.append(rgb_path)
+                     background_tasks.add_task(cleanup_file, rgb_path)
+                 else:
+                     valid_pdfs.append(path)
+             except Exception:
+                 # If not an image PIL can read, skip or try direct
+                 valid_pdfs.append(path)
+                 
         with open(output_path, "wb") as f:
-            f.write(img2pdf.convert(image_paths))
+            f.write(img2pdf.convert(valid_pdfs))
 
         for path in temp_files:
             background_tasks.add_task(cleanup_file, path)

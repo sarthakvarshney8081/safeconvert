@@ -7,10 +7,11 @@ export default function RepairPdfTool() {
     return (
         <ToolInterface
             title="Repair PDF"
-            description="Recover corrupted or damaged PDF files."
+            description="Recover data from corrupted or damaged PDF files."
             accept=".pdf"
-            apiEndpoint="/api/repair-pdf"
+            apiEndpoint="/api/optimize/repair"
             resultFileName="repaired.pdf"
+            processingMode="server"
         />
     );
 }

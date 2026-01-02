@@ -6,6 +6,16 @@ import ToolInterface from '@/components/ToolInterface';
 export default function ImageToPdfTool() {
     // This is the original API-based tool for converting Images -> PDF
     const processFiles = async (files: File[]) => {
+        if (files.length === 0) throw new Error("No files selected");
+
+        const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+        for (const file of files) {
+            if (!validTypes.includes(file.type)) {
+                alert(`File ${file.name} is not a supported image format (PNG, JPG, WebP).`);
+                throw new Error("Invalid format");
+            }
+        }
+
         const formData = new FormData();
         files.forEach((file) => formData.append('files', file));
 
@@ -14,7 +24,15 @@ export default function ImageToPdfTool() {
             body: formData,
         });
 
-        if (!response.ok) throw new Error("Conversion failed");
+        if (!response.ok) {
+            const errorText = await response.text();
+            let msg = "Conversion failed";
+            try {
+                const json = JSON.parse(errorText);
+                msg = json.detail || msg;
+            } catch { }
+            throw new Error(msg);
+        }
         return await response.blob();
     };
 

@@ -36,7 +36,7 @@ export default function CompressPdfTool() {
         formData.append("level", level);
 
         // Server-Side Processing
-        const response = await fetch('/api/pdf/compress', {
+        const response = await fetch('/api/optimize/compress', {
             method: 'POST',
             body: formData,
         });

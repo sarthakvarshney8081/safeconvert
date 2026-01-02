@@ -40,14 +40,33 @@ export default function SplitPdfTool() {
             apiEndpoint=""
             processingMode="client"
             optionsComponent={
-                <input
-                    type="text"
-                    name="pages"
-                    placeholder="e.g. 1-3, 5"
-                    className="input"
-                    style={{ width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
-                    defaultValue="all"
-                />
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: 4 }}>Start Page</label>
+                        <input
+                            type="number"
+                            name="start"
+                            placeholder="1"
+                            className="input"
+                            min="1"
+                            defaultValue="1"
+                            style={{ width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
+                            required
+                        />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: 4 }}>End Page</label>
+                        <input
+                            type="number"
+                            name="end"
+                            placeholder="e.g. 5"
+                            className="input"
+                            min="1"
+                            style={{ width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ccc' }}
+                            required
+                        />
+                    </div>
+                </div>
             }
             onProcess={processPdf}
         />

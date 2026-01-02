@@ -9,7 +9,7 @@ export default function PdfToPptTool() {
             title="PDF to PPT"
             description="Convert PDF slides to PowerPoint."
             accept=".pdf"
-            apiEndpoint="/api/convert/pdf-to-ppt"
+            apiEndpoint="/api/convert-from-pdf/to-ppt"
             resultFileName="presentation.pptx"
         />
     );

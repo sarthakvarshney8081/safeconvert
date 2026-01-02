@@ -10,6 +10,10 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     poppler-utils \
     tesseract-ocr \
+    tesseract-ocr-hin \
+    tesseract-ocr-fra \
+    tesseract-ocr-deu \
+    tesseract-ocr-spa \
     libreoffice \
     libreoffice-java-common \
     ghostscript \
