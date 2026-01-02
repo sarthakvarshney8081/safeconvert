@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Type, Pen, Download, FileUp, X, Check, MousePointer2, ChevronLeft, ChevronRight, Loader2, RotateCw } from 'lucide-react';
+import Link from 'next/link';
+import { Upload, Type, Pen, Download, FileUp, X, Check, MousePointer2, ChevronLeft, ChevronRight, Loader2, RotateCw, Home } from 'lucide-react';
 import ToolInterface from '@/components/ToolInterface';
 import dynamic from 'next/dynamic';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
@@ -9,7 +10,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 
 const SignatureCanvas = dynamic(() => import('react-signature-canvas'), { ssr: false }) as any;
 
-type Step = 'upload' | 'signature' | 'place';
+type Step = 'upload' | 'signature' | 'place' | 'success';
 
 export default function SignPdfTool() {
     const [step, setStep] = useState<Step>('upload');
@@ -203,13 +204,20 @@ export default function SignPdfTool() {
             link.click();
             URL.revokeObjectURL(url);
 
-            // Reset to Step 1 or show success
-            // setStep('upload');
+            setStep('success');
         } catch (err) {
             console.error("Signing failed:", err);
         } finally {
             setIsProcessing(false);
         }
+    };
+
+    const handleReset = () => {
+        setFile(null);
+        setPdfDoc(null);
+        setImgSrc('');
+        setSignatureImage(null);
+        setStep('upload');
     };
 
     return (
@@ -250,7 +258,7 @@ export default function SignPdfTool() {
                             <button type="button" onClick={() => setStep('upload')} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}><X size={24} /></button>
                         </div>
 
-                        <div style={{ display: 'flex', background: '#f5f5f7', padding: '5px', borderRadius: '12px', marginBottom: '25px' }}>
+                        <div style={{ display: 'flex', background: '#f5f5f7', padding: '5px', borderRadius: '12px', marginBottom: '25px', gap: '5px' }}>
                             {['draw', 'type', 'upload'].map(tab => (
                                 <button
                                     key={tab}
@@ -263,13 +271,22 @@ export default function SignPdfTool() {
                                         boxShadow: activeTab === tab ? 'var(--shadow-sm)' : 'none',
                                         color: activeTab === tab ? 'var(--primary)' : '#666',
                                         borderRadius: '8px',
-                                        textTransform: 'capitalize'
+                                        textTransform: 'capitalize',
+                                        fontSize: '0.75rem',
+                                        padding: '8px 4px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '4px',
+                                        minWidth: 0,
+                                        overflow: 'hidden'
                                     }}
                                 >
-                                    {tab === 'draw' && <Pen size={18} style={{ marginRight: '8px' }} />}
-                                    {tab === 'type' && <Type size={18} style={{ marginRight: '8px' }} />}
-                                    {tab === 'upload' && <Upload size={18} style={{ marginRight: '8px' }} />}
-                                    {tab}
+                                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {tab === 'draw' && <Pen size={16} />}
+                                        {tab === 'type' && <Type size={16} />}
+                                        {tab === 'upload' && <Upload size={16} />}
+                                    </span>
+                                    <span style={{ fontSize: '0.75rem' }}>{tab}</span>
                                 </button>
                             ))}
                         </div>
@@ -431,6 +448,28 @@ export default function SignPdfTool() {
                         </div>
                         <h2 style={{ marginBottom: '10px' }}>Ready to Sign?</h2>
                         <p style={{ color: '#666' }}>Upload your PDF document to begin the professional signing workflow.</p>
+                    </div>
+                )}
+
+                {/* Step 4: Success View */}
+                {step === 'success' && (
+                    <div className="card" style={{ textAlign: 'center', padding: '40px 20px', animation: 'fadeIn 0.3s ease', marginTop: '20px' }}>
+                        <div style={{ width: '80px', height: '80px', background: '#e8f5e9', color: '#2e7d32', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 25px' }}>
+                            <Check size={40} />
+                        </div>
+                        <h2 style={{ marginBottom: '10px' }}>PDF Signed Successfully!</h2>
+                        <p style={{ color: '#666', marginBottom: '40px' }}>Your document has been processed and downloaded.</p>
+
+                        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <button onClick={handleReset} className="btn" style={{ background: '#f5f5f7', padding: '12px 30px' }}>
+                                <RotateCw size={18} style={{ marginRight: '8px' }} />
+                                Sign Another PDF
+                            </button>
+                            <Link href="/" className="btn btn-primary" style={{ padding: '12px 30px' }}>
+                                <Home size={18} style={{ marginRight: '8px' }} />
+                                Go to Home
+                            </Link>
+                        </div>
                     </div>
                 )}
             </div>

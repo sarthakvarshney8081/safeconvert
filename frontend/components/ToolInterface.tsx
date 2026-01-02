@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import FileDropzone from './ui/FileDropzone';
-import { Loader2, Download, RefreshCw, XCircle } from 'lucide-react';
+import { Loader2, Download, RefreshCw, XCircle, Home, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import styles from './ToolInterface.module.css';
 
 interface ToolInterfaceProps {
@@ -126,7 +127,13 @@ export default function ToolInterface({
     };
 
     return (
-        <div className="container" style={{ maxWidth: 800, padding: '40px 20px' }}>
+        <div className="container" style={{ maxWidth: 800, padding: '20px 20px 40px' }}>
+            <div style={{ marginBottom: '20px' }}>
+                <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#666', fontSize: '0.9rem', fontWeight: 500, transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary)'} onMouseLeave={(e) => e.currentTarget.style.color = '#666'}>
+                    <ArrowLeft size={16} />
+                    Back to Tools
+                </Link>
+            </div>
             {/* ... Header ... */}
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 10 }}>
@@ -232,6 +239,10 @@ export default function ToolInterface({
                                 <RefreshCw size={18} style={{ marginRight: 8 }} />
                                 Start Over
                             </button>
+                            <Link href="/" className="btn" style={{ background: '#f5f5f7' }}>
+                                <Home size={18} style={{ marginRight: 8 }} />
+                                Home
+                            </Link>
                         </div>
                     </div>
                 ) : (
