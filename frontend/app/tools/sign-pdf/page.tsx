@@ -29,6 +29,28 @@ export default function SignPdfTool() {
     const [signatureImage, setSignatureImage] = useState<string | null>(null);
     const [typedText, setTypedText] = useState<string>('');
     const sigPadRef = useRef<any>(null);
+    const sigContainerRef = useRef<HTMLDivElement>(null);
+
+    // Sync canvas resolution with display size to fix offset issues
+    useEffect(() => {
+        const resizeCanvas = () => {
+            if (sigPadRef.current && sigContainerRef.current) {
+                const canvas = sigPadRef.current.getCanvas();
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                canvas.getContext("2d").scale(ratio, ratio);
+                sigPadRef.current.clear(); // Clear to reset internal state
+            }
+        };
+
+        if (activeTab === 'draw') {
+            window.addEventListener('resize', resizeCanvas);
+            // Small delay to ensure DOM is ready
+            setTimeout(resizeCanvas, 50);
+        }
+        return () => window.removeEventListener('resize', resizeCanvas);
+    }, [activeTab]);
 
     // Placement State (Crop)
     const [crop, setCrop] = useState<Crop>();
@@ -202,27 +224,27 @@ export default function SignPdfTool() {
             hideSubmitButton={true}
         >
             <div className="container" style={{ maxWidth: '1000px' }}>
-                {/* Custom Stepper */}
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '40px', gap: '20px' }}>
+                {/* Custom Stepper - Responsive */}
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '30px', gap: '15px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: step === 'upload' ? 'var(--primary)' : '#e0e0e0', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>1</div>
-                        <span style={{ fontWeight: step === 'upload' ? '600' : '400', color: step === 'upload' ? 'var(--primary)' : '#666' }}>Upload</span>
+                        <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: step === 'upload' ? 'var(--primary)' : '#e0e0e0', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>1</div>
+                        <span className="hide-mobile" style={{ fontSize: '0.9rem', fontWeight: step === 'upload' ? '600' : '400', color: step === 'upload' ? 'var(--primary)' : '#666' }}>Upload</span>
                     </div>
-                    <div style={{ width: '40px', height: '2px', background: '#e0e0e0' }} />
+                    <div style={{ width: '20px', height: '2px', background: '#e0e0e0', flexShrink: 0 }} />
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: step === 'signature' ? 'var(--primary)' : '#e0e0e0', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>2</div>
-                        <span style={{ fontWeight: step === 'signature' ? '600' : '400', color: step === 'signature' ? 'var(--primary)' : '#666' }}>Signature</span>
+                        <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: step === 'signature' ? 'var(--primary)' : '#e0e0e0', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>2</div>
+                        <span className="hide-mobile" style={{ fontSize: '0.9rem', fontWeight: step === 'signature' ? '600' : '400', color: step === 'signature' ? 'var(--primary)' : '#666' }}>Signature</span>
                     </div>
-                    <div style={{ width: '40px', height: '2px', background: '#e0e0e0' }} />
+                    <div style={{ width: '20px', height: '2px', background: '#e0e0e0', flexShrink: 0 }} />
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: step === 'place' ? 'var(--primary)' : '#e0e0e0', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>3</div>
-                        <span style={{ fontWeight: step === 'place' ? '600' : '400', color: step === 'place' ? 'var(--primary)' : '#666' }}>Place & Sign</span>
+                        <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: step === 'place' ? 'var(--primary)' : '#e0e0e0', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>3</div>
+                        <span className="hide-mobile" style={{ fontSize: '0.9rem', fontWeight: step === 'place' ? '600' : '400', color: step === 'place' ? 'var(--primary)' : '#666' }}>Place</span>
                     </div>
                 </div>
 
                 {/* Step 2: Create Signature */}
                 {step === 'signature' && (
-                    <div className="card" style={{ padding: '40px', animation: 'fadeIn 0.3s ease' }}>
+                    <div className="card" style={{ animation: 'fadeIn 0.3s ease' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                             <h2>Create Your Signature</h2>
                             <button type="button" onClick={() => setStep('upload')} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}><X size={24} /></button>
@@ -254,9 +276,9 @@ export default function SignPdfTool() {
 
                         <div style={{ height: '250px', border: '2px dashed #e0e0e0', borderRadius: '16px', background: '#fafafa', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative' }}>
                             {activeTab === 'draw' && (
-                                <div style={{ height: '100%', cursor: 'crosshair' }}>
-                                    <SignatureCanvas ref={sigPadRef} canvasProps={{ className: 'w-full h-full' }} onEnd={saveDrawnSignature} />
-                                    <button type="button" onClick={() => { sigPadRef.current?.clear(); setSignatureImage(null); }} style={{ position: 'absolute', bottom: '15px', right: '15px', fontSize: '0.8rem', color: 'var(--error)', border: 'none', background: 'none', fontWeight: '600', cursor: 'pointer' }}>Clear</button>
+                                <div ref={sigContainerRef} style={{ height: '100%', cursor: 'crosshair', position: 'relative' }}>
+                                    <SignatureCanvas ref={sigPadRef} canvasProps={{ style: { width: '100%', height: '100%' } }} onEnd={saveDrawnSignature} />
+                                    <button type="button" onClick={() => { sigPadRef.current?.clear(); setSignatureImage(null); }} style={{ position: 'absolute', bottom: '15px', right: '15px', fontSize: '0.8rem', color: 'var(--error)', border: 'none', background: 'none', fontWeight: '600', cursor: 'pointer', zIndex: 10 }}>Clear</button>
                                 </div>
                             )}
                             {activeTab === 'type' && (
@@ -285,16 +307,16 @@ export default function SignPdfTool() {
                             )}
                         </div>
 
-                        <div style={{ display: 'flex', gap: '20px', marginTop: '40px' }}>
-                            <button type="button" onClick={() => setStep('upload')} className="btn" style={{ flex: 1, background: '#f5f5f7' }}>Back</button>
+                        <div style={{ display: 'flex', gap: '15px', marginTop: '30px', flexWrap: 'wrap' }}>
+                            <button type="button" onClick={() => setStep('upload')} className="btn" style={{ flex: 1, background: '#f5f5f7', minWidth: '120px' }}>Back</button>
                             <button
                                 type="button"
                                 disabled={!signatureImage}
                                 onClick={() => setStep('place')}
                                 className="btn btn-primary"
-                                style={{ flex: 2, fontSize: '1.1rem' }}
+                                style={{ flex: 2, fontSize: '1rem', minWidth: '200px' }}
                             >
-                                Use This Signature <ChevronRight size={20} style={{ marginLeft: '8px' }} />
+                                Use This Signature <ChevronRight size={18} style={{ marginLeft: '8px' }} />
                             </button>
                         </div>
                     </div>
@@ -304,31 +326,31 @@ export default function SignPdfTool() {
                 {step === 'place' && (
                     <div style={{ animation: 'fadeIn 0.3s ease' }}>
                         {/* Control Bar */}
-                        <div className="card" style={{ padding: '15px 30px', marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
-                                <button type="button" onClick={() => setStep('signature')} className="btn" style={{ background: 'none', padding: '5px', color: '#666' }}><ChevronLeft size={20} /> Change Signature</button>
-                                <div style={{ height: '30px', width: '1px', background: '#eee' }} />
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <button type="button" disabled={currPageIndex <= 1} onClick={() => changePage(-1)} className="btn" style={{ background: '#f5f5f7', padding: '5px 12px' }}>&lt;</button>
-                                    <span style={{ fontWeight: '500' }}>Page {currPageIndex} <span style={{ color: '#aaa', fontWeight: '400' }}>/ {numPages}</span></span>
-                                    <button type="button" disabled={currPageIndex >= numPages} onClick={() => changePage(1)} className="btn" style={{ background: '#f5f5f7', padding: '5px 12px' }}>&gt;</button>
+                        <div className="card" style={{ padding: '15px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
+                                <button type="button" onClick={() => setStep('signature')} className="btn btn-sm" style={{ background: 'none', padding: '5px', color: '#666', fontSize: '0.85rem' }}><ChevronLeft size={16} /> Edit Sig</button>
+                                <div className="hide-mobile" style={{ height: '24px', width: '1px', background: '#eee' }} />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <button type="button" disabled={currPageIndex <= 1} onClick={() => changePage(-1)} className="btn btn-sm" style={{ background: '#f5f5f7', padding: '4px 10px' }}>&lt;</button>
+                                    <span style={{ fontWeight: '500', fontSize: '0.9rem' }}>{currPageIndex} / {numPages}</span>
+                                    <button type="button" disabled={currPageIndex >= numPages} onClick={() => changePage(1)} className="btn btn-sm" style={{ background: '#f5f5f7', padding: '4px 10px' }}>&gt;</button>
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <span style={{ fontSize: '0.9rem', fontWeight: '500', color: '#666' }}>Zoom:</span>
-                                    <input type="range" min="10" max="300" step="5" value={zoom} onChange={e => setZoom(parseFloat(e.target.value))} style={{ width: '100px' }} />
-                                    <span style={{ fontSize: '0.9rem', color: '#aaa', width: '45px' }}>{zoom}%</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap', width: '100%', justifyContent: 'space-between' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ fontSize: '0.8rem', fontWeight: '500', color: '#666' }}>Zoom:</span>
+                                    <input type="range" min="10" max="250" step="5" value={zoom} onChange={e => setZoom(parseFloat(e.target.value))} style={{ width: '80px' }} />
+                                    <span style={{ fontSize: '0.8rem', color: '#aaa', width: '35px' }}>{zoom}%</span>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={applySignature}
                                     disabled={!completedCrop || isProcessing}
                                     className="btn btn-primary"
-                                    style={{ padding: '12px 35px', borderRadius: '12px', boxShadow: '0 8px 16px rgba(98,0,238,0.2)' }}
+                                    style={{ padding: '10px 20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(98,0,238,0.15)', fontSize: '0.9rem' }}
                                 >
-                                    {isProcessing ? <><Loader2 className="animate-spin" size={20} style={{ marginRight: '10px' }} /> Signing...</> : <><Download size={20} style={{ marginRight: '10px' }} /> Finish & Download</>}
+                                    {isProcessing ? <Loader2 className="animate-spin" size={18} /> : <><Download size={18} style={{ marginRight: '8px' }} /> Download</>}
                                 </button>
                             </div>
                         </div>
@@ -336,11 +358,12 @@ export default function SignPdfTool() {
                         {/* Interactive PDF Map */}
                         <div
                             ref={containerRef}
+                            className="preview-container"
                             style={{
                                 background: '#1a1a1a',
-                                borderRadius: '24px',
-                                padding: '60px',
-                                height: '700px',
+                                borderRadius: '16px',
+                                padding: '20px',
+                                height: '500px',
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'flex-start',

@@ -142,7 +142,7 @@ export default function ToolInterface({
                 <p style={{ color: '#666' }}>{description}</p>
             </div>
 
-            <div className="card" style={{ padding: 40 }}>
+            <div className="card">
                 {status === 'idle' || status === 'ready' ? (
                     <form onSubmit={handleSubmit}>
                         <div style={{ marginBottom: 30 }}>

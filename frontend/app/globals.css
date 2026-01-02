@@ -69,6 +69,13 @@ a {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 40px;
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 20px !important;
+  }
 }
 
 .card:hover {
@@ -125,6 +132,24 @@ a {
   .grid-cols-4 {
     grid-template-columns: 1fr;
   }
+
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+.only-mobile {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .only-mobile {
+    display: block;
+  }
+}
+
+.w-full {
+  width: 100%;
 }
 
 /* Footer Improvements */

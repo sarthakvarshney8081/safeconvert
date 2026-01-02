@@ -25,7 +25,7 @@ export default function ExtractPagesTool() {
     };
 
     const processFile = async (files: File[], options: any) => {
-        const wasm = await import('../../../public/wasm/safeconvert_wasm');
+        const wasm = await import(/* webpackIgnore: true */ '/wasm/safeconvert_wasm.js');
         await wasm.default();
 
         const file = files[0];

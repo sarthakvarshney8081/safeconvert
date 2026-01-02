@@ -7,8 +7,7 @@ export default function OrganizePdfTool() {
     const [pageOrder, setPageOrder] = useState<string>("");
 
     const handleProcess = async (files: File[], options: any) => {
-        // @ts-ignore
-        const wasm = await import('../../../public/wasm/safeconvert_wasm');
+        const wasm = await import(/* webpackIgnore: true */ '/wasm/safeconvert_wasm.js');
         await wasm.default();
 
         if (files.length === 0) throw new Error("No file selected");

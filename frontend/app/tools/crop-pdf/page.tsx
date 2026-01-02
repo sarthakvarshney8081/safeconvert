@@ -197,8 +197,8 @@ export default function CropPdfTool() {
                         <div style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 15,
-                            padding: '20px',
+                            gap: 12,
+                            padding: '15px',
                             background: '#fff',
                             borderRadius: '12px',
                             border: '1px solid #eee',
@@ -207,31 +207,31 @@ export default function CropPdfTool() {
                             boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                         }}>
                             {/* Page Nav */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', gap: 15, alignItems: 'center' }}>
-                                    <button type="button" disabled={currPageIndex <= 1} onClick={() => changePage(-1)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #ddd', background: '#fff', cursor: 'pointer' }}>&larr;</button>
-                                    <span style={{ fontWeight: 600 }}>Page {currPageIndex} <span style={{ color: '#999', fontWeight: 400 }}>/ {numPages}</span></span>
-                                    <button type="button" disabled={currPageIndex >= numPages} onClick={() => changePage(1)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #ddd', background: '#fff', cursor: 'pointer' }}>&rarr;</button>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                                    <button type="button" disabled={currPageIndex <= 1} onClick={() => changePage(-1)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #ddd', background: '#fff', cursor: 'pointer', fontSize: '0.9rem' }}>&larr;</button>
+                                    <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{currPageIndex} / {numPages}</span>
+                                    <button type="button" disabled={currPageIndex >= numPages} onClick={() => changePage(1)} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #ddd', background: '#fff', cursor: 'pointer', fontSize: '0.9rem' }}>&rarr;</button>
                                 </div>
 
                                 { /* Zoom controls - Adjusted so that Auto-Fit = 100% */}
-                                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                                    <button type="button" onClick={handleZoomOut} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f7', border: 'none', borderRadius: '50%', cursor: 'pointer' }}>−</button>
-                                    <span style={{ fontSize: '0.9rem', width: 45, textAlign: 'center', fontWeight: 500 }}>{zoom}%</span>
-                                    <button type="button" onClick={handleZoomIn} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f7', border: 'none', borderRadius: '50%', cursor: 'pointer' }}>+</button>
+                                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                    <button type="button" onClick={handleZoomOut} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f7', border: 'none', borderRadius: '50%', cursor: 'pointer' }}>−</button>
+                                    <span style={{ fontSize: '0.8rem', width: 38, textAlign: 'center', fontWeight: 500 }}>{zoom}%</span>
+                                    <button type="button" onClick={handleZoomIn} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f7', border: 'none', borderRadius: '50%', cursor: 'pointer' }}>+</button>
                                 </div>
                             </div>
 
                             {/* Scope Selection */}
-                            <div style={{ borderTop: '1px solid #eee', paddingTop: 15, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                <label style={{ fontWeight: 600, color: '#333', fontSize: '0.9rem' }}>Apply crop to:</label>
-                                <div style={{ display: 'flex', gap: 24 }}>
-                                    <label style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer', fontSize: '0.95rem' }}>
-                                        <input type="radio" checked={scope === 'all'} onChange={() => setScope('all')} style={{ width: 18, height: 18, accentColor: 'var(--primary)' }} />
+                            <div style={{ borderTop: '1px solid #eee', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <label style={{ fontWeight: 600, color: '#333', fontSize: '0.85rem' }}>Apply crop to:</label>
+                                <div style={{ display: 'flex', gap: 15, flexWrap: 'wrap' }}>
+                                    <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer', fontSize: '0.9rem' }}>
+                                        <input type="radio" checked={scope === 'all'} onChange={() => setScope('all')} style={{ width: 16, height: 16, accentColor: 'var(--primary)' }} />
                                         All Pages
                                     </label>
-                                    <label style={{ display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer', fontSize: '0.95rem' }}>
-                                        <input type="radio" checked={scope === 'current'} onChange={() => setScope('current')} style={{ width: 18, height: 18, accentColor: 'var(--primary)' }} />
+                                    <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer', fontSize: '0.9rem' }}>
+                                        <input type="radio" checked={scope === 'current'} onChange={() => setScope('current')} style={{ width: 16, height: 16, accentColor: 'var(--primary)' }} />
                                         Current Page Only
                                     </label>
                                 </div>
@@ -242,14 +242,15 @@ export default function CropPdfTool() {
                     {imgSrc ? (
                         <div
                             ref={containerRef}
+                            className="preview-container"
                             style={{
                                 border: '1px solid #eee',
                                 background: '#1a1a1b',
-                                padding: '40px',
-                                borderRadius: '16px',
+                                padding: '20px',
+                                borderRadius: '12px',
                                 overflow: 'auto',
                                 width: '100%',
-                                maxHeight: '700px',
+                                height: '500px',
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'flex-start',
@@ -285,9 +286,9 @@ export default function CropPdfTool() {
                         </div>
                     )}
 
-                    <div style={{ background: '#e3f2fd', padding: '16px 20px', borderRadius: '12px', fontSize: '0.95rem', color: '#1565c0', display: 'flex', gap: 12, alignItems: 'center', width: '100%' }}>
-                        <span style={{ fontSize: '1.2rem' }}>💡</span>
-                        <span style={{ lineHeight: 1.5 }}><b>Pro Tip:</b> Drag handles on the image to select the crop area. Use the zoom controls above to adjust visibility.</span>
+                    <div style={{ background: '#e3f2fd', padding: '12px 15px', borderRadius: '10px', fontSize: '0.85rem', color: '#1565c0', display: 'flex', gap: 10, alignItems: 'center', width: '100%' }}>
+                        <span style={{ fontSize: '1rem' }}>💡</span>
+                        <span style={{ lineHeight: 1.4 }}><b>Pro Tip:</b> Drag handles on the image to select area. Zoom to adjust visibility.</span>
                     </div>
                 </div>
             }
