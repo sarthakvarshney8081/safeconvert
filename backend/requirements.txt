@@ -17,3 +17,5 @@ pdf2docx
 pytesseract
 pdfplumber
 python-pptx
+feedparser
+requests

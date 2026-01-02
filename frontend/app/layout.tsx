@@ -8,8 +8,25 @@ import Clarity from '@/components/analytics/Clarity';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'SafeConverts - Self-Hosted File Tools',
-  description: 'Privacy-focused file conversion and manipulation tools.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://safeconverts.com'),
+  title: {
+    default: 'SafeConverts - Self-Hosted File Tools',
+    template: '%s | SafeConverts',
+  },
+  description: 'Secure, private, and local-first file tools. Compress, convert, and edit PDFs locally.',
+  openGraph: {
+    title: 'SafeConverts - Self-Hosted File Tools',
+    description: 'Secure, private, and local-first file tools.',
+    url: '/',
+    siteName: 'SafeConverts',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SafeConverts',
+    description: 'Secure, private, and local-first file tools.',
+  },
 };
 
 export default function RootLayout({
