@@ -53,7 +53,7 @@ export default function PrivacyPage() {
                         In compliance with the Information Technology Act, 2000 and rules made thereunder, you may contact our Grievance Officer for any concerns:
                     </p>
                     <div style={{ background: '#f8fafc', padding: 20, borderRadius: 8 }}>
-                        <p><strong>Email:</strong> privacy@safeconverts.com</p>
+                        <p><strong>Email:</strong> support@safeconverts.com</p>
                     </div>
                 </section>
             </div>
