@@ -43,6 +43,27 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_CLARITY_ID && (
           <Clarity projectId={process.env.NEXT_PUBLIC_CLARITY_ID} />
         )}
+        <Script
+          id="schema-org"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'SafeConverts',
+              url: process.env.NEXT_PUBLIC_BASE_URL || 'https://safeconverts.com',
+              description: 'Secure, private, and local-first file tools. Compress, convert, and edit PDFs locally.',
+              publisher: {
+                '@type': 'Organization',
+                name: 'SafeConverts',
+                logo: {
+                  '@type': 'ImageObject',
+                  url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://safeconverts.com'}/icon.svg`,
+                },
+              },
+            }),
+          }}
+        />
         <Navbar />
         <main style={{ flex: 1, paddingBottom: 40 }}>
           {children}
