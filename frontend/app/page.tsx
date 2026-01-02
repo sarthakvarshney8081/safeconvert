@@ -88,7 +88,7 @@ export default function Home() {
       </div>
 
       <div style={{ marginBottom: 60 }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 20, color: '#333', borderBottom: '2px solid #eee', paddingBottom: 10 }}>Edit & Security (Wasm ⚡)</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 20, color: '#333', borderBottom: '2px solid #eee', paddingBottom: 10 }}>Advanced Tools (Local & Private)</h2>
         <div className="grid grid-cols-4" style={{ gap: 20 }}>
           <ToolCard
             title="Add Page Numbers"
@@ -101,7 +101,7 @@ export default function Home() {
             description="Add digital signatures to your documents."
             icon={PenTool}
             href="/tools/sign-pdf"
-            badge="Client-Side"
+            badge="Edit & Security"
           />
           <ToolCard
             title="Crop PDF"

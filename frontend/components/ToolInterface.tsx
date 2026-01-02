@@ -216,6 +216,15 @@ export default function ToolInterface({
                                 )}
                             </div>
                         )}
+
+                        {(status === 'idle' || status === 'ready') && (
+                            <div style={{ marginTop: 20, textAlign: 'center', borderTop: '1px solid #eee', paddingTop: 20 }}>
+                                <Link href="/" style={{ color: '#666', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                                    <ArrowLeft size={16} />
+                                    Back to Home
+                                </Link>
+                            </div>
+                        )}
                     </form>
                 ) : status === 'processing' || isProcessing ? (
                     <div style={{ textAlign: 'center', padding: 40 }}>
