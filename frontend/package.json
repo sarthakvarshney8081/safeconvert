@@ -16,7 +16,8 @@
     "react-dom": "19.2.3",
     "react-image-crop": "^11.0.10",
     "react-signature-canvas": "^1.0.6",
-    "react-draggable": "^4.4.6"
+    "react-draggable": "^4.4.6",
+    "@microsoft/clarity": "^0.7.12"
   },
   "devDependencies": {
     "@types/react-signature-canvas": "^1.0.2",
