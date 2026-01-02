@@ -11,6 +11,7 @@ export default function Navbar() {
 
     const links = [
         { href: '/', label: 'All Tools' },
+        { href: '/it-tools', label: 'IT Tools' },
         { href: '/workflow', label: 'Workflows' },
         { href: '/about', label: 'About' },
     ];

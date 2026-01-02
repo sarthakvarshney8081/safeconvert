@@ -29,3 +29,4 @@ temp/
 coverage/
 .idea/
 .vscode/
+frontend/.next

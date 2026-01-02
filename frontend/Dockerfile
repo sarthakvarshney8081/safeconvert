@@ -13,7 +13,7 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 # Context is root, so copy frontend package files
 COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
