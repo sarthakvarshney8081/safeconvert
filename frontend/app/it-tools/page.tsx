@@ -440,6 +440,8 @@ export default function ITToolsPage() {
                 <div style={{ position: 'relative', maxWidth: 500, margin: '0 auto' }}>
                     <input
                         type="text"
+                        id="tool-search"
+                        name="tool-search"
                         placeholder="Search tools..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}

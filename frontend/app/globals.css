@@ -1,3 +1,4 @@
+/* v1.0.1 - Force CSS Refresh */
 :root {
   /* Material Design Inspired Palette */
   --primary: #6200EE;
@@ -177,4 +178,23 @@ a {
 .footer-bottom {
   background: #fcfcfc;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Navbar Styles */
+.desktop-menu {
+  display: flex;
+}
+
+.mobile-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-menu {
+    display: none !important;
+  }
+
+  .mobile-toggle {
+    display: block !important;
+  }
 }

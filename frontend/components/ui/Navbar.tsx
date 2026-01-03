@@ -96,15 +96,7 @@ export default function Navbar() {
                 </div>
             )}
 
-            <style jsx>{`
-                .desktop-menu { display: flex; }
-                .mobile-toggle { display: none; }
 
-                @media (max-width: 768px) {
-                    .desktop-menu { display: none !important; }
-                    .mobile-toggle { display: block !important; }
-                }
-            `}</style>
         </nav>
     );
 }
