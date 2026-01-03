@@ -57,6 +57,7 @@ export default function Navbar() {
                     className="mobile-toggle"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#333' }}
+                    aria-label="Toggle menu"
                 >
                     {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>

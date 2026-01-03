@@ -93,7 +93,7 @@ export default function RootLayout({
               <div style={{ marginBottom: '25px' }}>
                 <img src="/logo.svg" alt="SafeConverts" style={{ height: '45px' }} />
               </div>
-              <p style={{ fontSize: '0.95rem', lineHeight: '1.6', maxWidth: '280px', color: '#888' }}>
+              <p style={{ fontSize: '0.95rem', lineHeight: '1.6', maxWidth: '280px', color: '#555' }}>
                 Secure, private, and local-first file tools. Your files never leave your browser or your server.
               </p>
             </div>
