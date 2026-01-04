@@ -20,6 +20,21 @@ async def convert_office_to_pdf(background_tasks: BackgroundTasks, file: UploadF
     try:
         temp_file = await save_upload_file(file)
         
+        # Security Validation
+        ALLOWED_EXTS = {'.docx', '.xlsx', '.pptx', '.doc', '.xls', '.ppt'}
+        ext = os.path.splitext(file.filename)[1].lower()
+        if ext not in ALLOWED_EXTS:
+             if temp_file and os.path.exists(temp_file): os.remove(temp_file)
+             raise HTTPException(status_code=400, detail=f"Invalid file type: {ext}. Allowed: {', '.join(ALLOWED_EXTS)}")
+
+        # Magic Byte Check for Modern Office (XML-based) which are ZIPs
+        if ext in {'.docx', '.xlsx', '.pptx'}:
+            with open(temp_file, 'rb') as f:
+                header = f.read(4)
+                if header != b'PK\x03\x04':
+                     if os.path.exists(temp_file): os.remove(temp_file)
+                     raise HTTPException(status_code=400, detail="Invalid file signature. Not a valid Office Open XML file.")
+        
         # Command: libreoffice --headless --convert-to pdf --outdir <dir> <file>
         cmd = [
             "libreoffice",

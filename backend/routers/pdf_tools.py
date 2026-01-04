@@ -19,7 +19,21 @@ async def merge_pdfs(background_tasks: BackgroundTasks, files: list[UploadFile] 
 
     try:
         # Save and merge all files
+        # Save and merge all files
         for file in files:
+            # Security Validation
+            if not file.filename.lower().endswith('.pdf'):
+                raise HTTPException(status_code=400, detail=f"Invalid file type: {file.filename}. Only PDF files are allowed.")
+            
+            if file.content_type != 'application/pdf':
+                raise HTTPException(status_code=400, detail=f"Invalid content type: {file.filename}. Expected application/pdf.")
+
+            # Magic Byte Validation (Prevent extension spoofing)
+            header = await file.read(4)
+            await file.seek(0) # Reset cursor
+            if header != b'%PDF':
+                raise HTTPException(status_code=400, detail=f"Invalid file signature: {file.filename}. Not a valid PDF.")
+
             path = await save_upload_file(file)
             temp_files.append(path)
             merger.append(path)

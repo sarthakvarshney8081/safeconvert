@@ -32,6 +32,24 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
             validFiles = validFiles.filter(f => f.size <= MAX_SIZE);
         }
 
+        // 3. File Type Validation (Strict check for Drag & Drop)
+        if (accept && validFiles.length > 0) {
+            const allowedTypes = accept.split(',').map(t => t.trim().toLowerCase());
+            const invalidTypeFiles = validFiles.filter(f => {
+                const ext = '.' + f.name.split('.').pop()?.toLowerCase();
+                const type = f.type.toLowerCase();
+                // Check if file matches EITHER extension OR mime type
+                return !allowedTypes.some(allowed =>
+                    allowed.startsWith('.') ? allowed === ext : (type === allowed || (allowed.endsWith('/*') && type.startsWith(allowed.replace('/*', ''))))
+                );
+            });
+
+            if (invalidTypeFiles.length > 0) {
+                alert(`Invalid file type! Allowed: ${accept}\nSkipped: ${invalidTypeFiles.map(f => f.name).join(', ')}`);
+                validFiles = validFiles.filter(f => !invalidTypeFiles.includes(f));
+            }
+        }
+
         if (validFiles.length > 0) {
             setFiles(prev => [...prev, ...validFiles]);
             onFilesSelected(validFiles);
