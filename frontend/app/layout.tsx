@@ -24,6 +24,15 @@ export const metadata: Metadata = {
     locale: 'en_US',
     type: 'website',
   },
+  keywords: [
+    'PDF Converter', 'Compress PDF', 'Merge PDF', 'PDF to Word', 'Sign PDF',
+    'Local PDF Tools', 'Secure File Conversion', 'Privacy Focused',
+    'Regex Tester', 'JSON Converter', 'Base64 Encoder', 'Hash Generator',
+    'Developer Tools', 'Free Online Tools', 'No Server Upload',
+    'Offline PDF Editor', 'Safe PDF Tools', 'PDF Merger', 'Split PDF',
+    'Image Compressor', 'PNG to SVG', 'Private File Tools',
+    'WebAssembly PDF', 'Secure PDF Editor', 'Best Free PDF Tools'
+  ],
   twitter: {
     card: 'summary_large_image',
     title: 'SafeConverts',
