@@ -1,6 +1,6 @@
-# SafeConvert - Self-Hosted File Tools
+# SafeConverts - Self-Hosted File Tools
 
-SafeConvert is a privacy-focused, self-hosted web platform for file manipulation (PDF and Images), running entirely on your own infrastructure using Docker.
+SafeConverts is a privacy-focused, self-hosted web platform for file manipulation (PDF and Images), running entirely on your own infrastructure using Docker.
 
 ## Quick Start
 

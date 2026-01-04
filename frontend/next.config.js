@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'standalone',
+    reactStrictMode: true,
+    swcMinify: true,
+    poweredByHeader: false,
+    compiler: {
+        removeConsole: process.env.NODE_ENV === "production",
+    },
 
     // Proxy API requests to backend container to keep backend private
     async rewrites() {

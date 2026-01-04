@@ -26,7 +26,7 @@ export default function TextManipulation() {
     const [stats, setStats] = useState({ chars: 0, words: 0, lines: 0, sentences: 0 });
 
     // ASCII State
-    const [asciiInput, setAsciiInput] = useState('SafeConvert');
+    const [asciiInput, setAsciiInput] = useState('SafeConverts');
     const [asciiResult, setAsciiResult] = useState('');
 
     // Lorem Logic

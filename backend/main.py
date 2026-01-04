@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
-app = FastAPI(title="SafeConvert API")
+app = FastAPI(title="SafeConverts API")
 
 # Configure CORS
 origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
@@ -17,7 +17,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "SafeConvert API is running"}
+    return {"message": "SafeConverts API is running"}
 
 @app.get("/health")
 async def health_check():
@@ -32,15 +32,15 @@ from contextlib import asynccontextmanager
 async def periodic_cleanup():
     while True:
         try:
-            # Run cleanup every 15 minutes
-            await asyncio.sleep(900)
+            # Run cleanup every 5 minutes
+            await asyncio.sleep(300)
             now = time.time()
             if os.path.exists(UPLOAD_DIR):
                 for filename in os.listdir(UPLOAD_DIR):
                     file_path = os.path.join(UPLOAD_DIR, filename)
-                    # Delete if older than 20 minutes (1200 seconds)
+                    # Delete if older than 10 minutes (600 seconds)
                     if os.path.isfile(file_path):
-                        if os.stat(file_path).st_mtime < now - 1200:
+                        if os.stat(file_path).st_mtime < now - 600:
                             os.remove(file_path)
                             print(f"Cleaned up {filename}")
         except Exception as e:

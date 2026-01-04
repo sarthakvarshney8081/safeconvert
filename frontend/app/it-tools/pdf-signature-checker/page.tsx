@@ -7,7 +7,7 @@ import { getSignatures, Signature } from 'pdf-signature-reader';
 
 export default function PdfSignatureChecker() {
     const [file, setFile] = useState<File | null>(null);
-    const [signatures, setSignatures] = useState<Signature[]>([]);
+    const [signatures, setSignatures] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 

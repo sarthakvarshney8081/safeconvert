@@ -1,4 +1,4 @@
-/* v1.0.1 - Force CSS Refresh */
+/* v1.0.3 - Premium Footer Update */
 :root {
   /* Material Design Inspired Palette */
   --primary: #6200EE;
@@ -12,6 +12,13 @@
   --on-secondary: #000000;
   --on-background: #000000;
   --on-surface: #000000;
+
+  /* Premium Footer Colors */
+  --footer-bg: #1a1b26;
+  /* Deep distinct dark blue/black */
+  --footer-text: #a1a1aa;
+  --footer-heading: #ffffff;
+  --footer-border: #27272a;
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -153,31 +160,54 @@ a {
   width: 100%;
 }
 
-/* Footer Improvements */
+/* Premium Footer Styles */
 .footer-link {
   transition: all 0.2s ease;
-  color: #666;
+  color: var(--footer-text);
   font-weight: 400;
   display: inline-block;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
 }
 
 .footer-link:hover {
   color: var(--primary);
   transform: translateX(3px);
+  text-shadow: 0 0 8px rgba(98, 0, 238, 0.4);
 }
 
 .footer-section-title {
-  color: #111;
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 1.25rem;
+  color: var(--footer-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  opacity: 0.9;
 }
 
 .footer-bottom {
-  background: #fcfcfc;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--footer-border);
+  color: var(--footer-text);
+}
+
+/* Responsive Footer Logic */
+.footer-desktop-only {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .footer-desktop-only {
+    display: none;
+  }
+
+  .footer-mobile-center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 /* Navbar Styles */
@@ -196,5 +226,27 @@ a {
 
   .mobile-toggle {
     display: block !important;
+  }
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+
+  15% {
+    transform: scale(1.15);
+  }
+
+  30% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.15);
+  }
+
+  60% {
+    transform: scale(1);
   }
 }

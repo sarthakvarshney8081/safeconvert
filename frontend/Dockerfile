@@ -27,6 +27,8 @@ COPY --from=wasm-builder /wasm/pkg ./public/wasm
 # Accept GA ID as build argument
 ARG NEXT_PUBLIC_GA_ID
 ENV NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID
+ARG NEXT_PUBLIC_CLARITY_ID
+ENV NEXT_PUBLIC_CLARITY_ID=$NEXT_PUBLIC_CLARITY_ID
 
 RUN npm run build
 
