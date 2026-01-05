@@ -19,3 +19,7 @@ pdfplumber
 python-pptx
 feedparser
 requests
+pdfminer.six
+pyhanko
+cryptography
+nest_asyncio

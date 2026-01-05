@@ -3,13 +3,13 @@
 import React, { useState } from 'react';
 import { FileSignature, Upload, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import ToolLayout from '@/components/ToolLayout';
-import { getSignatures, Signature } from 'pdf-signature-reader';
 
 export default function PdfSignatureChecker() {
     const [file, setFile] = useState<File | null>(null);
     const [signatures, setSignatures] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [debugInfo, setDebugInfo] = useState<string>('');
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
@@ -19,15 +19,37 @@ export default function PdfSignatureChecker() {
         setLoading(true);
         setError('');
         setSignatures([]);
+        setDebugInfo('');
 
         try {
-            const arrayBuffer = await selectedFile.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            const foundSignatures = getSignatures(buffer);
-            setSignatures(foundSignatures);
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            // Call Backend API
+            const res = await fetch('/api/pdf/verify-signature', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                let errMsg = `Server Error: ${res.status}`;
+                try {
+                    const json = JSON.parse(text);
+                    errMsg = json.detail || errMsg;
+                } catch (e) { }
+                throw new Error(errMsg);
+            }
+
+            const data = await res.json();
+            console.log("Backend Result:", data);
+            setDebugInfo(JSON.stringify(data, null, 2));
+
+            setSignatures(data.signatures || []);
+
         } catch (err) {
             console.error(err);
-            setError('Failed to parse PDF signatures. Ensure the file is a valid PDF.');
+            setError(`Failed to verify: ${(err as Error).message}`);
         } finally {
             setLoading(false);
         }
@@ -87,30 +109,38 @@ export default function PdfSignatureChecker() {
                         {signatures.map((sig, i) => (
                             <div key={i} style={{ padding: '20px', borderRadius: '12px', border: '1px solid #e0e0e0', background: '#fff' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
-                                    <CheckCircle size={24} color={sig.signedData.length > 0 ? 'green' : 'orange'} />
+                                    <CheckCircle size={24} color={sig.valid ? 'green' : 'orange'} />
                                     <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>Signature #{i + 1}</span>
                                 </div>
                                 <div style={{ display: 'grid', gap: '10px', fontSize: '0.9rem' }}>
                                     <div style={{ display: 'flex' }}>
-                                        <span style={{ width: '120px', color: '#666' }}>Reason:</span>
-                                        <span style={{ fontWeight: 500 }}>{sig.reason || 'N/A'}</span>
+                                        <span style={{ width: '120px', color: '#666' }}>Signer:</span>
+                                        <span style={{ fontWeight: 500 }}>{sig.signer || 'Unknown'}</span>
                                     </div>
                                     <div style={{ display: 'flex' }}>
-                                        <span style={{ width: '120px', color: '#666' }}>Contact Info:</span>
-                                        <span style={{ fontWeight: 500 }}>{sig.contactInfo || 'N/A'}</span>
+                                        <span style={{ width: '120px', color: '#666' }}>Timestamp:</span>
+                                        <span style={{ fontWeight: 500 }}>{sig.timestamp || 'N/A'}</span>
                                     </div>
                                     <div style={{ display: 'flex' }}>
-                                        <span style={{ width: '120px', color: '#666' }}>Location:</span>
-                                        <span style={{ fontWeight: 500 }}>{sig.location || 'N/A'}</span>
+                                        <span style={{ width: '120px', color: '#666' }}>Integrity:</span>
+                                        <span style={{ fontWeight: 500, color: sig.valid ? 'green' : 'red' }}>
+                                            {sig.valid ? 'Valid' : 'Invalid'}
+                                        </span>
                                     </div>
                                     <div style={{ display: 'flex' }}>
-                                        <span style={{ width: '120px', color: '#666' }}>Byte Range:</span>
-                                        <span style={{ fontFamily: 'monospace' }}>[{sig.byteRange.join(', ')}]</span>
+                                        <span style={{ width: '120px', color: '#666' }}>Trust:</span>
+                                        <span style={{ fontWeight: 500 }}>{sig.trust ? 'Trusted' : 'Untrusted (Self-Signed?)'}</span>
                                     </div>
                                     <div style={{ display: 'flex' }}>
-                                        <span style={{ width: '120px', color: '#666' }}>Type:</span>
-                                        <span>{sig.type} | {sig.subFilter}</span>
+                                        <span style={{ width: '120px', color: '#666' }}>Field:</span>
+                                        <span style={{ fontFamily: 'monospace' }}>{sig.field}</span>
                                     </div>
+                                    {sig.error && (
+                                        <div style={{ display: 'flex', color: 'red' }}>
+                                            <span style={{ width: '120px' }}>Error:</span>
+                                            <span>{sig.error}</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -118,6 +148,14 @@ export default function PdfSignatureChecker() {
                 )}
 
             </div>
+
+            {/* Debug Output */}
+            {debugInfo && (
+                <div style={{ marginTop: 20, padding: 20, background: '#eee', borderRadius: 8, overflow: 'auto' }}>
+                    <strong>Raw Debug Output:</strong>
+                    <pre style={{ fontSize: '0.8rem' }}>{debugInfo}</pre>
+                </div>
+            )}
         </ToolLayout>
     );
 }

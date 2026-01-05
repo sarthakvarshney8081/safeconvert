@@ -30,3 +30,5 @@ coverage/
 .idea/
 .vscode/
 frontend/.next
+
+frontend/app/latex-builder/

@@ -29,6 +29,8 @@ ARG NEXT_PUBLIC_GA_ID
 ENV NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID
 ARG NEXT_PUBLIC_CLARITY_ID
 ENV NEXT_PUBLIC_CLARITY_ID=$NEXT_PUBLIC_CLARITY_ID
+ARG NEXT_PUBLIC_ADSENSE_ID
+ENV NEXT_PUBLIC_ADSENSE_ID=$NEXT_PUBLIC_ADSENSE_ID
 
 RUN npm run build
 
@@ -42,6 +44,9 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
+# Upgrade system packages to fix vulnerabilities (e.g. busybox)
+RUN apk update && apk upgrade --no-cache
 
 # Copy standalone build
 COPY --from=builder /app/public ./public

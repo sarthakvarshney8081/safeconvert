@@ -16,18 +16,27 @@ export default function PrivacyContent() {
                 </div>
 
                 <div style={{ background: '#fff', padding: 40, borderRadius: 12, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', border: '1px solid #f0f0f0' }}>
+
                     <section style={{ marginBottom: 30, borderBottom: '1px solid #eee', paddingBottom: 30 }}>
                         <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>1. Commitment to Privacy</h2>
                         <p>
-                            At SafeConverts, your privacy is our absolute priority. We have engineered our systems to minimize data retention and ensure that you retain full control over your documents. We do not track, sell, or share your personal information.
+                            At SafeConvert, your privacy is our absolute priority. We have engineered our systems to minimize data retention. While we do not sell your personal document data, we use third-party services (like Google) to serve advertisements, which may involve limited data collection for ad personalization.
                         </p>
                     </section>
 
                     <section style={{ marginBottom: 30, borderBottom: '1px solid #eee', paddingBottom: 30 }}>
-                        <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>2. Data Handling & Security</h2>
-                        <p style={{ marginBottom: 10 }}>
-                            Our data processing pipeline is automated and secure:
-                        </p>
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>2. Cookies and Advertising</h2>
+                        <p style={{ marginBottom: 10 }}><strong>Google AdSense:</strong> We use Google as a third-party vendor to serve ads on our site.</p>
+                        <ul style={{ listStyle: 'disc', listStylePosition: 'inside', paddingLeft: 10, color: '#444' }}>
+                            <li style={{ marginBottom: 10 }}><strong>Cookies:</strong> Google uses cookies to serve ads based on your prior visits to our website or other websites.</li>
+                            <li style={{ marginBottom: 10 }}><strong>Personalized Ads:</strong> Users in the EEA and UK will be presented with a Consent Message to opt-in or out of personalized advertising.</li>
+                            <li><strong>Google's Terms:</strong> For more information, please visit <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb' }}>How Google uses information from sites or apps that use our services</a>.</li>
+                        </ul>
+                    </section>
+
+                    <section style={{ marginBottom: 30, borderBottom: '1px solid #eee', paddingBottom: 30 }}>
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>3. Data Handling & Security</h2>
+                        <p style={{ marginBottom: 10 }}>Our data processing pipeline is automated and secure:</p>
                         <ul style={{ listStyle: 'none', padding: 0 }}>
                             <li style={{ marginBottom: 10, paddingLeft: 20, borderLeft: '3px solid var(--primary)' }}>
                                 <strong style={{ color: '#333' }}>Encryption:</strong> All file transfers are encrypted using industry-standard TLS protocols.
@@ -39,21 +48,17 @@ export default function PrivacyContent() {
                     </section>
 
                     <section style={{ marginBottom: 30, borderBottom: '1px solid #eee', paddingBottom: 30 }}>
-                        <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>3. Automated Deletion Policy</h2>
-                        <p>
-                            We adhere to a strict retention policy to protect your sensitive information:
-                        </p>
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>4. Automated Deletion Policy</h2>
+                        <p>We adhere to a strict retention policy:</p>
                         <ul style={{ background: '#f8fafc', padding: 20, borderRadius: 8, marginTop: 15, listStyle: 'disc', listStylePosition: 'inside' }}>
                             <li style={{ marginBottom: 8, color: '#444' }}><strong>Immediately:</strong> Original uploads are deleted as soon as processing starts.</li>
-                            <li style={{ color: '#444' }}><strong>Within 10 Minutes:</strong> All processed output files are permanently purged from our servers.</li>
+                            <li style={{ color: '#444' }}><strong>Within 20 Minutes:</strong> All processed output files are permanently purged from our servers.</li>
                         </ul>
                     </section>
 
                     <section style={{ marginBottom: 30 }}>
-                        <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>4. Grievance Officer</h2>
-                        <p style={{ marginBottom: 20 }}>
-                            In compliance with the Information Technology Act, 2000 and rules made thereunder, you may contact our Grievance Officer for any concerns:
-                        </p>
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: 15, color: '#333' }}>5. Contact Us</h2>
+                        <p style={{ marginBottom: 20 }}>For any concerns regarding your privacy, you may contact us at:</p>
                         <div style={{ background: '#f8fafc', padding: 20, borderRadius: 8 }}>
                             <p><strong>Email:</strong> support@safeconverts.com</p>
                         </div>

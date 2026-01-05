@@ -10,8 +10,9 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const links = [
-        { href: '/', label: 'All Tools' },
+        { href: '/tools', label: 'PDF Tools' },
         { href: '/it-tools', label: 'IT Tools' },
+        { href: '/latex-builder', label: 'LaTeX Builder' },
         { href: '/workflow', label: 'Workflows' },
         { href: '/about', label: 'About' },
     ];
@@ -27,7 +28,7 @@ export default function Navbar() {
             borderBottom: '1px solid #eee',
             position: 'sticky',
             top: 0,
-            zIndex: 50
+            zIndex: 1000
         }}>
             <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px' }}>
                 <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', fontSize: '1.5rem', color: 'var(--primary)' }}>

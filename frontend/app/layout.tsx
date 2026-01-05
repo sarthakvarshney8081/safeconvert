@@ -11,6 +11,9 @@ const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://safeconverts.com'),
+  alternates: {
+    canonical: '/',
+  },
   title: {
     default: 'SafeConverts - Secure PDF Converter & Free Local File Tools', // ~59 chars
     template: '%s | SafeConverts',
@@ -70,6 +73,14 @@ export default function RootLayout({
         )}
         {process.env.NEXT_PUBLIC_CLARITY_ID && (
           <Clarity projectId={process.env.NEXT_PUBLIC_CLARITY_ID} />
+        )}
+        {process.env.NEXT_PUBLIC_ADSENSE_ID && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_ID}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
         )}
         <script
           id="schema-org"

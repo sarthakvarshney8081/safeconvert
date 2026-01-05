@@ -19,10 +19,14 @@ RUN apt-get update && apt-get install -y \
     ghostscript \
     default-jre \
     ffmpeg \
-    libsm6 \
     libxext6 \
     potrace \
+    texlive-latex-base \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
     && rm -rf /var/lib/apt/lists/*
+
+# Tectonic removed due to installer failure. Using standard pdflatex.
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

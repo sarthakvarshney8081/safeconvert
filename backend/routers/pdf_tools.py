@@ -63,3 +63,64 @@ async def merge_pdfs(background_tasks: BackgroundTasks, files: list[UploadFile] 
             cleanup_file(path)
         raise HTTPException(status_code=500, detail=f"Merge failed: {str(e)}")
 
+
+@router.post("/verify-signature")
+async def verify_signature(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+    temp_path = await save_upload_file(file)
+    results = []
+
+    try:
+        from pyhanko.pdf_utils.reader import PdfFileReader
+        from pyhanko.sign import validation
+        from pyhanko.sign.general import load_certs_from_pemder
+
+        with open(temp_path, 'rb') as f:
+            reader = PdfFileReader(f)
+            
+            # Check for signatures
+            if not reader.embedded_signatures:
+                return {"signatures": []}
+
+            # embedded_signatures is a list of SignatureObject in some versions, or a dict in others?
+            # pyhanko>=0.20 reader.embedded_signatures returns a list of signature fields (strings)? 
+            # OR it returns a list of objects.
+            
+            # According to error: "list indices must be integers or slices, not EmbeddedPdfSignature"
+            # This implies reader.embedded_signatures IS A LIST.
+            # And 'sig' IS An Element of that list (EmbeddedPdfSignature object).
+            # So I should pass 'sig' directly, not reader.embedded_signatures[sig].
+
+            import nest_asyncio
+            nest_asyncio.apply()
+
+            for sig in reader.embedded_signatures:
+                try:
+                    # Fix: Use nest_asyncio to allow pyhanko's internal asyncio.run() to work
+                    # even if we are in a running loop.
+                    status = validation.validate_pdf_signature(sig)
+                    
+                    # Extract Data
+                    results.append({
+                        "field": sig.field_name if hasattr(sig, 'field_name') else str(sig),
+                        "valid": status.bottom_line,
+                        "signer": status.signer_cert.subject.human_friendly if status.signer_cert else "Unknown",
+                        "timestamp": str(status.signing_time) if status.signing_time else None,
+                        "integrity": status.integrity,
+                        "trust": status.trusted
+                    })
+                except Exception as e:
+                    print(f"Error validating signature: {e}")
+                    # Don't try to serialize 'sig' if it's complex
+                    results.append({
+                        "field": str(sig),
+                        "error": str(e),
+                        "valid": False
+                    })
+
+    except Exception as e:
+        print(f"Verification Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        background_tasks.add_task(cleanup_file, temp_path)
+
+    return {"signatures": results}

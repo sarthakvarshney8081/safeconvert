@@ -70,6 +70,29 @@ export default function HomeTools() {
         { title: 'GIF Maker', description: 'Images to GIF.', icon: ImageIcon, href: '/tools/gif-maker', color: '#9C27B0' },
     ];
 
+    // IT Tools Integration
+    const itTools = [
+        { title: 'Hash Text', description: 'MD5, SHA1, SHA256 hashing.', icon: FileType, href: '/it-tools/hash-text', color: '#607D8B' },
+        { title: 'Bcrypt Generator', description: 'Hash & verify passwords.', icon: Hash, href: '/it-tools/bcrypt-generator', color: '#E91E63' },
+        { title: 'Base64 Converter', description: 'Encode/Decode text & files.', icon: FileType, href: '/it-tools/base64-converter', color: '#3f51b5' },
+        { title: 'JSON Converter', description: 'Format & Convert JSON/YAML.', icon: FileType, href: '/it-tools/data-converter', color: '#4caf50' },
+        { title: 'Regex Cheatsheet', description: 'Common regex patterns.', icon: FileType, href: '/it-tools/regex-cheatsheet', color: '#e91e63' },
+        { title: 'UUID Generator', description: 'Generate v1/v4 UUIDs.', icon: FileType, href: '/it-tools/uuid-generator', color: '#673AB7' },
+        { title: 'QR Code', description: 'Create QR codes.', icon: Scan, href: '/it-tools/qr-code-generator', color: '#000000' },
+        { title: 'WiFi QR', description: 'WiFi login codes.', icon: Scan, href: '/it-tools/wifi-qr-code', color: '#2196F3' },
+        { title: 'JWT Parser', description: 'Decode JWT tokens.', icon: Shield, href: '/it-tools/jwt-parser', color: '#e91e63' },
+        { title: 'URL Parser', description: 'Deconstruct URLs.', icon: FileType, href: '/it-tools/url-parser', color: '#2196f3' },
+        { title: 'Git Cheatsheet', description: 'Common commands.', icon: FileType, href: '/it-tools/git-cheatsheet', color: '#f44336' },
+        { title: 'Password Strength', description: 'Check entropy.', icon: Shield, href: '/it-tools/password-strength-analyser', color: '#4CAF50' },
+        { title: 'PDF Sign Checker', description: 'Verify signatures.', icon: Shield, href: '/it-tools/pdf-signature-checker', color: '#9C27B0' },
+        { title: 'Markdown to HTML', description: 'Preview markdown.', icon: FileType, href: '/it-tools/markdown-to-html', color: '#2196F3' },
+        { title: 'Text Statistics', description: 'Count words/chars.', icon: FileType, href: '/it-tools/text-manipulation', color: '#673ab7' },
+        { title: 'Diff Checker', description: 'Compare text files.', icon: FileType, href: '/it-tools/diff-tools', color: '#ff5722' },
+        { title: 'Color Converter', description: 'HEX/RGB/HSL.', icon: ImageIcon, href: '/it-tools/color-converter', color: '#2196f3' },
+        { title: 'Date Converter', description: 'ISO/Timestamp.', icon: FileType, href: '/it-tools/date-time-converter', color: '#e91e63' },
+        { title: 'Unit Converter', description: 'Binary/Hex/Decimal.', icon: FileType, href: '/it-tools/integer-base-converter', color: '#9c27b0' }
+    ];
+
     const [searchQuery, setSearchQuery] = useState('');
 
     const filterTools = (tools: Tool[]) => {
@@ -87,7 +110,12 @@ export default function HomeTools() {
     const filteredAdvanced = filterTools(advancedTools);
     const filteredVideo = filterTools(videoTools);
 
-    const hasResults = filteredPdf.length > 0 || filteredConverter.length > 0 || filteredImage.length > 0 || filteredAdvanced.length > 0 || filteredVideo.length > 0;
+    // Only show IT tools if there is a search query OR if we decide to show them all (user said "simultaneously go")
+    // For now, let's show them if search query matches, OR maybe just a few popular ones?
+    // Let's filter them like the rest.
+    const filteredItTools = filterTools(itTools);
+
+    const hasResults = filteredPdf.length > 0 || filteredConverter.length > 0 || filteredImage.length > 0 || filteredAdvanced.length > 0 || filteredVideo.length > 0 || filteredItTools.length > 0;
 
     return (
         <div>
@@ -98,7 +126,7 @@ export default function HomeTools() {
                 </div>
                 <input
                     type="text"
-                    placeholder="Search for tools (e.g. 'Merge', 'Compress', 'PDF to Word')..."
+                    placeholder="Search tools (e.g. 'Merge', 'JSON', 'Regex')..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{
@@ -155,6 +183,18 @@ export default function HomeTools() {
                     <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 20, color: '#333', borderBottom: '2px solid #eee', paddingBottom: 10 }}>Image Tools</h2>
                     <div className="grid grid-cols-4" style={{ gap: 20 }}>
                         {filteredImage.map((tool, i) => (
+                            <ToolCard key={i} {...tool} />
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* New IT Tools Section */}
+            {filteredItTools.length > 0 && (
+                <div style={{ marginBottom: 60 }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 20, color: '#333', borderBottom: '2px solid #eee', paddingBottom: 10 }}>IT & Developer Tools</h2>
+                    <div className="grid grid-cols-4" style={{ gap: 20 }}>
+                        {filteredItTools.map((tool, i) => (
                             <ToolCard key={i} {...tool} />
                         ))}
                     </div>
