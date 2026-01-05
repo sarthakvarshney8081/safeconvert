@@ -52,7 +52,7 @@ export default function PrivacyContent() {
                         <p>We adhere to a strict retention policy:</p>
                         <ul style={{ background: '#f8fafc', padding: 20, borderRadius: 8, marginTop: 15, listStyle: 'disc', listStylePosition: 'inside' }}>
                             <li style={{ marginBottom: 8, color: '#444' }}><strong>Immediately:</strong> Original uploads are deleted as soon as processing starts.</li>
-                            <li style={{ color: '#444' }}><strong>Within 20 Minutes:</strong> All processed output files are permanently purged from our servers.</li>
+                            <li style={{ color: '#444' }}><strong>Within 10 Minutes:</strong> All processed output files are permanently purged from our servers.</li>
                         </ul>
                     </section>
 
