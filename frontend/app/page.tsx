@@ -29,7 +29,8 @@ function HomeContent() {
       <LandingHero />
 
       {/* Tool Categories - Full Width Container with Forced 4 Columns */}
-      <div className="container" style={{ padding: '60px 20px' }}>
+      <div className="container" style={{ padding: '10px 20px 60px' }}>
+
 
         {/* PDF Tools */}
         {pdfTools.length > 0 && (

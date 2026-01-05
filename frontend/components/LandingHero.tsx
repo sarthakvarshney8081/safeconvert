@@ -41,7 +41,7 @@ export default function LandingHero() {
     };
 
     return (
-        <div style={{ padding: '140px 20px 60px', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
+        <div style={{ padding: '80px 20px 40px', minHeight: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
 
             {/* Background Decor (Gradients) */}
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100%', overflow: 'hidden', zIndex: -1, background: 'radial-gradient(circle at 50% 10%, #f0f9ff 0%, #fff 100%)' }}>
@@ -50,17 +50,17 @@ export default function LandingHero() {
             </div>
 
             {/* Hero Content */}
-            <div style={{ textAlign: 'center', maxWidth: 800, marginBottom: 60, animation: 'fadeIn 0.8s ease' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', borderRadius: 20, fontSize: '0.9rem', marginBottom: 20, fontWeight: 500 }}>
-                    <Globe size={16} />
+            <div style={{ textAlign: 'center', maxWidth: 800, marginBottom: 30, animation: 'fadeIn 0.8s ease' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', borderRadius: 20, fontSize: '0.85rem', marginBottom: 15, fontWeight: 500 }}>
+                    <Globe size={14} />
                     <span>Global Privacy-First Platform</span>
                 </div>
 
                 <h1 style={{
-                    fontSize: '4rem',
+                    fontSize: '3.5rem',
                     fontWeight: 800,
                     lineHeight: 1.1,
-                    marginBottom: 24,
+                    marginBottom: 16,
                     background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -69,7 +69,7 @@ export default function LandingHero() {
                     SafeConverts
                 </h1>
 
-                <p style={{ fontSize: '1.25rem', color: '#64748b', lineHeight: 1.6, maxWidth: 600, margin: '0 auto' }}>
+                <p style={{ fontSize: '1.1rem', color: '#64748b', lineHeight: 1.5, maxWidth: 600, margin: '0 auto' }}>
                     Premium PDF and Image tools. 100% Privacy-Focused.
                     <br />
                     No sign-up required.
@@ -77,7 +77,7 @@ export default function LandingHero() {
             </div>
 
             {/* Unified Search Bar */}
-            <div style={{ width: '100%', maxWidth: 500, position: 'relative', marginBottom: 60, zIndex: 20 }}>
+            <div style={{ width: '100%', maxWidth: 500, position: 'relative', marginBottom: 30, zIndex: 20 }}>
                 <input
                     type="text"
                     placeholder="Search tools (e.g. Merge, JSON, Regex)..."
@@ -95,8 +95,8 @@ export default function LandingHero() {
                     }}
                     style={{
                         width: '100%',
-                        padding: '20px 24px 20px 55px',
-                        fontSize: '1.1rem',
+                        padding: '16px 20px 16px 50px',
+                        fontSize: '1rem',
                         borderRadius: '16px',
                         border: '1px solid #e2e8f0',
                         backgroundColor: 'white',
@@ -105,7 +105,7 @@ export default function LandingHero() {
                         transition: 'transform 0.2s, box-shadow 0.2s'
                     }}
                 />
-                <Search style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={24} />
+                <Search style={{ position: 'absolute', left: 18, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} size={20} />
 
                 {/* Dropdown */}
                 {isFocused && searchQuery.length > 1 && results.length > 0 && (
@@ -152,17 +152,17 @@ export default function LandingHero() {
             {/* Cards Moved to Bottom of Page */}
 
             {/* Trust Badges */}
-            <div style={{ display: 'flex', gap: 40, marginTop: 80, opacity: 0.6 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#64748b', fontSize: '0.9rem' }}>
-                    <ShieldCheck size={20} />
+            <div style={{ display: 'flex', gap: 30, marginTop: 10, opacity: 0.8, marginBottom: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#64748b', fontSize: '0.85rem' }}>
+                    <ShieldCheck size={16} />
                     <span>Secure & Private</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#64748b', fontSize: '0.9rem' }}>
-                    <Zap size={20} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#64748b', fontSize: '0.85rem' }}>
+                    <Zap size={16} />
                     <span>Lightning Fast</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#64748b', fontSize: '0.9rem' }}>
-                    <Globe size={20} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#64748b', fontSize: '0.85rem' }}>
+                    <Globe size={16} />
                     <span>Browser-Based</span>
                 </div>
             </div>
