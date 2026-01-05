@@ -3,24 +3,38 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Search, FileText, Terminal, ArrowRight, ShieldCheck, Zap, Globe } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { allTools } from '@/lib/toolsData';
 
 export default function LandingHero() {
     const router = useRouter();
-    const [searchQuery, setSearchQuery] = useState('');
+    const searchParams = useSearchParams();
+
+    // Initialize state from URL if present
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
     const [results, setResults] = useState<any[]>([]);
     const [isFocused, setIsFocused] = useState(false);
 
+    // Sync input with URL
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const q = e.target.value;
         setSearchQuery(q);
+
+        // Update URL without full reload
+        const params = new URLSearchParams(window.location.search);
+        if (q) {
+            params.set('q', q);
+        } else {
+            params.delete('q');
+        }
+        router.replace(`?${params.toString()}`, { scroll: false });
+
         if (q.length > 1) {
             const filtered = allTools.filter((t: any) =>
                 t.title.toLowerCase().includes(q.toLowerCase()) ||
                 t.description.toLowerCase().includes(q.toLowerCase())
             );
-            setResults(filtered.slice(0, 5)); // Limit to 5
+            setResults(filtered.slice(0, 5));
         } else {
             setResults([]);
         }
