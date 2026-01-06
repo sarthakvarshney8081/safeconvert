@@ -116,7 +116,7 @@ export default function RootLayout({
 
             {/* tool columns */}
             <div className="footer-desktop-only">
-              <h4 className="footer-section-title" style={{ color: '#fff', opacity: 1 }}>PDF Solutions</h4>
+              <h2 className="footer-section-title" style={{ color: '#fff', opacity: 1 }}>PDF Solutions</h2>
               <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <li><a href="/tools/merge-pdf" className="footer-link" style={{ color: '#e4e4e7' }}>Merge Documents</a></li>
                 <li><a href="/tools/compress-pdf" className="footer-link" style={{ color: '#e4e4e7' }}>Compress PDF</a></li>
@@ -127,7 +127,7 @@ export default function RootLayout({
             </div>
 
             <div className="footer-desktop-only">
-              <h4 className="footer-section-title" style={{ color: '#fff', opacity: 1 }}>Developer Tools</h4>
+              <h2 className="footer-section-title" style={{ color: '#fff', opacity: 1 }}>Developer Tools</h2>
               <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <li><a href="/it-tools/regex-cheatsheet" className="footer-link" style={{ color: '#e4e4e7' }}>Regex Cheatsheet</a></li>
                 <li><a href="/it-tools/data-converter" className="footer-link" style={{ color: '#e4e4e7' }}>JSON / YAML</a></li>
@@ -138,7 +138,7 @@ export default function RootLayout({
             </div>
 
             <div className="footer-desktop-only">
-              <h4 className="footer-section-title" style={{ color: '#fff', opacity: 1 }}>Utilities</h4>
+              <h2 className="footer-section-title" style={{ color: '#fff', opacity: 1 }}>Utilities</h2>
               <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <li><a href="/tools/compress-image" className="footer-link" style={{ color: '#e4e4e7' }}>Image Compressor</a></li>
                 <li><a href="/tools/png-to-svg" className="footer-link" style={{ color: '#e4e4e7' }}>Vectorize Image</a></li>
@@ -148,7 +148,7 @@ export default function RootLayout({
             </div>
 
             <div className="footer-mobile-center">
-              <h4 className="footer-section-title" style={{ color: '#fff', opacity: 1 }}>Company</h4>
+              <h2 className="footer-section-title" style={{ color: '#fff', opacity: 1 }}>Company</h2>
               <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <li><a href="/about" className="footer-link" style={{ color: '#e4e4e7' }}>About Us</a></li>
                 <li><a href="/contact" className="footer-link" style={{ color: '#e4e4e7' }}>Contact Support</a></li>
