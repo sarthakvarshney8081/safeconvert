@@ -57,12 +57,12 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
             <Script
-              strategy="afterInteractive"
+              strategy="lazyOnload"
               src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
             />
             <Script
               id="google-analytics"
-              strategy="afterInteractive"
+              strategy="lazyOnload"
             >
               {`
                 window.dataLayer = window.dataLayer || [];
@@ -172,6 +172,8 @@ export default function RootLayout({
                 <img
                   src="/logo-white.svg"
                   alt="SafeConverts Logo"
+                  width={274}
+                  height={64}
                   style={{ height: '64px', width: 'auto' }}
                 />
               </div>
