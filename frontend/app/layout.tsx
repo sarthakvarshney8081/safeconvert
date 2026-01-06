@@ -15,26 +15,29 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   title: {
-    default: 'SafeConverts - Secure PDF Converter & Free Local File Tools', // ~59 chars
+    default: 'SafeConverts - Private PDF Converter, IT Tools & Developer Utilities', // ~65 chars
     template: '%s | SafeConverts',
   },
-  description: 'SafeConverts provides secure, local-first PDF and image tools running entirely in your browser. Compress, convert, and manage files privately without uploads.', // ~158 chars
+  description: 'SafeConverts offers secure, local-first file tools including PDF editors, LaTeX builder, Docker visualizers, and essential IT utilities. Everything runs privately in your browser with zero server uploads.', // ~195 chars
   openGraph: {
-    title: 'SafeConverts - Secure PDF Converter & Free Local File Tools', // Match title
-    description: 'Secure, private, and local-first file tools.',
+    title: 'SafeConverts - Secure PDF Converter & Developer Utilities', // Match title
+    description: 'Private, browser-based PDF tools, LaTeX editor, Docker maps, and IT utilities.',
     url: '/',
     siteName: 'SafeConverts',
     locale: 'en_US',
     type: 'website',
   },
   keywords: [
-    'PDF Converter', 'Compress PDF', 'Merge PDF', 'PDF to Word', 'Sign PDF',
-    'Local PDF Tools', 'Secure File Conversion', 'Privacy Focused',
-    'Regex Tester', 'JSON Converter', 'Base64 Encoder', 'Hash Generator',
-    'Developer Tools', 'Free Online Tools', 'No Server Upload',
-    'Offline PDF Editor', 'Safe PDF Tools', 'PDF Merger', 'Split PDF',
-    'Image Compressor', 'PNG to SVG', 'Private File Tools',
-    'WebAssembly PDF', 'Secure PDF Editor', 'Best Free PDF Tools'
+    'PDF Converter', 'Merge PDF', 'Compress PDF', 'Sign PDF', 'PDF to Word',
+    'PDF to Excel', 'PDF to PPT', 'PDF to Image', 'Image to PDF', 'Repair PDF',
+    'Unlock PDF', 'Protect PDF', 'LaTeX Builder', 'LaTeX Editor', 'LaTeX to PDF',
+    'Docker Map', 'Infrastructure Visualizer', 'BIP39 Generator', 'Mnemonic Generator',
+    'Regex Tester', 'JWT Debugger', 'Bcrypt Generator', 'JSON Converter', 'YAML Converter',
+    'Base64 Encoder', 'Hash Generator', 'UUID Generator', 'ULID Generator',
+    'QR Code Generator', 'WiFi QR Code', 'Chmod Calculator', 'Crontab Generator',
+    'Password Strength Checker', 'URL Parser', 'User Agent Parser', 'MIME Types',
+    'Image Compressor', 'PNG to SVG', 'Private File Tools', 'Local PDF Tools',
+    'WebAssembly PDF', 'Secure Dev Tools', 'Free Online Utilities'
   ],
   twitter: {
     card: 'summary_large_image',
