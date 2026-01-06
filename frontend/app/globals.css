@@ -208,6 +208,17 @@ a {
     flex-direction: column;
     align-items: center;
   }
+
+  .footer-attribution-container {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 12px !important;
+  }
+
+  .footer-attribution-group {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
 }
 
 /* Navbar Styles */
