@@ -23,3 +23,5 @@ pdfminer.six
 pyhanko
 cryptography
 nest_asyncio
+
+urllib3>=2.6.3

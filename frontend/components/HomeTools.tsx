@@ -36,6 +36,16 @@ export default function HomeTools() {
                 </div>
             )}
 
+            {/* Advanced / Featured Tools */}
+            {advancedTools.length > 0 && (
+                <div style={{ marginBottom: 60 }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 20, color: '#333', borderBottom: '2px solid #eee', paddingBottom: 10 }}>Advanced Features</h2>
+                    <div className="grid grid-cols-4" style={{ gap: 20 }}>
+                        {advancedTools.map((tool, i) => <ToolCard key={`adv-${i}`} {...tool} />)}
+                    </div>
+                </div>
+            )}
+
             {/* Converters */}
             {converterTools.length > 0 && (
                 <div style={{ marginBottom: 60 }}>
