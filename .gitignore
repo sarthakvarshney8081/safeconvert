@@ -32,3 +32,8 @@ coverage/
 frontend/.next
 
 
+
+# Logs
+logs/
+*.log
+backend/logs/
