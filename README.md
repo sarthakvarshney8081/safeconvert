@@ -4,8 +4,6 @@ SafeConverts is a privacy-focused, self-hosted web platform for file manipulatio
 
 ## Quick Start
 
-## Quick Start
-
 1. **Deploy**:
    ```bash
    git pull
