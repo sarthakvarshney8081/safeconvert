@@ -4,6 +4,7 @@ services:
   backend:
     build: ./backend
     image: varshneysarthak/safeconvert-backend:latest
+    restart: always
     # Ports removed for security (gateway internal routing)
     volumes:
       - temp_data:/app/temp
@@ -20,6 +21,7 @@ services:
         - NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}
         - NEXT_PUBLIC_CLARITY_ID=${NEXT_PUBLIC_CLARITY_ID}
     image: varshneysarthak/safeconvert-frontend:latest
+    restart: always
     # Ports removed for security (gateway internal routing)
     environment:
       - NEXT_PUBLIC_API_URL=/api
@@ -29,6 +31,7 @@ services:
   gateway:
     # build: ./nginx
     image: varshneysarthak/safeconvert-gateway:latest
+    restart: always
     ports:
       - "80:80"
     depends_on:
