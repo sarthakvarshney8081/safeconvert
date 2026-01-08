@@ -4,26 +4,29 @@ SafeConverts is a privacy-focused, self-hosted web platform for file manipulatio
 
 ## Quick Start
 
-1. **Start the Application**:
+## Quick Start
+
+1. **Deploy**:
    ```bash
+   git pull
+   docker compose pull
    docker compose up -d
    ```
 
 2. **Access the Tools**:
-   - **Frontend UI**: [http://localhost:3333](http://localhost:3333)
-   - **Backend API**: [http://localhost:8888/docs](http://localhost:8888/docs)
-
-## Features
-- **PDF Tools**: Merge, Split, Rotate, Protect, Unlock, OCR.
-- **Image Tools**: Compress, Convert (PNG/JPEG/WEBP).
-- **Converters**: Office to PDF, Image to PDF, PDF to Image.
-- **Workflows**: Visual builder for chaining operations.
+   - **Web Interface**: [http://localhost](http://localhost) (Port 80)
+   - **API Docs**: [http://localhost/api/docs](http://localhost/api/docs)
 
 ## Architecture
-- **Frontend**: Next.js 14 (Node 20+).
-- **Backend**: Python FastAPI.
-- **Infrastructure**: Docker Compose.
+- **Gateway**: Nginx (Hardened, Port 80). Routes traffic to Frontend/Backend.
+- **Frontend**: Next.js 14 (Internal Port 3000).
+- **Backend**: Python FastAPI (Internal Port 8000).
+- **Security**: Direct access to internal ports (3333, 8888) is blocked. All traffic flows through the Gateway.
 
 ## Configuration
-- **Frontend Port**: 3333 (Mapped to internal 3000)
-- **Backend Port**: 8888 (Mapped to internal 8000)
+- **Public Port**: 80 (Gateway)
+- **Images**:
+    - `varshneysarthak/safeconvert-gateway:latest`
+    - `varshneysarthak/safeconvert-frontend:latest`
+    - `varshneysarthak/safeconvert-backend:latest`
+
