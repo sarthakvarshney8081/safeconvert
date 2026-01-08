@@ -27,7 +27,7 @@ services:
       - NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID}
 
   gateway:
-    build: ./nginx
+    # build: ./nginx
     image: varshneysarthak/safeconvert-gateway:latest
     ports:
       - "80:80"
