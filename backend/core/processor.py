@@ -4,6 +4,8 @@ import uuid
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
+from core.audit_logger import log_audit_event
+
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "temp")
 
 if not os.path.exists(UPLOAD_DIR):
@@ -21,7 +23,8 @@ async def save_upload_file(upload_file) -> str:
     
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(upload_file.file, buffer)
-        
+    
+    log_audit_event("FILE_UPLOAD_SUCCESS", file_id, f"Original: {upload_file.filename}")
     return file_path
 
 def cleanup_file(file_path: str):
@@ -30,6 +33,8 @@ def cleanup_file(file_path: str):
     """
     try:
         if os.path.exists(file_path):
+            file_id = Path(file_path).stem
             os.remove(file_path)
+            log_audit_event("FILE_CLEANUP_SUCCESS", file_id, f"Path: {file_path}")
     except Exception as e:
         print(f"Error cleaning up file {file_path}: {e}")

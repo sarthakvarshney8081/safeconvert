@@ -26,8 +26,10 @@ async def health_check():
 import asyncio
 import time
 import shutil
+from core.audit_logger import log_audit_event
 from core.processor import UPLOAD_DIR
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 async def periodic_cleanup():
     while True:
@@ -36,12 +38,18 @@ async def periodic_cleanup():
             await asyncio.sleep(300)
             now = time.time()
             if os.path.exists(UPLOAD_DIR):
-                for filename in os.listdir(UPLOAD_DIR):
+                files_to_check = os.listdir(UPLOAD_DIR)
+                if files_to_check:
+                    log_audit_event("AUTO_CLEANUP_BATCH_START", "SYSTEM", f"Checking {len(files_to_check)} files")
+                
+                for filename in files_to_check:
                     file_path = os.path.join(UPLOAD_DIR, filename)
                     # Delete if older than 10 minutes (600 seconds)
                     if os.path.isfile(file_path):
                         if os.stat(file_path).st_mtime < now - 600:
+                            file_id = Path(filename).stem
                             os.remove(file_path)
+                            log_audit_event("AUTO_CLEANUP_DELETE", file_id, f"Reason: Exceeded 10m TTL | Path: {file_path}")
                             print(f"Cleaned up {filename}")
         except Exception as e:
             print(f"Cleanup error: {e}")

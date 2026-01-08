@@ -93,6 +93,17 @@ async def verify_signature(background_tasks: BackgroundTasks, file: UploadFile =
             import nest_asyncio
             nest_asyncio.apply()
 
+            from pyhanko.sign.validation import pdf_embedded
+            
+            # Monkeypatch _validate_subfilter to support legacy formats
+            original_validate = pdf_embedded._validate_subfilter
+            def patched_validate(subfilter_str, permitted_subfilters, err_msg):
+                if subfilter_str in ('/adbe.pkcs7.sha1', '/adbe.x509.rsa_sha1'):
+                    return
+                return original_validate(subfilter_str, permitted_subfilters, err_msg)
+            
+            pdf_embedded._validate_subfilter = patched_validate
+
             for sig in reader.embedded_signatures:
                 try:
                     # Fix: Use nest_asyncio to allow pyhanko's internal asyncio.run() to work

@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
@@ -8,6 +8,7 @@ WORKDIR /app
 # libreoffice: required for office conversion
 # ghostscript: required for some PDF operations
 RUN apt-get update && apt-get install -y \
+    zip \
     poppler-utils \
     tesseract-ocr \
     tesseract-ocr-hin \

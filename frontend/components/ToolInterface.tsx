@@ -30,6 +30,8 @@ interface ToolInterfaceProps {
     children?: React.ReactNode;
     isProcessing?: boolean;
     hideSubmitButton?: boolean;
+    initialStatus?: 'idle' | 'ready' | 'processing' | 'completed' | 'error';
+    initialFiles?: File[];
 }
 
 export default function ToolInterface({
@@ -49,10 +51,12 @@ export default function ToolInterface({
     extraOptions,
     children,
     isProcessing = false,
-    hideSubmitButton = false
+    hideSubmitButton = false,
+    initialStatus = 'idle',
+    initialFiles = []
 }: ToolInterfaceProps) {
-    const [status, setStatus] = useState<'idle' | 'ready' | 'processing' | 'completed' | 'error'>('idle');
-    const [files, setFiles] = useState<File[]>([]);
+    const [status, setStatus] = useState<'idle' | 'ready' | 'processing' | 'completed' | 'error'>(initialStatus);
+    const [files, setFiles] = useState<File[]>(initialFiles);
     const [resultUrl, setResultUrl] = useState<string | null>(null);
     const [dynamicFileName, setDynamicFileName] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);

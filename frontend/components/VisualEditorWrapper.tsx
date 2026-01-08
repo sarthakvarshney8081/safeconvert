@@ -5,9 +5,13 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
+import Heading from '@tiptap/extension-heading';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import TextAlign from '@tiptap/extension-text-align';
 import {
     Bold, Italic, Underline as UnderlineIcon, Strikethrough,
-    List, ListOrdered, Undo, Redo, Link as LinkIcon, Unlink
+    List, ListOrdered, Undo, Redo, Link as LinkIcon, Unlink,
+    Heading1, Heading2, Heading3, Minus, AlignLeft as AlignLeftIcon, AlignCenter, AlignRight
 } from 'lucide-react';
 
 interface VisualEditorProps {
@@ -48,6 +52,30 @@ const MenuBar = ({ editor }: { editor: any }) => {
             flexWrap: 'wrap'
         }}>
             <Button
+                onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                isActive={editor.isActive('heading', { level: 1 })}
+                title="Heading 1"
+            >
+                <Heading1 size={16} />
+            </Button>
+            <Button
+                onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                isActive={editor.isActive('heading', { level: 2 })}
+                title="Heading 2"
+            >
+                <Heading2 size={16} />
+            </Button>
+            <Button
+                onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                isActive={editor.isActive('heading', { level: 3 })}
+                title="Heading 3"
+            >
+                <Heading3 size={16} />
+            </Button>
+
+            <div style={{ width: 1, background: '#cbd5e1', margin: '0 4px' }} />
+
+            <Button
                 onClick={() => editor.chain().focus().toggleBold().run()}
                 disabled={!editor.can().chain().focus().toggleBold().run()}
                 isActive={editor.isActive('bold')}
@@ -81,6 +109,30 @@ const MenuBar = ({ editor }: { editor: any }) => {
             <div style={{ width: 1, background: '#cbd5e1', margin: '0 4px' }} />
 
             <Button
+                onClick={() => editor.chain().focus().setTextAlign('left').run()}
+                isActive={editor.isActive({ textAlign: 'left' })}
+                title="Align Left"
+            >
+                <AlignLeftIcon size={16} />
+            </Button>
+            <Button
+                onClick={() => editor.chain().focus().setTextAlign('center').run()}
+                isActive={editor.isActive({ textAlign: 'center' })}
+                title="Align Center"
+            >
+                <AlignCenter size={16} />
+            </Button>
+            <Button
+                onClick={() => editor.chain().focus().setTextAlign('right').run()}
+                isActive={editor.isActive({ textAlign: 'right' })}
+                title="Align Right"
+            >
+                <AlignRight size={16} />
+            </Button>
+
+            <div style={{ width: 1, background: '#cbd5e1', margin: '0 4px' }} />
+
+            <Button
                 onClick={() => editor.chain().focus().toggleBulletList().run()}
                 isActive={editor.isActive('bulletList')}
                 title="Bullet List"
@@ -93,6 +145,12 @@ const MenuBar = ({ editor }: { editor: any }) => {
                 title="Ordered List"
             >
                 <ListOrdered size={16} />
+            </Button>
+            <Button
+                onClick={() => editor.chain().focus().setHorizontalRule().run()}
+                title="Horizontal Rule"
+            >
+                <Minus size={16} />
             </Button>
 
             <div style={{ width: 1, background: '#cbd5e1', margin: '0 4px' }} />
@@ -118,10 +176,20 @@ const MenuBar = ({ editor }: { editor: any }) => {
 export default function VisualEditorWrapper({ value, onChange }: VisualEditorProps) {
     const editor = useEditor({
         extensions: [
-            StarterKit,
+            StarterKit.configure({
+                heading: false, // Use dedicated extension
+                horizontalRule: false, // Use dedicated extension
+            }),
             Underline,
             Link.configure({
                 openOnClick: false,
+            }),
+            Heading.configure({
+                levels: [1, 2, 3],
+            }),
+            HorizontalRule,
+            TextAlign.configure({
+                types: ['heading', 'paragraph'],
             }),
         ],
         content: value,

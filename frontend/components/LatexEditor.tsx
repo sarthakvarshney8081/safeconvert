@@ -76,36 +76,37 @@ export default function LatexEditor() {
             .replace(/\\date\{.*?\}/g, '')
             .replace(/\\maketitle/g, '<h1>My Resume</h1>');
 
-        // 3. Structural Conversions (Aligned with html-to-latex)
-        // \section -> h1 (html-to-latex maps h1 back to \section)
-        // \subsection -> h2
-        // \subsubsection -> h3
-        html = html.replace(/\\section\*?\{(.*?)\}/g, '<h1>$1</h1>')
-            .replace(/\\subsection\*?\{(.*?)\}/g, '<h2>$1</h2>')
-            .replace(/\\subsubsection\*?\{(.*?)\}/g, '<h3>$1</h3>')
-            .replace(/\\centering\{(.*?)\}/g, '<center>$1</center>')
-            .replace(/\{\\centering (.*?)\}/g, '<center>$1</center>');
+        // 3. Structural Conversions
+        html = html.replace(/\\section\*?\{([\s\S]*?)\}/g, '<h1>$1</h1>')
+            .replace(/\\subsection\*?\{([\s\S]*?)\}/g, '<h2>$1</h2>')
+            .replace(/\\subsubsection\*?\{([\s\S]*?)\}/g, '<h3>$1</h3>')
+            .replace(/\\centering\{([\s\S]*?)\}/g, '<center>$1</center>')
+            .replace(/\{\\centering ([\s\S]*?)\}/g, '<center>$1</center>')
+            .replace(/\\titlerule/g, '<hr>');
 
-        // 4. Text Formatting
-        html = html.replace(/\\textbf\{(.*?)\}/g, '<strong>$1</strong>')
-            .replace(/\\textit\{(.*?)\}/g, '<em>$1</em>')
-            .replace(/\\underline\{(.*?)\}/g, '<u>$1</u>')
-            .replace(/\\emph\{(.*?)\}/g, '<em>$1</em>');
+        // 4. Text Formatting & Links
+        html = html.replace(/\\textbf\{([\s\S]*?)\}/g, '<strong>$1</strong>')
+            .replace(/\\textit\{([\s\S]*?)\}/g, '<em>$1</em>')
+            .replace(/\\underline\{([\s\S]*?)\}/g, '<u>$1</u>')
+            .replace(/\\emph\{([\s\S]*?)\}/g, '<em>$1</em>')
+            .replace(/\\href\{([^}]+)\}\{([\s\S]*?)\}/g, '<a href="$1">$2</a>');
 
         // 5. Lists
         html = html.replace(/\\begin\{itemize\}/g, '<ul>')
             .replace(/\\end\{itemize\}/g, '</ul>')
             .replace(/\\begin\{enumerate\}/g, '<ol>')
             .replace(/\\end\{enumerate\}/g, '</ol>')
-            .replace(/\\item\s+(.*)/g, '<li>$1</li>');
+            .replace(/\\item\s+([\s\S]*?)(?=\\item|\\end\{itemize\}|\\end\{enumerate\}|$)/g, '<li>$1</li>');
 
         // 6. Newlines & Cleanup
-        // Detect double newlines as paragraph breaks
-        html = html.replace(/\r\n/g, '\n'); // Normalize
-        html = html.replace(/\n\n+/g, '<br><br>'); // Double newline -> Double break (Simulate Para)
+        html = html.replace(/\r\n/g, '\n');
+        html = html.replace(/\n\s*\n+/g, '</p><p>'); // Double newline -> Paragraph break
         html = html.replace(/\\\\/g, '<br>');      // Explicit LaTeX break -> Break
 
-        // Note: Single \n in LaTeX is just a space, but we leave it (browser collapses it usually)
+        // Wrap in p tags if needed
+        if (!html.trim().startsWith('<h') && !html.trim().startsWith('<p') && !html.trim().startsWith('<ul') && !html.trim().startsWith('<ol') && !html.trim().startsWith('<hr')) {
+            html = `<p>${html}</p>`;
+        }
 
         return html.trim();
     };

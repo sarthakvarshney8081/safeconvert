@@ -1,8 +1,8 @@
 from fastapi import APIRouter, UploadFile, File
 from core.processor import save_upload_file, cleanup_file
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Response
+from fastapi.responses import FileResponse, StreamingResponse
 from core.processor import save_upload_file, cleanup_file, UPLOAD_DIR
 import os
 import uuid
@@ -11,6 +11,7 @@ from pdf2image import convert_from_path
 import subprocess
 import zipfile
 import shutil
+import io
 
 router = APIRouter(tags=["convert"])
 
@@ -115,31 +116,45 @@ async def convert_pdf_to_image(background_tasks: BackgroundTasks, file: UploadFi
         temp_file = await save_upload_file(file)
         
         images = convert_from_path(temp_file)
+        print(f"DEBUG: Found {len(images)} images in PDF", flush=True)
         
-        output_paths = []
+        # Always return a ZIP for consistency and to avoid extension issues on macOS
+        zip_path = os.path.join(UPLOAD_DIR, f"images_{uuid.uuid4()}.zip")
+        
+        # Save images to folder first
         for i, image in enumerate(images):
-            image_path = os.path.join(output_dir, f"page_{i+1}.{fmt}")
-            image.save(image_path, fmt.upper())
-            output_paths.append(image_path)
-            
-        # If single page, return image. If multiple, return zip.
-        if len(output_paths) == 1:
-            background_tasks.add_task(shutil.rmtree, output_dir, ignore_errors=True)
-            background_tasks.add_task(cleanup_file, temp_file)
-            return FileResponse(output_paths[0], filename=f"page_1.{fmt}")
-        else:
-            # Create zip
-            zip_path = os.path.join(UPLOAD_DIR, f"images_{uuid.uuid4()}.zip")
-            with zipfile.ZipFile(zip_path, 'w') as zipf:
-                for img_path in output_paths:
-                    zipf.write(img_path, arcname=os.path.basename(img_path))
-            
-            background_tasks.add_task(shutil.rmtree, output_dir, ignore_errors=True)
-            background_tasks.add_task(cleanup_file, temp_file)
-            # Cleanup zip eventually?
-            # background_tasks.add_task(cleanup_file, zip_path) # Risk of deleting before stream
-            
-            return FileResponse(zip_path, filename="images.zip", media_type="application/zip")
+            img_name = f"page_{i+1}.{fmt}"
+            img_path = os.path.join(output_dir, img_name)
+            if fmt.lower() == 'png' and image.mode in ("RGBA", "P"):
+                image = image.convert("RGB")
+            image.save(img_path, fmt.upper())
+
+        # Use system ZIP (standard tool) for maximum macOS compatibility
+        # -0: no compression (stored), -j: junk paths (no dirs)
+        try:
+            subprocess.run(
+                ['zip', '-0', '-j', zip_path] + [os.path.join(output_dir, f) for f in os.listdir(output_dir)],
+                check=True,
+                capture_output=True
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"DEBUG: ZIP command failed: {e.stderr.decode()}", flush=True)
+            raise Exception("System ZIP creation failed")
+        
+        # Log final file size for verification
+        zip_size = os.path.getsize(zip_path)
+        print(f"DEBUG: Final ZIP created at {zip_path}, size: {zip_size} bytes", flush=True)
+
+        # Cleanup intermediate image files and input PDF
+        background_tasks.add_task(shutil.rmtree, output_dir, ignore_errors=True)
+        background_tasks.add_task(cleanup_file, temp_file)
+        # Note: ZIP file will be cleaned up by the periodic task in main.py (10m TTL)
+
+        return FileResponse(
+            zip_path, 
+            filename="converted_images.zip", 
+            media_type="application/zip"
+        )
 
     except Exception as e:
         if temp_file: cleanup_file(temp_file)
@@ -250,3 +265,99 @@ async def convert_pdf_to_ppt(
         if temp_file: cleanup_file(temp_file)
         if os.path.exists(output_path): cleanup_file(output_path)
         raise HTTPException(status_code=500, detail=f"PDF to PPT failed: {str(e)}")
+
+@router.post("/pdf-to-html")
+async def convert_pdf_to_html(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+    temp_file = None
+    output_dir = os.path.join(UPLOAD_DIR, f"pdf2html_{uuid.uuid4()}")
+    os.makedirs(output_dir, exist_ok=True)
+    
+    try:
+        temp_file = await save_upload_file(file)
+        
+        # pdftohtml -s (single file) -c (complex layout) -i (ignore images? No we want them)
+        # -noframes (no frameset)
+        output_html = os.path.join(output_dir, "index.html")
+        
+        # We need to run pdftohtml
+        # It comes with poppler-utils
+        process = subprocess.run(
+            ['pdftohtml', '-s', '-c', '-noframes', '-dataurls', temp_file, output_html],
+            capture_output=True,
+            text=True
+        )
+        
+        if process.returncode != 0:
+             # Fallback to simple mode if complex fails?
+             raise Exception(f"pdftohtml failed: {process.stderr}")
+
+        if not os.path.exists(output_html):
+            raise Exception("Output HTML not found")
+
+        # Read HTML content to return directly? 
+        # Or return file?
+        # If there are images, they might be embedded (data URI) or external.
+        # With -s and -c, usually creates background images.
+        # Let's inspect the directory.
+        
+        # Actually, for "Live Editor", receiving the HTML string is better.
+        # But if there are external images, we need to serve them or embed them.
+        # pdftohtml -s usually embeds? No, it might not.
+        # Let's try to embed everything? 
+        # -dataurls? (Available in newer poppler?)
+        
+        # If we return a file, the frontend needs to fetch it.
+        # Let's return the HTML string if it's reasonable size, or a URL.
+        # For simplicity, let's return the textual content of the HTML file, 
+        # assuming basic images are handled or we zip it if complex.
+        
+        # For now: Return the HTML content directly.
+        with open(output_html, 'r', encoding='utf-8', errors='ignore') as f:
+            html_content = f.read()
+
+        # Cleanup
+        background_tasks.add_task(shutil.rmtree, output_dir, ignore_errors=True)
+        background_tasks.add_task(cleanup_file, temp_file)
+        
+        return Response(content=html_content, media_type="text/html")
+
+    except Exception as e:
+        if temp_file: cleanup_file(temp_file)
+        shutil.rmtree(output_dir, ignore_errors=True)
+        raise HTTPException(status_code=500, detail=f"PDF to HTML failed: {str(e)}")
+
+@router.post("/html-to-pdf")
+async def convert_html_to_pdf(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+    temp_file = None
+    output_dir = os.path.join(UPLOAD_DIR, f"html2pdf_{uuid.uuid4()}")
+    os.makedirs(output_dir, exist_ok=True)
+    
+    try:
+        temp_file = await save_upload_file(file)
+        
+        # Use LibreOffice to convert HTML to PDF
+        process = subprocess.run(
+            ['libreoffice', '--headless', '--convert-to', 'pdf', temp_file, '--outdir', output_dir],
+            capture_output=True,
+            text=True
+        )
+        
+        if process.returncode != 0:
+             raise Exception(f"LibreOffice conversion failed: {process.stderr}")
+             
+        # Find PDF
+        files = [f for f in os.listdir(output_dir) if f.endswith('.pdf')]
+        if not files:
+            raise Exception("Output PDF not found")
+            
+        output_pdf = os.path.join(output_dir, files[0])
+        
+        background_tasks.add_task(shutil.rmtree, output_dir, ignore_errors=True)
+        background_tasks.add_task(cleanup_file, temp_file)
+        
+        return FileResponse(output_pdf, filename="converted.pdf", media_type="application/pdf")
+
+    except Exception as e:
+        if temp_file: cleanup_file(temp_file)
+        shutil.rmtree(output_dir, ignore_errors=True)
+        raise HTTPException(status_code=500, detail=f"HTML to PDF failed: {str(e)}")

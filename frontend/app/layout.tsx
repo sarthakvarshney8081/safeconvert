@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: 'SafeConverts - Private PDF Converter, IT Tools & Developer Utilities', // ~65 chars
     template: '%s | SafeConverts',
   },
-  description: 'SafeConverts offers secure, local-first file tools including PDF editors, LaTeX builder, Docker visualizers, and essential IT utilities. Everything runs privately in your browser with zero server uploads.', // ~195 chars
+  description: 'Secure, private, and local-first file tools. PDF editing, LaTeX building, and IT utilities that run entirely in your browser with zero server uploads.', // ~152 chars
   openGraph: {
     title: 'SafeConverts - Secure PDF Converter & Developer Utilities', // Match title
     description: 'Private, browser-based PDF tools, LaTeX editor, Docker maps, and IT utilities.',

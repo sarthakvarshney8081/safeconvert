@@ -358,6 +358,30 @@ export default function ITToolsPage() {
             icon: Timer,
             color: '#009688'
         },
+        {
+            category: 'Utilities',
+            title: 'ETA Calculator',
+            description: 'Predict task completion time based on progress rate.',
+            href: '/it-tools/eta-calculator',
+            icon: Timer,
+            color: '#6200EE'
+        },
+        {
+            category: 'Utilities',
+            title: 'JSON to TOML',
+            description: 'Convert JSON to TOML format for configuration files.',
+            href: '/it-tools/json-to-toml',
+            icon: FileCode,
+            color: '#4caf50'
+        },
+        {
+            category: 'Utilities',
+            title: 'Timezone Converter',
+            description: 'Compare current times across multiple world zones.',
+            href: '/it-tools/timezone-converter',
+            icon: Globe,
+            color: '#3b82f6'
+        },
 
         // Networking & Infra
         {

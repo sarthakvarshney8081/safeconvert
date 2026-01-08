@@ -8,6 +8,7 @@ services:
       - "8888:8000"
     volumes:
       - temp_data:/app/temp
+      - ./backend/logs:/app/logs
     environment:
       - UPLOAD_DIR=${UPLOAD_DIR:-/app/temp}
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}

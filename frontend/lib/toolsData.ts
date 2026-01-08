@@ -1,6 +1,6 @@
 import {
     FileStack, Scissors, RotateCw, Image as ImageIcon, FileType, Shield, Unlock, Scan, Minimize2, Video, Hash, PenTool,
-    Terminal, Globe, Info, Rss, ArrowLeftRight, Palette, List, Code, KeyRound, Wifi, Camera, Timer, Calculator, FileDiff, AlignLeft, CalendarClock
+    Terminal, Globe, Info, Rss, ArrowLeftRight, Palette, List, Code, KeyRound, Wifi, Camera, Timer, Calculator, FileDiff, AlignLeft, CalendarClock, FileCode
 } from 'lucide-react';
 
 export const allTools = [
@@ -21,6 +21,7 @@ export const allTools = [
     { title: 'Sign PDF', description: 'Add digital signatures.', icon: PenTool, href: '/tools/sign-pdf', badge: 'Edit & Security', category: 'Advanced' },
     { title: 'LaTeX to PDF', description: 'Compile LaTeX code to PDF.', icon: FileType, href: '/latex-builder', color: '#2563eb', category: 'Advanced' },
     { title: 'Crop PDF', description: 'Trim margins.', icon: Scissors, href: '/tools/crop-pdf', color: '#8BC34A', category: 'Advanced' },
+    { title: 'Edit PDF', description: 'Add text, images, and shapes.', icon: PenTool, href: '/tools/edit-pdf', color: '#FF9800', badge: 'Beta', category: 'Advanced' },
 
     // --- Converters ---
     { title: 'Image to PDF', description: 'JPG/PNG to PDF.', icon: ImageIcon, href: '/tools/image-to-pdf', color: '#00B0FF', category: 'Converter' },
@@ -58,7 +59,10 @@ export const allTools = [
     { title: 'Diff Checker', description: 'Compare text files.', icon: FileType, href: '/it-tools/diff-tools', color: '#ff5722', category: 'IT' },
     { title: 'Color Converter', description: 'HEX/RGB/HSL.', icon: ImageIcon, href: '/it-tools/color-converter', color: '#2196f3', category: 'IT' },
     { title: 'Date Converter', description: 'ISO/Timestamp.', icon: FileType, href: '/it-tools/date-time-converter', color: '#e91e63', category: 'IT' },
-    { title: 'Unit Converter', description: 'Binary/Hex/Decimal.', icon: FileType, href: '/it-tools/integer-base-converter', color: '#9c27b0', category: 'IT' }
+    { title: 'Unit Converter', description: 'Binary/Hex/Decimal.', icon: FileType, href: '/it-tools/integer-base-converter', color: '#9c27b0', category: 'IT' },
+    { title: 'ETA Calculator', description: 'Predict task completion time.', icon: Timer, href: '/it-tools/eta-calculator', color: '#6200EE', category: 'IT' },
+    { title: 'JSON to TOML', description: 'Convert JSON to TOML format.', icon: FileCode, href: '/it-tools/json-to-toml', color: '#4caf50', category: 'IT' },
+    { title: 'Timezone Converter', description: 'Compare times across zones.', icon: Globe, href: '/it-tools/timezone-converter', color: '#3b82f6', category: 'IT' }
 ];
 
 export const popularTools = [
@@ -67,5 +71,6 @@ export const popularTools = [
     allTools.find(t => t.href.includes('image-to-pdf'))!,
     allTools.find(t => t.href.includes('pdf-to-word'))!,
     allTools.find(t => t.href.includes('data-converter'))!, // JSON
-    allTools.find(t => t.href.includes('wifi-qr-code'))!
+    allTools.find(t => t.href.includes('wifi-qr-code'))!,
+    allTools.find(t => t.href.includes('eta-calculator'))!
 ];

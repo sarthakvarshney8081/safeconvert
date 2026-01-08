@@ -18,7 +18,9 @@ export default function PdfToImageTool() {
             const err = await response.json();
             throw new Error(err.detail || "Conversion failed");
         }
-        return await response.blob();
+        const blob = await response.blob();
+        console.log("DEBUG: Received blob", { size: blob.size, type: blob.type });
+        return blob;
     };
 
     return (

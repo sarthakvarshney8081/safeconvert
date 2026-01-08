@@ -9,9 +9,11 @@ const HeroSkeleton = () => (
     width: '100%',
     background: 'radial-gradient(circle at 50% 10%, #f0f9ff 0%, #fff 100%)',
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center'
   }}>
+    <h1 style={{ opacity: 0, position: 'absolute' }}>SafeConverts - Private PDF Tools & IT Utilities</h1>
     {/* Optional: Add shimmer effect or simple loader */}
   </div>
 );
