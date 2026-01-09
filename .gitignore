@@ -37,3 +37,6 @@ frontend/.next
 logs/
 *.log
 backend/logs/
+
+# Certificates
+*.pfx

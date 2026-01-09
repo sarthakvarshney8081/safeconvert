@@ -19,6 +19,7 @@ export const allTools = [
     { title: 'Verify Signature', description: 'Check PDF signatures.', icon: Shield, href: '/it-tools/pdf-signature-checker', color: '#9C27B0', category: 'PDF' },
     { title: 'Add Page Numbers', description: 'Insert page numbers.', icon: Hash, href: '/tools/page-numbers', category: 'Advanced' },
     { title: 'Sign PDF', description: 'Add digital signatures.', icon: PenTool, href: '/tools/sign-pdf', badge: 'Edit & Security', category: 'Advanced' },
+    { title: 'Digital Signature', description: 'Cryptographically sign PDFs with PFX certificates.', icon: Shield, href: '/tools/digital-sign', badge: 'New', category: 'Advanced' },
     { title: 'LaTeX to PDF', description: 'Compile LaTeX code to PDF.', icon: FileType, href: '/latex-builder', color: '#2563eb', badge: 'Beta', category: 'Advanced' },
     { title: 'Crop PDF', description: 'Trim margins.', icon: Scissors, href: '/tools/crop-pdf', color: '#8BC34A', category: 'Advanced' },
     { title: 'Edit PDF', description: 'Add text, images, and shapes.', icon: PenTool, href: '/tools/edit-pdf', color: '#FF9800', badge: 'Beta', category: 'Advanced' },

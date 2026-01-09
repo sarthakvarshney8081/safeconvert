@@ -109,13 +109,16 @@ async def verify_signature(background_tasks: BackgroundTasks, file: UploadFile =
                     # Fix: Use nest_asyncio to allow pyhanko's internal asyncio.run() to work
                     # even if we are in a running loop.
                     status = validation.validate_pdf_signature(sig)
-                    
+
+                    signer_cert = getattr(status, 'signing_cert', getattr(status, 'signer_cert', None))
+                    signing_time = getattr(status, 'signing_time', None)
+
                     # Extract Data
                     results.append({
                         "field": sig.field_name if hasattr(sig, 'field_name') else str(sig),
                         "valid": status.bottom_line,
-                        "signer": status.signer_cert.subject.human_friendly if status.signer_cert else "Unknown",
-                        "timestamp": str(status.signing_time) if status.signing_time else None,
+                        "signer": signer_cert.subject.human_friendly if signer_cert else "Unknown",
+                        "timestamp": str(signing_time) if signing_time else "N/A",
                         "integrity": status.integrity,
                         "trust": status.trusted
                     })

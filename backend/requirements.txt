@@ -20,8 +20,11 @@ python-pptx
 feedparser
 requests
 pdfminer.six
-pyhanko
-cryptography
+pyhanko[crypto]>=0.25.0
+cryptography>=42.0.0
+endesive
 nest_asyncio
 
 urllib3>=2.6.3
+reportlab
+
