@@ -115,8 +115,8 @@ export default function DigitalSignatureTool() {
         if (newPage >= 1 && newPage <= numPages) {
             setCurrPageIndex(newPage);
             await renderPage(pdfDoc, newPage);
-            setCrop(undefined);
-            setCompletedCrop(undefined);
+            // setCrop(undefined); // Keep crop for efficient multi-page signing
+            // setCompletedCrop(undefined);
         }
     };
 
@@ -426,12 +426,12 @@ export default function DigitalSignatureTool() {
                     <div style={{ animation: 'fadeIn 0.3s ease' }}>
                         <div className="card" style={{ padding: '10px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                <button onClick={() => setStep('signature')} className="btn btn-sm">Edit Sig</button>
-                                <button onClick={() => changePage(-1)} disabled={currPageIndex <= 1} className="btn btn-sm">&lt;</button>
+                                <button type="button" onClick={() => setStep('signature')} className="btn btn-sm">Edit Sig</button>
+                                <button type="button" onClick={() => changePage(-1)} disabled={currPageIndex <= 1} className="btn btn-sm">&lt;</button>
                                 <span>{currPageIndex} / {numPages}</span>
-                                <button onClick={() => changePage(1)} disabled={currPageIndex >= numPages} className="btn btn-sm">&gt;</button>
+                                <button type="button" onClick={() => changePage(1)} disabled={currPageIndex >= numPages} className="btn btn-sm">&gt;</button>
                             </div>
-                            <button onClick={handleSign} disabled={!completedCrop || isProcessing} className="btn btn-primary" style={{ padding: '8px 20px' }}>
+                            <button type="button" onClick={handleSign} disabled={!completedCrop || isProcessing} className="btn btn-primary" style={{ padding: '8px 20px' }}>
                                 {isProcessing ? <Loader2 className="animate-spin" size={16} /> : <><ShieldCheck size={16} style={{ marginRight: '5px' }} /> Sign Document</>}
                             </button>
                         </div>
