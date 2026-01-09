@@ -1,22 +1,7 @@
 import React, { Suspense } from 'react';
-import LandingHero from '@/components/LandingHero'; // Client Component (uses useSearchParams)
-import HomeTools from '@/components/HomeTools';     // Client Component (uses useSearchParams)
-
-// Create a static skeleton for the Hero to prevent CLS
-const HeroSkeleton = () => (
-  <div style={{
-    height: '600px',
-    width: '100%',
-    background: 'radial-gradient(circle at 50% 10%, #f0f9ff 0%, #fff 100%)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }}>
-    <h1 style={{ opacity: 0, position: 'absolute' }}>SafeConverts - Private PDF Tools & IT Utilities</h1>
-    {/* Optional: Add shimmer effect or simple loader */}
-  </div>
-);
+import HeroStatic from '@/components/HeroStatic';
+import HeroSearch from '@/components/HeroSearch';
+import HomeTools from '@/components/HomeTools';
 
 // Create a static skeleton for the Tools Grid
 const ToolsSkeleton = () => (
@@ -33,17 +18,20 @@ const ToolsSkeleton = () => (
 export default function Home() {
   return (
     <main style={{ width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}>
-      {/* 
-        Wrap LandingHero in Suspense because it uses client-side hooks (useSearchParams). 
-        The fallback reserves space to minimize layout shift.
-      */}
-      <Suspense fallback={<HeroSkeleton />}>
-        <LandingHero />
-      </Suspense>
 
       {/* 
-        Wrap HomeTools in Suspense (it filters tools based on URL params).
-        Separate boundary allows Hero to load even if Tools logic is slower.
+        HeroStatic is a Server Component: Paints H1/Background immediately (LCP Win).
+        HeroSearch is a Client Component: Hydrates for search logic.
+        Wrapped in Suspense to prevent de-opting entire page to client rendering.
+      */}
+      <HeroStatic>
+        <Suspense fallback={<div style={{ height: 56, width: '100%', maxWidth: 500, background: '#f8fafc', borderRadius: 16 }} />}>
+          <HeroSearch />
+        </Suspense>
+      </HeroStatic>
+
+      {/* 
+        HomeTools filters tools based on URL params.
       */}
       <Suspense fallback={<ToolsSkeleton />}>
         <HomeTools />
