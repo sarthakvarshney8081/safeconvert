@@ -1,5 +1,5 @@
 import {
-    FileStack, Scissors, RotateCw, Image as ImageIcon, FileType, Shield, Unlock, Scan, Minimize2, Video, Hash, PenTool,
+    FileStack, Scissors, RotateCw, Image as ImageIcon, FileType, Shield, Unlock, Scan, Minimize2, Video, Hash, PenTool, Eraser,
     Terminal, Globe, Info, Rss, ArrowLeftRight, Palette, List, Code, KeyRound, Wifi, Camera, Timer, Calculator, FileDiff, AlignLeft, CalendarClock, FileCode
 } from 'lucide-react';
 
@@ -22,12 +22,13 @@ export const allTools = [
     { title: 'Digital Signature', description: 'Cryptographically sign PDFs with PFX certificates.', icon: Shield, href: '/tools/digital-sign', badge: 'New', category: 'Advanced' },
     { title: 'LaTeX to PDF', description: 'Compile LaTeX code to PDF.', icon: FileType, href: '/latex-builder', color: '#2563eb', badge: 'Beta', category: 'Advanced' },
     { title: 'Crop PDF', description: 'Trim margins.', icon: Scissors, href: '/tools/crop-pdf', color: '#8BC34A', category: 'Advanced' },
+    { title: 'Redact PDF', description: 'Permanently remove sensitive info.', icon: Eraser, href: '/tools/redact-pdf', color: '#000000', badge: 'New', category: 'Advanced' },
     { title: 'Edit PDF', description: 'Add text, images, and shapes.', icon: PenTool, href: '/tools/edit-pdf', color: '#FF9800', badge: 'Beta', category: 'Advanced' },
 
     // --- Converters ---
     { title: 'Image to PDF', description: 'JPG/PNG to PDF.', icon: ImageIcon, href: '/tools/image-to-pdf', color: '#00B0FF', category: 'Converter' },
     { title: 'Office to PDF', description: 'Word/Excel to PDF.', icon: FileType, href: '/tools/office-to-pdf', color: '#FFC107', category: 'Converter' },
-    { title: 'Scan to PDF', description: 'OCR images to text.', icon: Scan, href: '/tools/scan-pdf', color: '#607D8B', category: 'Converter' },
+    { title: 'OCR PDF', description: 'Make PDFs searchable.', icon: Scan, href: '/tools/ocr-pdf', color: '#607D8B', category: 'Converter' },
     { title: 'PDF to Image', description: 'Save as high-res JPG.', icon: ImageIcon, href: '/tools/pdf-to-image', color: '#00E676', category: 'Converter' },
     { title: 'PDF to Word', description: 'Convert to DOCX.', icon: FileType, href: '/tools/pdf-to-word', color: '#3b82f6', category: 'Converter' },
     { title: 'PDF to Excel', description: 'Convert to XLSX.', icon: FileType, href: '/tools/pdf-to-excel', color: '#22c55e', category: 'Converter' },
@@ -45,7 +46,7 @@ export const allTools = [
     { title: 'Hash Text', description: 'MD5, SHA1, SHA256 hashing.', icon: FileType, href: '/it-tools/hash-text', color: '#607D8B', category: 'IT' },
     { title: 'Bcrypt Generator', description: 'Hash & verify passwords.', icon: Hash, href: '/it-tools/bcrypt-generator', color: '#E91E63', category: 'IT' },
     { title: 'Base64 Converter', description: 'Encode/Decode text & files.', icon: FileType, href: '/it-tools/base64-converter', color: '#3f51b5', category: 'IT' },
-    { title: 'JSON Converter', description: 'Format & Convert JSON/YAML.', icon: FileType, href: '/it-tools/data-converter', color: '#4caf50', category: 'IT' },
+    { title: 'JSON & TOON Converter', description: 'Format & Convert JSON, YAML, TOON.', icon: FileType, href: '/it-tools/data-converter', color: '#4caf50', category: 'IT' },
     { title: 'Regex Cheatsheet', description: 'Common regex patterns.', icon: FileType, href: '/it-tools/regex-cheatsheet', color: '#e91e63', category: 'IT' },
     { title: 'UUID Generator', description: 'Generate v1/v4 UUIDs.', icon: FileType, href: '/it-tools/uuid-generator', color: '#673AB7', category: 'IT' },
     { title: 'QR Code', description: 'Create QR codes.', icon: Scan, href: '/it-tools/qr-code-generator', color: '#000000', category: 'IT' },

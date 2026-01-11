@@ -28,3 +28,6 @@ nest_asyncio
 urllib3>=2.6.3
 reportlab
 
+
+pymupdf
+img2pdf

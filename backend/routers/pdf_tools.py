@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 from core.processor import save_upload_file, cleanup_file
 import os
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Form
 from fastapi.responses import FileResponse
 from core.processor import save_upload_file, cleanup_file, UPLOAD_DIR
 import os
@@ -13,30 +13,84 @@ from pypdf import PdfWriter
 router = APIRouter(tags=["pdf"])
 
 @router.post("/merge")
-async def merge_pdfs(background_tasks: BackgroundTasks, files: list[UploadFile] = File(...)):
+async def merge_pdfs(background_tasks: BackgroundTasks, files: list[UploadFile] = File(...), manifest: str = Form(None)):
     merger = PdfWriter()
     temp_files = []
 
     try:
-        # Save and merge all files
-        # Save and merge all files
+        # 1. Save all files first
         for file in files:
             # Security Validation
             if not file.filename.lower().endswith('.pdf'):
                 raise HTTPException(status_code=400, detail=f"Invalid file type: {file.filename}. Only PDF files are allowed.")
             
-            if file.content_type != 'application/pdf':
-                raise HTTPException(status_code=400, detail=f"Invalid content type: {file.filename}. Expected application/pdf.")
-
-            # Magic Byte Validation (Prevent extension spoofing)
-            header = await file.read(4)
-            await file.seek(0) # Reset cursor
-            if header != b'%PDF':
-                raise HTTPException(status_code=400, detail=f"Invalid file signature: {file.filename}. Not a valid PDF.")
-
             path = await save_upload_file(file)
             temp_files.append(path)
-            merger.append(path)
+
+        # 2. Process Merge
+        import json
+        from fastapi import Form
+        
+        # Check if manifest is provided (It comes as a Form field)
+        # Note: manifest argument must be added to function signature
+        
+        if manifest:
+            try:
+                instructions = json.loads(manifest)
+                # instructions: [{ "file_index": 0, "pages": "1-3" }, ...]
+                
+                for item in instructions:
+                    idx = int(item.get('file_index', 0))
+                    if idx < 0 or idx >= len(temp_files):
+                        continue
+                        
+                    input_path = temp_files[idx]
+                    page_range = item.get('pages', 'all')
+                    
+                    if page_range.lower() == 'all':
+                        merger.append(input_path)
+                    else:
+                        # Parse Range: "1-3", "5", "4-end"
+                        # Expects strictly "start-end" or "single" (1-based from UI, 0-based for pypdf?)
+                        # Let's assume UI sends 1-based strings, convert to 0-based for pypdf.
+                        # Actually pypdf.append(pages=(start, stop)) is (start, stop).
+                        # Let's parse securely.
+                        import re
+                        
+                        # Get total pages to handle 'end'
+                        from pypdf import PdfReader
+                        reader = PdfReader(input_path)
+                        total_pages = len(reader.pages)
+                        
+                        def parse_page_str(p_str, max_p):
+                            if p_str.lower() == 'end': return max_p
+                            val = int(p_str)
+                            return min(max(val, 1), max_p)
+
+                        # Handle "1-3"
+                        if '-' in page_range:
+                            start_s, end_s = page_range.split('-')
+                            start = parse_page_str(start_s, total_pages) - 1 # 0-based
+                            end = parse_page_str(end_s, total_pages)         # Stop is exclusive? No, pypdf pages=(start, stop) is usually inclusive? 
+                            # Wait, pypdf.append(pages=...) is (start, stop[, step]). Stop is exclusive.
+                            # UI "1-3" usually means 1, 2, 3. So stop should be 3 (index 3 is excluded).
+                            # If UI "1-3" (Indices 0, 1, 2). Stop 3.
+                            # So start=0, end=3.
+                            merger.append(input_path, pages=(start, end))
+                        else:
+                            # Single Page "5"
+                            p = parse_page_str(page_range, total_pages) - 1
+                            merger.append(input_path, pages=(p, p+1))
+
+            except Exception as e:
+                print(f"Manifest Error: {e}")
+                # Fallback or Error? Error ideally.
+                raise HTTPException(status_code=400, detail=f"Invalid Manifest: {str(e)}")
+
+        else:
+            # Legacy Mode: Append all files in order
+            for path in temp_files:
+                merger.append(path)
 
         # Create output
         output_filename = f"merged_{uuid.uuid4()}.pdf"

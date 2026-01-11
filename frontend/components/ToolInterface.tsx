@@ -10,14 +10,16 @@ interface ToolInterfaceProps {
     title: string;
     description: string;
     apiEndpoint?: string;
-    accept: string;
+    accept?: string;
+    hideDropzone?: boolean;
     multiple?: boolean;
     maxFiles?: number;
     processingMode?: 'client' | 'server';
     optionsComponent?: React.ReactNode;
     optionsTitle?: string;
-    onProcess?: (files: File[], options: any) => Promise<Blob | { blob: Blob; fileName?: string }>; // Enhanced signature
-    onFileSelect?: (file: File) => Promise<void> | void; // Callback when file is chosen
+    onProcess?: (files: File[], options: any) => Promise<Blob | { blob: Blob; fileName?: string }>;
+    onFileSelect?: (file: File) => Promise<void> | void;
+    onFilesChange?: (files: File[]) => void;
     resultFileName?: string;
     icon?: any;
     extraOptions?: {
@@ -32,12 +34,14 @@ interface ToolInterfaceProps {
     hideSubmitButton?: boolean;
     initialStatus?: 'idle' | 'ready' | 'processing' | 'completed' | 'error';
     initialFiles?: File[];
+    maxWidth?: string | number;
 }
 
 export default function ToolInterface({
     title,
     description,
     accept,
+    hideDropzone = false,
     multiple = false,
     maxFiles,
     processingMode = 'server',
@@ -46,6 +50,7 @@ export default function ToolInterface({
     apiEndpoint,
     onProcess,
     onFileSelect,
+    onFilesChange,
     resultFileName = "result.pdf",
     icon: Icon,
     extraOptions,
@@ -53,7 +58,8 @@ export default function ToolInterface({
     isProcessing = false,
     hideSubmitButton = false,
     initialStatus = 'idle',
-    initialFiles = []
+    initialFiles = [],
+    maxWidth = 800
 }: ToolInterfaceProps) {
     const [status, setStatus] = useState<'idle' | 'ready' | 'processing' | 'completed' | 'error'>(initialStatus);
     const [files, setFiles] = useState<File[]>(initialFiles);
@@ -61,21 +67,26 @@ export default function ToolInterface({
     const [dynamicFileName, setDynamicFileName] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // ... (handlers) ...
-
     const handleFilesSelected = (selectedFiles: File[]) => {
         setFiles(selectedFiles);
         setStatus('ready');
         setError(null);
         setDynamicFileName(null);
+
         if (onFileSelect && selectedFiles.length > 0) {
             onFileSelect(selectedFiles[0]);
+        }
+
+        if (onFilesChange) {
+            onFilesChange(selectedFiles);
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (files.length === 0) return;
+
+        // Allow submitting without files if dropzone is hidden (logic for text tools)
+        if (!hideDropzone && files.length === 0) return;
 
         setStatus('processing');
         setError(null);
@@ -153,22 +164,24 @@ export default function ToolInterface({
         setResultUrl(null);
         setStatus('idle');
         setError(null);
+        if (onFilesChange) {
+            onFilesChange([]);
+        }
     };
 
     return (
-        <div className="container" style={{ maxWidth: 800, padding: '20px 20px 40px' }}>
+        <div className="container" style={{ maxWidth: maxWidth, padding: '20px 20px 40px', width: '100%', margin: '0 auto' }}>
             <div style={{ marginBottom: '20px' }}>
                 <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#666', fontSize: '0.9rem', fontWeight: 500, transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary)'} onMouseLeave={(e) => e.currentTarget.style.color = '#666'}>
                     <ArrowLeft size={16} />
                     Back to Tools
                 </Link>
             </div>
-            {/* ... Header ... */}
+
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 10 }}>
                     {Icon && <Icon size={40} className="text-primary" />}
                     <h1 style={{ margin: 0 }}>{title}</h1>
-                    {/* ... Badges ... */}
                     {processingMode === 'client' ? (
                         <span style={{ fontSize: '0.8rem', padding: '4px 8px', borderRadius: 12, background: '#e3f2fd', color: '#1565c0', display: 'inline-flex', alignItems: 'center', gap: 4 }}>⚡ Browser</span>
                     ) : (
@@ -181,16 +194,17 @@ export default function ToolInterface({
             <div className="card">
                 {status === 'idle' || status === 'ready' ? (
                     <form onSubmit={handleSubmit}>
-                        <div style={{ marginBottom: 30 }}>
-                            <FileDropzone
-                                onFilesSelected={handleFilesSelected}
-                                accept={accept}
-                                multiple={multiple}
-                                maxFiles={maxFiles}
-                            />
-                        </div>
+                        {!hideDropzone && (
+                            <div style={{ marginBottom: 30 }}>
+                                <FileDropzone
+                                    onFilesSelected={handleFilesSelected}
+                                    accept={accept || ""}
+                                    multiple={multiple}
+                                    maxFiles={maxFiles}
+                                />
+                            </div>
+                        )}
 
-                        {/* Custom Children Content (e.g. Editors) */}
                         {children && status !== 'idle' && (
                             <div style={{ marginBottom: 30, animation: 'fadeIn 0.3s ease' }}>
                                 {children}
@@ -199,7 +213,6 @@ export default function ToolInterface({
 
                         {status === 'ready' && (
                             <div style={{ animation: 'fadeIn 0.3s ease' }}>
-                                {/* Dynamic Extra Options */}
                                 {extraOptions && (
                                     <div style={{ marginBottom: 30, padding: 20, background: '#f5f5f7', borderRadius: 8 }}>
                                         <h3 style={{ marginBottom: 15, fontSize: '1rem' }}>Options</h3>

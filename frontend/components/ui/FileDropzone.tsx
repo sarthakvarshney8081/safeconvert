@@ -51,8 +51,11 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
         }
 
         if (validFiles.length > 0) {
-            setFiles(prev => [...prev, ...validFiles]);
-            onFilesSelected(validFiles);
+            setFiles(prev => {
+                const updated = [...prev, ...validFiles];
+                onFilesSelected(updated); // Emit FULL list
+                return updated;
+            });
         }
     }, [files, maxFiles, onFilesSelected]);
 
@@ -84,8 +87,11 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
     }, [handleFiles]);
 
     const removeFile = (index: number) => {
-        setFiles(prev => prev.filter((_, i) => i !== index));
-        // Note: This doesn't notify parent to remove, might need sync if parent manages state
+        setFiles(prev => {
+            const updated = prev.filter((_, i) => i !== index);
+            onFilesSelected(updated);
+            return updated;
+        });
     };
 
     return (
@@ -118,12 +124,15 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
             {files.length > 0 && (
                 <div className={styles.fileList}>
                     {files.map((file, index) => (
-                        <div key={index} className={styles.fileItem}>
+                        <div key={index} className={styles.fileItem} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                             <File size={20} className={styles.fileIcon} />
-                            <span className={styles.fileName}>{file.name}</span>
-                            <button onClick={() => removeFile(index)} className={styles.removeBtn}>
-                                <X size={16} />
-                            </button>
+                            <span className={styles.fileName} style={{ flex: 1 }}>{file.name}</span>
+
+                            <div style={{ display: 'flex', gap: 5 }}>
+                                <button type="button" onClick={(e) => { e.preventDefault(); removeFile(index); }} className={styles.removeBtn} title="Remove">
+                                    <X size={16} />
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>

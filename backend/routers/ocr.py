@@ -1,71 +1,79 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Form
 from fastapi.responses import FileResponse
-import pytesseract
-from pdf2image import convert_from_path
-from PIL import Image
+import ocrmypdf
 import os
 from core.processor import save_upload_file, cleanup_file
-import pypdf
 
 router = APIRouter(tags=["OCR"])
 
-@router.post("/scan-pdf")
-async def perform_ocr(background_tasks: BackgroundTasks, file: UploadFile = File(...), lang: str = "eng"):
+@router.post("/scan-pdf") # Keep endpoint same to avoid breaking if frontend isn't updated immediately, or update frontend to /ocr-pdf? Frontend calls /api/ocr/scan-pdf currently.
+async def perform_ocr(
+    background_tasks: BackgroundTasks, 
+    file: UploadFile = File(...), 
+    lang: str = Form("eng") # Change to Form param to match frontend
+):
     """
-    Perform OCR on a PDF or Image and return a searchable PDF.
-    Uses pytesseract.image_to_pdf_or_hocr
+    Perform OCR on a PDF/Image using ocrmypdf.
     """
     temp_file = await save_upload_file(file)
     output_pdf = temp_file + "_ocr.pdf"
     
     try:
-        # Check if file is image or PDF
+        # ocrmypdf requires input to be a file path.
+        # It handles Image inputs if installed plugins (tesseract) support it, but primarily it expects PDF.
+        # If input is image, we might need to convert to PDF first?
+        # ocrmypdf supports image inputs via 'image_to_pdf' preprocessing? 
+        # Actually standard ocrmypdf takes PDF as input.
+        
+        # Check content type
         content_type = file.content_type
+        input_path = temp_file
         
         if "image" in content_type:
-            # Simple Image to PDF OCR
-            pdf_bytes = pytesseract.image_to_pdf_or_hocr(temp_file, extension='pdf', lang=lang)
-            with open(output_pdf, "wb") as f:
-                f.write(pdf_bytes)
-                
-        elif "pdf" in content_type:
-            # PDF to PDF (OCR) - Convert pages to images then OCR them
-            # This is complex (ocrmypdf is better but we use bare tesseract for now)
-            # Strategy: Convert PDF pages to images -> OCR each -> Merge
-            # Easier: Use ocrmypdf if installed (it was in requirements logic but Tesseract is available)
-            # Fallback manual pipelne:
-            
-            # Since ocrmypdf might not be in path or complicated, let's use a simpler approach for 'Scan to PDF'
-            # Assume input is Scanned Image-only PDF.
-            images = convert_from_path(temp_file)
-            
-            from pypdf import PdfWriter, PdfReader
-            import io
-            
-            writer = PdfWriter()
-            
-            for img in images:
-                pdf_bytes = pytesseract.image_to_pdf_or_hocr(img, extension='pdf', lang=lang)
-                # Load this page
-                page_reader = PdfReader(io.BytesIO(pdf_bytes))
-                writer.add_page(page_reader.pages[0])
-                
-            writer.write(output_pdf)
-            
-        else:
-             raise HTTPException(status_code=400, detail="Unsupported file format")
+             # Convert image to PDF first using img2pdf or Pillow
+             from PIL import Image
+             import img2pdf
+             img_pdf_path = temp_file + ".pdf"
+             
+             # Convert using img2pdf (lossless)
+             with open(temp_file, "rb") as f:
+                 pdf_bytes = img2pdf.convert(f)
+             with open(img_pdf_path, "wb") as f:
+                 f.write(pdf_bytes)
+             
+             input_path = img_pdf_path
+        
+        # Process with OCRmyPDF
+        # force_ocr=True ensures purely image PDFs get processed.
+        # skip_text=True avoids processing pages that already have text (unless force_ocr).
+        # We want to force OCR if user asks.
+        
+        ocrmypdf.ocr(
+            input_path, 
+            output_pdf, 
+            language=lang,
+            force_ocr=True, # Make sure we get text layer
+            progress_bar=False,
+            jobs=4 # Parallel processing
+        )
+        
+        # Cleanup input if we created intermediate
+        if input_path != temp_file and os.path.exists(input_path):
+            os.remove(input_path)
 
         background_tasks.add_task(cleanup_file, temp_file)
+        # We don't verify output existence, ocrmypdf throws error if fail.
         
         return FileResponse(
             output_pdf, 
-            filename="ocr_result.pdf",
+            filename="ocr_result_searchable.pdf",
             media_type="application/pdf"
         )
         
     except Exception as e:
+        print(f"OCR Error: {e}")
         if os.path.exists(temp_file):
-            os.remove(temp_file)
+             os.remove(temp_file)
         if os.path.exists(output_pdf):
              os.remove(output_pdf)
         raise HTTPException(status_code=500, detail=str(e))

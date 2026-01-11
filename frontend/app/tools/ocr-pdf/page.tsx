@@ -24,8 +24,8 @@ export default function ScanPdfTool() {
 
     return (
         <ToolInterface
-            title="Scan to PDF (OCR)"
-            description="Convert scanned images or PDFs into searchable, selectable text documents."
+            title="OCR PDF"
+            description="Convert scanned documents into searchable, selectable PDF text."
             accept=".pdf,.png,.jpg,.jpeg"
             apiEndpoint="/api/ocr/scan-pdf"
             onProcess={processFile}

@@ -4,9 +4,12 @@ services:
   backend:
     build: ./backend
     image: varshneysarthak/safeconvert-backend:latest
+    container_name: pizza-backend-1
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     restart: always
     # Ports removed for security (gateway internal routing)
     volumes:
+      - ./backend:/app
       - temp_data:/app/temp
       - ./backend/logs:/app/logs
     environment:
@@ -30,7 +33,7 @@ services:
 
   gateway:
     build: ./nginx
-    # image: varshneysarthak/safeconvert-gateway:latest
+    image: varshneysarthak/safeconvert-gateway:latest
     restart: always
     ports:
       - "80:80"

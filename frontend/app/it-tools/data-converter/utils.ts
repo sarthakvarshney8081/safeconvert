@@ -1,8 +1,9 @@
 import YAML from 'yaml';
 import TOML from '@iarna/toml';
 import convert from 'xml-js';
+import { jsonToToon } from '@/lib/toon';
 
-export type DataFormat = 'json' | 'yaml' | 'toml' | 'xml';
+export type DataFormat = 'json' | 'yaml' | 'toml' | 'xml' | 'toon';
 
 export function parseData(content: string, format: DataFormat): any {
     if (!content.trim()) return null;
@@ -20,6 +21,9 @@ export function parseData(content: string, format: DataFormat): any {
                 const result = convert.xml2js(content, { compact: true });
                 // Often XML root is needed or we just return the object
                 return result;
+            case 'toon':
+                // Attempt to parse TOON as YAML (since it's similar)
+                return YAML.parse(content);
             default:
                 return null;
         }
@@ -41,6 +45,8 @@ export function stringifyData(data: any, format: DataFormat): string {
                 return TOML.stringify(data);
             case 'xml':
                 return convert.js2xml(data, { compact: true, spaces: 2 });
+            case 'toon':
+                return jsonToToon(data);
             default:
                 return '';
         }

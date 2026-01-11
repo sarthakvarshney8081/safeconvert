@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import ToolLayout from '@/components/ToolLayout';
-import { Wifi, Download, FileJson, Image as ImageIcon, FileText } from 'lucide-react';
+import { Wifi, Download, FileJson, Image as ImageIcon, FileText, Eye, EyeOff } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
@@ -16,6 +16,7 @@ function WifiQrContent() {
     const [hidden, setHidden] = useState(false);
     const [wifiQrVal, setWifiQrVal] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         // WIFI:S:<SSID>;T:<WPA|WEP|>;P:<password>;H:<true|false|>;
@@ -84,7 +85,33 @@ function WifiQrContent() {
                     </div>
                     <div>
                         <label style={{ display: 'block', marginBottom: 5 }}>Password</label>
-                        <input type="text" value={wifiPass} onChange={(e) => setWifiPass(e.target.value)} style={inputStyle} placeholder="Enter Password" />
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                value={wifiPass}
+                                onChange={(e) => setWifiPass(e.target.value)}
+                                style={{ ...inputStyle, paddingRight: 40 }}
+                                placeholder="Enter Password"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: 10,
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#666',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
                     <div>
                         <label style={{ display: 'block', marginBottom: 5 }}>Encryption</label>
