@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import FileDropzone from './ui/FileDropzone';
+import BookmarkSuggestion from './ui/BookmarkSuggestion';
 import { Loader2, Download, RefreshCw, XCircle, Home, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import styles from './ToolInterface.module.css';
@@ -295,6 +296,7 @@ export default function ToolInterface({
                                 Home
                             </Link>
                         </div>
+                        <BookmarkSuggestion />
                     </div>
                 ) : (
                     <div style={{ textAlign: 'center', padding: 20 }}>

@@ -1,0 +1,68 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 80vh;
+    background-color: #ffffff;
+    color: #1a202c;
+    /* gray-900 */
+    padding: 4rem 1rem;
+    text-align: center;
+}
+
+.lottieWrapper {
+    width: 300px;
+    height: 300px;
+    max-width: 100%;
+}
+
+@media (min-width: 768px) {
+    .lottieWrapper {
+        width: 400px;
+        height: 400px;
+    }
+}
+
+.title {
+    font-size: 2.25rem;
+    /* text-4xl */
+    line-height: 2.5rem;
+    font-weight: 800;
+    /* font-extrabold */
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: #111827;
+}
+
+.description {
+    font-size: 1.125rem;
+    /* text-lg */
+    line-height: 1.75rem;
+    color: #4b5563;
+    /* text-gray-600 */
+    max-width: 28rem;
+    margin: 0 auto;
+}
+
+.homeButton {
+    margin-top: 2rem;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    /* rounded-full */
+    font-weight: 600;
+    font-size: 1.125rem;
+    /* text-lg */
+    transition: all 0.3s ease;
+    background-color: var(--primary, #6200EE);
+    color: var(--on-primary, #ffffff);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.homeButton:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
