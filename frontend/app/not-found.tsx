@@ -6,11 +6,5 @@ export const metadata = {
 };
 
 export default function NotFound() {
-    return (
-        <html lang="en">
-            <body>
-                <NotFoundClient />
-            </body>
-        </html>
-    );
+    return <NotFoundClient />;
 }
