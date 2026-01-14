@@ -283,7 +283,7 @@ export default function ToolInterface({
                         <h2 style={{ marginBottom: 10 }}>Task Completed!</h2>
                         <p style={{ color: '#666', marginBottom: 30 }}>Your files have been processed successfully.</p>
 
-                        <div style={{ display: 'flex', gap: 20, justifyContent: 'center' }}>
+                        <div style={{ display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
                             <a href={resultUrl} download={dynamicFileName || resultFileName} className="btn btn-primary">
                                 Download File
                             </a>

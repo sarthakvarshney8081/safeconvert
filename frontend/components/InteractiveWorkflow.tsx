@@ -223,7 +223,7 @@ export default function InteractiveWorkflow({ steps, initialFiles, onReset }: In
                     )}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
                     <button onClick={onReset} className="btn" style={{ background: '#f5f5f7', color: '#333' }}>
                         <RefreshCw size={18} style={{ marginRight: 8 }} /> Start New
                     </button>
