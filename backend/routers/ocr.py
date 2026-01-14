@@ -54,7 +54,8 @@ async def perform_ocr(
             language=lang,
             force_ocr=True, # Make sure we get text layer
             progress_bar=False,
-            jobs=4 # Parallel processing
+            jobs=4, # Parallel processing
+            invalidate_digital_signatures=True
         )
         
         # Cleanup input if we created intermediate
