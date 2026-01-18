@@ -139,6 +139,7 @@ export default function MergePdfTool() {
             multiple={true}
             onFilesChange={handleFilesChange}
             onProcess={process}
+            minFiles={2}
         >
             <div style={{ marginTop: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
@@ -177,8 +178,8 @@ export default function MergePdfTool() {
                                             </button>
                                         </div>
 
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{file?.name || `Unknown File ${block.fileIndex}`}</div>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ fontWeight: 600, fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>{file?.name || `Unknown File ${block.fileIndex}`}</div>
                                             <div style={{ fontSize: '0.8rem', color: '#666' }}>{maxPages} Pages</div>
                                         </div>
 

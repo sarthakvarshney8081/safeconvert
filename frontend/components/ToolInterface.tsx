@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import FileDropzone from './ui/FileDropzone';
 import BookmarkSuggestion from './ui/BookmarkSuggestion';
 import { Loader2, Download, RefreshCw, XCircle, Home, ArrowLeft } from 'lucide-react';
+import { toast } from 'sonner';
 import Link from 'next/link';
 import styles from './ToolInterface.module.css';
 
@@ -36,6 +37,7 @@ interface ToolInterfaceProps {
     initialStatus?: 'idle' | 'ready' | 'processing' | 'completed' | 'error';
     initialFiles?: File[];
     maxWidth?: string | number;
+    minFiles?: number;
 }
 
 export default function ToolInterface({
@@ -60,7 +62,8 @@ export default function ToolInterface({
     hideSubmitButton = false,
     initialStatus = 'idle',
     initialFiles = [],
-    maxWidth = 800
+    maxWidth = 800,
+    minFiles = 1
 }: ToolInterfaceProps) {
     const [status, setStatus] = useState<'idle' | 'ready' | 'processing' | 'completed' | 'error'>(initialStatus);
     const [files, setFiles] = useState<File[]>(initialFiles);
@@ -88,6 +91,11 @@ export default function ToolInterface({
 
         // Allow submitting without files if dropzone is hidden (logic for text tools)
         if (!hideDropzone && files.length === 0) return;
+
+        if (files.length < minFiles) {
+            toast.error(`At least ${minFiles} file${minFiles > 1 ? 's' : ''} are required.`);
+            return;
+        }
 
         setStatus('processing');
         setError(null);
@@ -284,7 +292,12 @@ export default function ToolInterface({
                         <p style={{ color: '#666', marginBottom: 30 }}>Your files have been processed successfully.</p>
 
                         <div style={{ display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <a href={resultUrl} download={dynamicFileName || resultFileName} className="btn btn-primary">
+                            <a
+                                href={resultUrl}
+                                download={dynamicFileName || resultFileName}
+                                className="btn btn-primary"
+                                onClick={() => toast.success('Download started', { description: 'Check your downloads folder.' })}
+                            >
                                 Download File
                             </a>
                             <button onClick={handleReset} className="btn" style={{ background: '#f5f5f7' }}>

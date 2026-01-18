@@ -5,6 +5,7 @@ import './globals.css';
 import Navbar from '@/components/ui/Navbar';
 import Clarity from '@/components/analytics/Clarity';
 import SocialLinks from '@/components/ui/SocialLinks';
+import { Toaster } from 'sonner';
 
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
@@ -102,6 +103,7 @@ export default function RootLayout({
         <main style={{ flex: 1, paddingBottom: 40 }}>
           {children}
         </main>
+        <Toaster richColors position="top-right" />
 
         <footer style={{ background: 'var(--footer-bg)', color: 'var(--footer-text)', marginTop: 'auto', borderTop: '1px solid var(--footer-border)', padding: '40px 0 0' }}>
           <div className="container">

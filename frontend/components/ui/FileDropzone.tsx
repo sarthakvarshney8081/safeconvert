@@ -4,6 +4,8 @@ import React, { useCallback, useState } from 'react';
 import { Upload, File, X } from 'lucide-react';
 import styles from './FileDropzone.module.css';
 
+import { toast } from 'sonner';
+
 interface FileDropzoneProps {
     onFilesSelected: (files: File[]) => void;
     accept?: string;
@@ -20,7 +22,7 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
 
         // 1. Max Files Check
         if (maxFiles && (files.length + incomingFiles.length) > maxFiles) {
-            alert(`You can only upload a maximum of ${maxFiles} files.`);
+            toast.error(`You can only upload a maximum of ${maxFiles} files.`);
             validFiles = incomingFiles.slice(0, maxFiles - files.length);
         }
 
@@ -28,7 +30,9 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
         const MAX_SIZE = 20 * 1024 * 1024; // 20MB in bytes
         const oversizeFiles = validFiles.filter(f => f.size > MAX_SIZE);
         if (oversizeFiles.length > 0) {
-            alert(`Some files are too large! Max file size is 20MB.\nSkipped: ${oversizeFiles.map(f => f.name).join(', ')}`);
+            toast.error(`Some files are too large! Max file size is 20MB.`, {
+                description: `Skipped: ${oversizeFiles.map(f => f.name).join(', ')}`
+            });
             validFiles = validFiles.filter(f => f.size <= MAX_SIZE);
         }
 
@@ -45,7 +49,9 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
             });
 
             if (invalidTypeFiles.length > 0) {
-                alert(`Invalid file type! Allowed: ${accept}\nSkipped: ${invalidTypeFiles.map(f => f.name).join(', ')}`);
+                toast.error(`Invalid file type! Allowed: ${accept}`, {
+                    description: `Skipped: ${invalidTypeFiles.map(f => f.name).join(', ')}`
+                });
                 validFiles = validFiles.filter(f => !invalidTypeFiles.includes(f));
             }
         }
@@ -126,10 +132,10 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
                     {files.map((file, index) => (
                         <div key={index} className={styles.fileItem} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                             <File size={20} className={styles.fileIcon} />
-                            <span className={styles.fileName} style={{ flex: 1 }}>{file.name}</span>
+                            <span className={styles.fileName} style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0 }}>{file.name}</span>
 
                             <div style={{ display: 'flex', gap: 5 }}>
-                                <button type="button" onClick={(e) => { e.preventDefault(); removeFile(index); }} className={styles.removeBtn} title="Remove">
+                                <button type="button" onClick={(e) => { e.preventDefault(); removeFile(index); }} className={styles.removeBtn} title="Remove" style={{ flexShrink: 0 }}>
                                     <X size={16} />
                                 </button>
                             </div>

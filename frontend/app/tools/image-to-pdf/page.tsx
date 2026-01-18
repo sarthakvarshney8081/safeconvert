@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ToolInterface from '@/components/ToolInterface';
+import { toast } from 'sonner';
 
 export default function ImageToPdfTool() {
     // This is the original API-based tool for converting Images -> PDF
@@ -11,7 +12,7 @@ export default function ImageToPdfTool() {
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
         for (const file of files) {
             if (!validTypes.includes(file.type)) {
-                alert(`File ${file.name} is not a supported image format (PNG, JPG, WebP).`);
+                toast.error(`File ${file.name} is not a supported image format (PNG, JPG, WebP).`);
                 throw new Error("Invalid format");
             }
         }

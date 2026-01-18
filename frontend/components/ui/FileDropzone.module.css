@@ -59,6 +59,8 @@
     margin-top: 20px;
     display: grid;
     gap: 10px;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
 }
 
 .fileItem {
