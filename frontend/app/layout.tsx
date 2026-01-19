@@ -170,7 +170,7 @@ export default function RootLayout({
               flexDirection: 'column',
               alignItems: 'center',
               textAlign: 'center',
-              padding: '40px 0',
+              padding: '40px 0 20px',
               borderTop: '1px solid rgba(255,255,255,0.1)',
               marginBottom: '0'
             }}>
@@ -201,7 +201,7 @@ export default function RootLayout({
           </div>
 
           {/* Row 3: Bottom attribution */}
-          <div className="footer-bottom" style={{ padding: '20px 0', borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '30px' }}>
+          <div className="footer-bottom" style={{ padding: '20px 0', borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '0' }}>
             <div className="container footer-attribution-container" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '15px' }}>
               <p style={{ fontSize: '0.85rem', color: '#e4e4e7', margin: 0 }}>&copy; {new Date().getFullYear()} SafeConverts Inc.</p>
 
