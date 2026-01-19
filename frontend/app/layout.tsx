@@ -78,6 +78,10 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_CLARITY_ID && (
           <Clarity projectId={process.env.NEXT_PUBLIC_CLARITY_ID} />
         )}
+        <Script
+          src="https://unpkg.com/website-carbon-badges@1.1.3/b.min.js"
+          strategy="lazyOnload"
+        />
         <script
           id="schema-org"
           type="application/ld+json"
@@ -190,6 +194,9 @@ export default function RootLayout({
                 Professional-grade file tools running locally in your browser. Complete privacy, zero server uploads, and lightning-fast processing.
               </p>
               <SocialLinks />
+              <div style={{ marginTop: '24px' }}>
+                <div id="wcb" className="carbonbadge"></div>
+              </div>
             </div>
           </div>
 
