@@ -195,7 +195,7 @@ export default function RootLayout({
               </p>
               <SocialLinks />
               <div style={{ marginTop: '24px' }}>
-                <div id="wcb" className="carbonbadge"></div>
+                <div id="wcb" className="carbonbadge wcb-d"></div>
               </div>
             </div>
           </div>
