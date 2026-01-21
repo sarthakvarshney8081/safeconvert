@@ -208,7 +208,11 @@ export default function RootLayout({
               <div className="footer-attribution-group" style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
                 <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#d4d4d8', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#4ade80', display: 'inline-block' }}></span>
-                  Secure • Private • Local
+                  Secure
+                  <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#4ade80', display: 'inline-block' }}></span>
+                  Private
+                  <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#4ade80', display: 'inline-block' }}></span>
+                  Local
                 </p>
                 <div style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.2)' }} className="hide-mobile"></div>
                 <p style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.85rem', color: '#e4e4e7', margin: 0 }}>
