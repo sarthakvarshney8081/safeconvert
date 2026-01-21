@@ -194,8 +194,23 @@ export default function RootLayout({
                 Professional-grade file tools running locally in your browser. Complete privacy, zero server uploads, and lightning-fast processing.
               </p>
               <SocialLinks />
-              <div style={{ marginTop: '24px' }}>
+              <div style={{ marginTop: '24px', position: 'relative', display: 'inline-block' }}>
                 <div id="wcb" className="carbonbadge wcb-d"></div>
+                <a
+                  href="https://www.websitecarbon.com/website/safeconverts-com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 10,
+                    cursor: 'pointer'
+                  }}
+                  aria-label="Check our website carbon footprint"
+                />
               </div>
             </div>
           </div>
