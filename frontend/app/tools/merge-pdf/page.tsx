@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Merge, ArrowDown, ArrowUp, Trash2, Split } from 'lucide-react';
 import ToolInterface from '@/components/ToolInterface';
+import ContentSection from '@/components/ContentSection';
 
 interface Block {
     id: string;
@@ -131,93 +132,145 @@ export default function MergePdfTool() {
     };
 
     return (
-        <ToolInterface
-            title="Merge PDF"
-            description="Combine multiple PDF files into one. Drag and drop to reorder or use Advanced Mode to interleave specific pages."
-            icon={Merge}
-            accept=".pdf"
-            multiple={true}
-            onFilesChange={handleFilesChange}
-            onProcess={process}
-            minFiles={2}
-        >
-            <div style={{ marginTop: 20 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
-                    <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Merge Sequence</h3>
-                    <div className="form-check form-switch" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            id="advancedMode"
-                            checked={isAdvanced}
-                            onChange={e => setIsAdvanced(e.target.checked)}
-                            style={{ cursor: 'pointer' }}
-                        />
-                        <label className="form-check-label" htmlFor="advancedMode" style={{ cursor: 'pointer', userSelect: 'none' }}>
-                            Advanced Mode (Split & Range)
-                        </label>
+        <>
+            <ToolInterface
+                title="Merge PDF"
+                description="Combine multiple PDF files into one. Drag and drop to reorder or use Advanced Mode to interleave specific pages."
+                icon={Merge}
+                accept=".pdf"
+                multiple={true}
+                onFilesChange={handleFilesChange}
+                onProcess={process}
+                minFiles={2}
+            >
+                <div style={{ marginTop: 20 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+                        <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Merge Sequence</h3>
+                        <div className="form-check form-switch" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                id="advancedMode"
+                                checked={isAdvanced}
+                                onChange={e => setIsAdvanced(e.target.checked)}
+                                style={{ cursor: 'pointer' }}
+                            />
+                            <label className="form-check-label" htmlFor="advancedMode" style={{ cursor: 'pointer', userSelect: 'none' }}>
+                                Advanced Mode (Split & Range)
+                            </label>
+                        </div>
                     </div>
-                </div>
 
-                <div className="card" style={{ padding: 10, background: '#f8f9fa' }}>
-                    {files.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: 20, color: '#999' }}> Upload files to start building sequence </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                            {blocks.map((block, index) => {
-                                const file = files[block.fileIndex];
-                                const maxPages = pageCounts[block.fileIndex] || '?';
-                                return (
-                                    <div key={block.id} className="card" style={{ padding: '10px 15px', display: 'flex', alignItems: 'center', gap: 15, borderLeft: '4px solid var(--primary)' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', color: '#ccc' }}>
-                                            <button type="button" onClick={() => moveBlock(index, 'up')} disabled={index === 0} style={{ border: 'none', background: 'transparent', cursor: index === 0 ? 'default' : 'pointer', padding: 2 }}>
-                                                <ArrowUp size={14} color={index === 0 ? '#eee' : '#666'} />
-                                            </button>
-                                            <button type="button" onClick={() => moveBlock(index, 'down')} disabled={index === blocks.length - 1} style={{ border: 'none', background: 'transparent', cursor: index === blocks.length - 1 ? 'default' : 'pointer', padding: 2 }}>
-                                                <ArrowDown size={14} color={index === blocks.length - 1 ? '#eee' : '#666'} />
-                                            </button>
-                                        </div>
-
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontWeight: 600, fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>{file?.name || `Unknown File ${block.fileIndex}`}</div>
-                                            <div style={{ fontSize: '0.8rem', color: '#666' }}>{maxPages} Pages</div>
-                                        </div>
-
-                                        {isAdvanced && (
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <span style={{ fontSize: '0.85rem' }}>Range:</span>
-                                                <input
-                                                    type="text"
-                                                    value={block.range}
-                                                    onChange={e => updateRange(index, e.target.value)}
-                                                    placeholder="e.g. 1-3, 5, all"
-                                                    style={{ width: 80, padding: '4px 8px', borderRadius: 4, border: '1px solid #ccc', fontSize: '0.9rem' }}
-                                                />
-                                            </div>
-                                        )}
-
-                                        <div style={{ display: 'flex', gap: 5 }}>
-                                            {isAdvanced && (
-                                                <button type="button" onClick={() => splitBlock(index)} className="btn btn-sm" style={{ background: '#e3f2fd', color: '#1565c0', padding: 6 }} title="Split this block">
-                                                    <Split size={16} />
+                    <div className="card" style={{ padding: 10, background: '#f8f9fa' }}>
+                        {files.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: 20, color: '#999' }}> Upload files to start building sequence </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                {blocks.map((block, index) => {
+                                    const file = files[block.fileIndex];
+                                    const maxPages = pageCounts[block.fileIndex] || '?';
+                                    return (
+                                        <div key={block.id} className="card" style={{ padding: '10px 15px', display: 'flex', alignItems: 'center', gap: 15, borderLeft: '4px solid var(--primary)' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', color: '#ccc' }}>
+                                                <button type="button" onClick={() => moveBlock(index, 'up')} disabled={index === 0} style={{ border: 'none', background: 'transparent', cursor: index === 0 ? 'default' : 'pointer', padding: 2 }}>
+                                                    <ArrowUp size={14} color={index === 0 ? '#eee' : '#666'} />
                                                 </button>
+                                                <button type="button" onClick={() => moveBlock(index, 'down')} disabled={index === blocks.length - 1} style={{ border: 'none', background: 'transparent', cursor: index === blocks.length - 1 ? 'default' : 'pointer', padding: 2 }}>
+                                                    <ArrowDown size={14} color={index === blocks.length - 1 ? '#eee' : '#666'} />
+                                                </button>
+                                            </div>
+
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ fontWeight: 600, fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>{file?.name || `Unknown File ${block.fileIndex}`}</div>
+                                                <div style={{ fontSize: '0.8rem', color: '#666' }}>{maxPages} Pages</div>
+                                            </div>
+
+                                            {isAdvanced && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                    <span style={{ fontSize: '0.85rem' }}>Range:</span>
+                                                    <input
+                                                        type="text"
+                                                        value={block.range}
+                                                        onChange={e => updateRange(index, e.target.value)}
+                                                        placeholder="e.g. 1-3, 5, all"
+                                                        style={{ width: 80, padding: '4px 8px', borderRadius: 4, border: '1px solid #ccc', fontSize: '0.9rem' }}
+                                                    />
+                                                </div>
                                             )}
-                                            <button type="button" onClick={() => removeBlock(index)} className="btn btn-sm" style={{ background: '#ffebee', color: '#c62828', padding: 6 }} title="Remove block">
-                                                <Trash2 size={16} />
-                                            </button>
+
+                                            <div style={{ display: 'flex', gap: 5 }}>
+                                                {isAdvanced && (
+                                                    <button type="button" onClick={() => splitBlock(index)} className="btn btn-sm" style={{ background: '#e3f2fd', color: '#1565c0', padding: 6 }} title="Split this block">
+                                                        <Split size={16} />
+                                                    </button>
+                                                )}
+                                                <button type="button" onClick={() => removeBlock(index)} className="btn btn-sm" style={{ background: '#ffebee', color: '#c62828', padding: 6 }} title="Remove block">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                    {isAdvanced && (
+                        <div style={{ marginTop: 10, fontSize: '0.85rem', color: '#666' }}>
+                            * Range examples: <code>1-3</code>, <code>5</code>, <code>4-end</code>, <code>all</code>.
                         </div>
                     )}
                 </div>
-                {isAdvanced && (
-                    <div style={{ marginTop: 10, fontSize: '0.85rem', color: '#666' }}>
-                        * Range examples: <code>1-3</code>, <code>5</code>, <code>4-end</code>, <code>all</code>.
-                    </div>
-                )}
-            </div>
-        </ToolInterface>
+            </ToolInterface>
+
+            <ContentSection
+                title="Combine PDF Files (Simple & Advanced)"
+                features={[
+                    {
+                        title: "Standard Merge",
+                        description: "Quickly combine multiple PDF documents into a single file. Just upload and click merged."
+                    },
+                    {
+                        title: "Advanced Sequence Control",
+                        description: "Enable 'Advanced Mode' to split documents and pick specific page ranges (e.g., '1-5') from each file."
+                    },
+                    {
+                        title: "Secure Processing",
+                        description: "Your files are processed securely on our servers and deleted immediately after the task is complete."
+                    }
+                ]}
+                steps={[
+                    {
+                        title: "Select Files",
+                        description: "Upload two or more PDF files you want to combine."
+                    },
+                    {
+                        title: "Arrange Order",
+                        description: "Use the Up/Down arrows to change the order of the files."
+                    },
+                    {
+                        title: "Advanced Mode (Optional)",
+                        description: "Toggle the 'Advanced' switch to see more options. You can click the 'Split' icon to use the same file twice in different places, or edit the 'Range' field to include only specific pages (like '1-3' or '5,7-9')."
+                    },
+                    {
+                        title: "Merge",
+                        description: "Click the 'Merge PDF' button to download your single combined document."
+                    }
+                ]}
+                faq={[
+                    {
+                        question: "What is Advanced Mode?",
+                        answer: "Advanced Mode gives you granular control. Instead of just appending File A to File B, you can say 'Take pages 1-3 from File A, then all of File B, then page 10 from File A'. Perfect for assembling reports."
+                    },
+                    {
+                        question: "How do I specify page ranges?",
+                        answer: "In Advanced Mode, you can type ranges like '1-5', single pages like '3', or '4-end' to go to the end of the document. 'all' includes the whole file."
+                    },
+                    {
+                        question: "Is there a file limit?",
+                        answer: "We support merging multiple files. Heavy files might take longer to process, but there is no strict hard limit for standard usage."
+                    }
+                ]}
+            />
+        </>
     );
 }

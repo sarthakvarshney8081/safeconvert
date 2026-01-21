@@ -8,6 +8,7 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     restart: always
     # Ports removed for security (gateway internal routing)
+    # Ports removed for security (gateway internal routing)
     volumes:
       - ./backend:/app
       - temp_data:/app/temp

@@ -28,7 +28,7 @@ async def validate_rss(
             # Add User-Agent to avoid 403s from some sites
             response = requests.get(url, headers={'User-Agent': 'SafeConverts-RSS-Validator/1.0'}, timeout=10)
             response.raise_for_status()
-            rss_content = response.text
+            rss_content = response.content
         except requests.RequestException as e:
              return RSSValidationResponse(
                 valid=False,

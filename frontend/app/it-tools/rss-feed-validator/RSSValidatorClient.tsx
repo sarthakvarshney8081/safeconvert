@@ -28,7 +28,7 @@ export default function RSSFeedValidator() {
         }
 
         try {
-            const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8888';
+            const apiBase = process.env.NEXT_PUBLIC_API_URL || '/api';
             const res = await fetch(`${apiBase}/web/rss-validate`, {
                 method: 'POST',
                 body: formData,
@@ -41,7 +41,11 @@ export default function RSSFeedValidator() {
             const data = await res.json();
             setResult(data);
         } catch (err: any) {
-            setError(err.message || 'An error occurred while validating');
+            let message = err.message || 'An error occurred while validating';
+            if (message.includes('Failed to fetch')) {
+                message = 'Connection to server failed. Please ensure the backend is running on port 8000.';
+            }
+            setError(message);
         } finally {
             setLoading(false);
         }
