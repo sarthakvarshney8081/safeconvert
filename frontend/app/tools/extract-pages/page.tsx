@@ -62,6 +62,23 @@ export default function ExtractPagesTool() {
                     />
                 </div>
             }
+            textContent={
+                <div className="prose" style={{ maxWidth: '100%', color: '#333' }}>
+                    <h2 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: 20 }}>How to Extract Pages from PDF</h2>
+                    <ol style={{ paddingLeft: 20, marginBottom: 30, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <li><strong>Upload PDF:</strong> Select or drag & drop the PDF file you want to split.</li>
+                        <li><strong>Choose Pages:</strong> Enter the page numbers you want to <strong>keep</strong> (e.g. "1-5, 8").</li>
+                        <li><strong>Extract:</strong> Click the button to generate a new PDF containing only these pages.</li>
+                        <li><strong>Download:</strong> Instantly download your new smaller file.</li>
+                    </ol>
+
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: 15, marginTop: 40 }}>Privacy First</h2>
+                    <p style={{ lineHeight: 1.6, color: '#4b5563' }}>
+                        This tool runs purely in your browser using WebAssembly. Your documents are never sent to any server,
+                        ensuring 100% privacy for your sensitive data.
+                    </p>
+                </div>
+            }
         />
     );
 }

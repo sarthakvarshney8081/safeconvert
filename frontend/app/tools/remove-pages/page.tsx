@@ -69,6 +69,25 @@ export default function RemovePagesTool() {
                     </p>
                 </div>
             }
+
+            textContent={
+                <div className="prose" style={{ maxWidth: '100%', color: '#333' }}>
+                    <h2 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: 20 }}>How to Remove Pages from PDF</h2>
+                    <ol style={{ paddingLeft: 20, marginBottom: 30, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <li><strong>Upload your PDF:</strong> Drag and drop your file regarding the dropzone above.</li>
+                        <li><strong>Select Pages:</strong> Enter the page numbers you want to delete (e.g. "1, 3-5").</li>
+                        <li><strong>Remove:</strong> Click the "Remove Pages" button to process your file locally.</li>
+                        <li><strong>Download:</strong> Save your new PDF with the specified pages removed.</li>
+                    </ol>
+
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: 15, marginTop: 40 }}>Why use this tool?</h2>
+                    <p style={{ lineHeight: 1.6, color: '#4b5563' }}>
+                        Quickly delete unwanted pages from documents without uploading them to a server.
+                        Your files remain private and secure on your device. Perfect for removing sensitive information,
+                        blank pages, or irrelevant sections from reports and contracts.
+                    </p>
+                </div>
+            }
         />
     );
 }

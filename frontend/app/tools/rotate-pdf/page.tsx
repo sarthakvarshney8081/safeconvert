@@ -55,6 +55,23 @@ export default function RotatePdfTool() {
                 </select>
             }
             onProcess={processPdf}
+            textContent={
+                <div className="prose" style={{ maxWidth: '100%', color: '#333' }}>
+                    <h2 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: 20 }}>How to Rotate PDF Pages</h2>
+                    <ol style={{ paddingLeft: 20, marginBottom: 30, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <li><strong>Select File:</strong> Upload the PDF you want to rotate.</li>
+                        <li><strong>Choose Angle:</strong> Select 90°, 180°, or 270° clockwise rotation.</li>
+                        <li><strong>Rotate:</strong> Click the button to apply the rotation to all pages.</li>
+                        <li><strong>Save:</strong> Download your correctly oriented document.</li>
+                    </ol>
+
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: 15, marginTop: 40 }}>Fix Orientation Permanently</h2>
+                    <p style={{ lineHeight: 1.6, color: '#4b5563' }}>
+                        Unlike simple view rotation in PDF readers, this tool permanently rotates the pages in the file itself.
+                        The changes will be saved when you download, so it opens correctly on any specific device.
+                    </p>
+                </div>
+            }
         />
     );
 }

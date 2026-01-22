@@ -38,6 +38,7 @@ interface ToolInterfaceProps {
     initialFiles?: File[];
     maxWidth?: string | number;
     minFiles?: number;
+    textContent?: React.ReactNode;
 }
 
 export default function ToolInterface({
@@ -63,7 +64,8 @@ export default function ToolInterface({
     initialStatus = 'idle',
     initialFiles = [],
     maxWidth = 800,
-    minFiles = 1
+    minFiles = 1,
+    textContent
 }: ToolInterfaceProps) {
     const [status, setStatus] = useState<'idle' | 'ready' | 'processing' | 'completed' | 'error'>(initialStatus);
     const [files, setFiles] = useState<File[]>(initialFiles);
@@ -324,6 +326,11 @@ export default function ToolInterface({
                     </div>
                 )}
             </div>
+            {textContent && (
+                <div style={{ marginTop: 60, animation: 'fadeIn 0.5s ease' }}>
+                    {textContent}
+                </div>
+            )}
         </div>
     );
 }
