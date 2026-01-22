@@ -2,23 +2,15 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Script from 'next/script';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './not-found.module.css';
 
 export default function NotFoundClient() {
     return (
         <div className={styles.container}>
-            <Script
-                src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"
-                type="module"
-                strategy="lazyOnload"
-            />
             <div className={styles.lottieWrapper}>
-                {/* @ts-ignore */}
-                <dotlottie-player
-                    src="https://lottie.host/43aa1a61-9490-4f18-a596-f6ef52d7c476/LpQIZQdZBI.lottie"
-                    background="transparent"
-                    speed="1"
+                <DotLottieReact
+                    src="https://lottie.host/16f79314-a280-45b5-ac82-449fdbf78891/bOt4lYEVm4.lottie"
                     loop
                     autoplay
                 />
