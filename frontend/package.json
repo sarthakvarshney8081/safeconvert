@@ -59,6 +59,7 @@
     "papaparse": "^5.5.3",
     "pdfjs-dist": "^5.4.530",
     "qrcode.react": "^4.2.0",
+    "quill": "^2.0.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-draggable": "^4.4.6",
