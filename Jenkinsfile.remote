@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    environment {
+        // Defines the deployment target
+        DEPLOY_SERVER_USER = 'sarthak' 
+        DEPLOY_SERVER_IP = '192.168.10.132'
+    }
+
+    stages {
+        stage('Deploy & Build on Server') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'deploy-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                    sh """
+                        ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${DEPLOY_SERVER_USER}@${DEPLOY_SERVER_IP} '
+                            # 1. Go to the project directory
+                            cd "/home/sarthak/safeconvert" && \
+                            
+                            # 2. Pull the latest code changes (but NOT images)
+                            git pull origin main && \
+                            
+                            # 3. Build containers directly on this server
+                            # --build forces a rebuild from the Dockerfile
+                            # -d runs it in valid detached mode
+                            docker compose up --build -d
+                        '
+                    """
+                }
+            }
+        }
+    }
+}
