@@ -38,9 +38,10 @@ fi
 
 # Build Backend
 echo "Building Backend ($PLATFORMS)..."
-docker buildx build $BUILD_OPTS -t $BACKEND_IMAGE backend
+docker buildx build $BUILD_OPTS -t $BACKEND_IMAGE ./backend
 
 # Build Frontend
+# We use the root context (.) because the Dockerfile needs access to both /wasm and /frontend
 echo "Building Frontend ($PLATFORMS)..."
 docker buildx build $BUILD_OPTS \
   -t $FRONTEND_IMAGE \
