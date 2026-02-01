@@ -25,9 +25,8 @@ cryptography>=42.0.0
 endesive
 nest_asyncio
 
-urllib3>=2.6.3
+urllib3>=1.26.18
 reportlab
 
 
 pymupdf
-img2pdf
