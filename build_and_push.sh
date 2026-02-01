@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Exit on error
-# set -e (Disabled for debugging)
+set -e
 
 # Default values
 PLATFORMS="linux/amd64"
