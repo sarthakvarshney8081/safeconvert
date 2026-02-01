@@ -37,12 +37,7 @@ pipeline {
             }
         }
 
-        stage('Full Multi-platform Push') {
-            steps {
-                // This runs after deployment to ensure high-availability images are ready
-                sh './build_and_push.sh --full --push'
-            }
-        }
+
     }
 
     post {
