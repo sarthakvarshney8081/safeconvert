@@ -23,9 +23,10 @@ pipeline {
 
         stage('Deploy to Production') {
             steps {
-                sshagent(['deploy-ssh-key']) {
+                // Use a generic SSH command instead of the potentially missing sshagent plugin
+                withCredentials([sshUserPrivateKey(credentialsId: 'deploy-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER_USER}@${DEPLOY_SERVER_IP} '
+                        ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no sarthak@${DEPLOY_SERVER_IP} '
                             cd "/Users/sarthakvarshney/Docker Projects/nodejs-app/nodejs-app/pizza" && \
                             git pull origin main && \
                             docker compose pull && \
@@ -38,7 +39,7 @@ pipeline {
 
         stage('Full Multi-platform Push') {
             steps {
-                // This can run after deployment is live
+                // This runs after deployment to ensure high-availability images are ready
                 sh './build_and_push.sh --full --push'
             }
         }
@@ -47,8 +48,8 @@ pipeline {
     post {
         always {
             sh 'docker logout'
-            // Cleanup Jenkins VM resources to save disk space
-            sh './build_and_push.sh --cleanup'
+            // Cleanup Jenkins VM resources using the specific cleanup-only flag
+            sh './build_and_push.sh --cleanup-only'
         }
     }
 }
