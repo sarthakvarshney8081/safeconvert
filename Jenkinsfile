@@ -10,15 +10,13 @@ pipeline {
     }
 
     stages {
-        stage('Build & Push') {
+        stage('Fast Build & Push') {
             steps {
                 script {
-                    // Login to Docker Hub
                     sh 'echo $DOCKER_HUB_CREDS_PSW | docker login -u $DOCKER_HUB_CREDS_USR --password-stdin'
-                    
-                    // Make script executable and run it
                     sh 'chmod +x build_and_push.sh'
-                    sh './build_and_push.sh'
+                    // Fast build (single architecture) and push to Docker Hub
+                    sh './build_and_push.sh --push'
                 }
             }
         }
@@ -26,7 +24,6 @@ pipeline {
         stage('Deploy to Production') {
             steps {
                 sshagent(['deploy-ssh-key']) {
-                    // connect and pull updates
                     sh """
                         ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER_USER}@${DEPLOY_SERVER_IP} '
                             cd "/Users/sarthakvarshney/Docker Projects/nodejs-app/nodejs-app/pizza" && \
@@ -38,12 +35,20 @@ pipeline {
                 }
             }
         }
+
+        stage('Full Multi-platform Push') {
+            steps {
+                // This can run after deployment is live
+                sh './build_and_push.sh --full --push'
+            }
+        }
     }
 
     post {
         always {
-            // Logout
             sh 'docker logout'
+            // Cleanup Jenkins VM resources to save disk space
+            sh './build_and_push.sh --cleanup'
         }
     }
 }
