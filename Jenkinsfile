@@ -27,7 +27,7 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'deploy-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh """
                         ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no sarthak@${DEPLOY_SERVER_IP} '
-                            cd "/Users/sarthakvarshney/Docker Projects/nodejs-app/nodejs-app/pizza" && \
+                            cd "/home/sarthak/safeconvert" && \
                             git pull origin main && \
                             docker compose pull && \
                             docker compose up -d
