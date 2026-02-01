@@ -6,6 +6,7 @@ import {
 export const allTools = [
     // --- PDF Tools ---
     { title: 'Merge PDF', description: 'Combine multiple PDFs into one.', icon: FileStack, href: '/tools/merge-pdf', color: '#FF5252', category: 'PDF' },
+    { title: 'Merge PDF with Images', description: 'Combine PDFs and Images.', icon: FileStack, href: '/tools/merge-pdf-with-images', color: '#E65100', category: 'PDF' },
     { title: 'Split PDF', description: 'Separate PDF pages.', icon: Scissors, href: '/tools/split-pdf', color: '#FF4081', category: 'PDF' },
     { title: 'Remove Pages', description: 'Delete unwanted pages.', icon: Minimize2, href: '/tools/remove-pages', color: '#ef4444', category: 'PDF' },
     { title: 'Extract Pages', description: 'Save specific pages.', icon: FileType, href: '/tools/extract-pages', color: '#8b5cf6', category: 'PDF' },

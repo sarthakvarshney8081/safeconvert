@@ -21,8 +21,9 @@ async def merge_pdfs(background_tasks: BackgroundTasks, files: list[UploadFile] 
         # 1. Save all files first
         for file in files:
             # Security Validation
-            if not file.filename.lower().endswith('.pdf'):
-                raise HTTPException(status_code=400, detail=f"Invalid file type: {file.filename}. Only PDF files are allowed.")
+            filename_lower = file.filename.lower()
+            if not (filename_lower.endswith('.pdf') or filename_lower.endswith(('.jpg', '.jpeg', '.png', '.webp'))):
+                raise HTTPException(status_code=400, detail=f"Invalid file type: {file.filename}. Only PDF and Image files are allowed.")
             
             path = await save_upload_file(file)
             temp_files.append(path)
@@ -30,6 +31,52 @@ async def merge_pdfs(background_tasks: BackgroundTasks, files: list[UploadFile] 
         # 2. Process Merge
         import json
         from fastapi import Form
+        import img2pdf
+        from PIL import Image
+
+        # Pre-process: Convert any images to temp PDFs
+        processed_files = [] # This will hold paths to PDFs (original or converted)
+        
+        for path in temp_files:
+            if path.lower().endswith('.pdf'):
+                processed_files.append(path)
+            else:
+                # It's an image, convert to PDF
+                try:
+                    img_pdf_path = path + ".pdf"
+                    
+                    # Handle RGBA/P modes for JPG conversion compatibility if needed, 
+                    # but img2pdf handles many. 
+                    # Generally safely convert to RGB or use PIL to save as PDF if img2pdf fails? 
+                    # Let's use the logic from converters.py (PIL -> RGB if needed, then img2pdf)
+                    
+                    # Check mode
+                    try: 
+                        img = Image.open(path)
+                        valid_img_path = path
+                        
+                        if img.mode == 'RGBA':
+                             valid_img_path = path + "_rgb.jpg"
+                             img.convert('RGB').save(valid_img_path, "JPEG")
+                             # We need to cleanup this intermediate file too
+                             background_tasks.add_task(cleanup_file, valid_img_path)
+                             
+                        with open(img_pdf_path, "wb") as f:
+                            f.write(img2pdf.convert(valid_img_path))
+                            
+                        processed_files.append(img_pdf_path)
+                        background_tasks.add_task(cleanup_file, img_pdf_path) # Cleanup temp pdf
+                        
+                    except Exception as img_err:
+                        print(f"Error converting image {path}: {img_err}")
+                        raise HTTPException(status_code=400, detail=f"Failed to convert image {os.path.basename(path)}")
+
+                except Exception as e:
+                     raise HTTPException(status_code=500, detail=f"Image conversion error: {str(e)}")
+
+        # Use processed_files for merging instead of temp_files (which were raw uploads)
+        # Note: indices in manifest refer to the uploaded files order, which matches processed_files order.
+
         
         # Check if manifest is provided (It comes as a Form field)
         # Note: manifest argument must be added to function signature
@@ -41,10 +88,10 @@ async def merge_pdfs(background_tasks: BackgroundTasks, files: list[UploadFile] 
                 
                 for item in instructions:
                     idx = int(item.get('file_index', 0))
-                    if idx < 0 or idx >= len(temp_files):
+                    if idx < 0 or idx >= len(processed_files):
                         continue
                         
-                    input_path = temp_files[idx]
+                    input_path = processed_files[idx]
                     page_range = item.get('pages', 'all')
                     
                     if page_range.lower() == 'all':
@@ -89,7 +136,7 @@ async def merge_pdfs(background_tasks: BackgroundTasks, files: list[UploadFile] 
 
         else:
             # Legacy Mode: Append all files in order
-            for path in temp_files:
+            for path in processed_files:
                 merger.append(path)
 
         # Create output
