@@ -39,6 +39,7 @@ export default function SplitPdfTool() {
             accept=".pdf"
             apiEndpoint=""
             processingMode="client"
+            maxSize={100 * 1024 * 1024} // 100MB
             optionsComponent={
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                     <div style={{ flex: 1 }}>
