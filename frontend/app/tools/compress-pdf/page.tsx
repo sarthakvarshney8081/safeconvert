@@ -57,6 +57,7 @@ export default function CompressPdfTool() {
             accept=".pdf"
             onProcess={processFile}
             resultFileName="compressed.pdf"
+            maxSize={100 * 1024 * 1024} // 100MB
             optionsComponent={
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
                     <div style={{ fontSize: '0.85rem', color: '#666', background: '#f5f5f5', padding: '8px', borderRadius: '4px' }}>

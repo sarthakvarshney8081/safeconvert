@@ -11,9 +11,10 @@ interface FileDropzoneProps {
     accept?: string;
     multiple?: boolean;
     maxFiles?: number;
+    maxSize?: number; // Optional max size in bytes
 }
 
-export default function FileDropzone({ onFilesSelected, accept, multiple = false, maxFiles }: FileDropzoneProps) {
+export default function FileDropzone({ onFilesSelected, accept, multiple = false, maxFiles, maxSize }: FileDropzoneProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
 
@@ -26,11 +27,12 @@ export default function FileDropzone({ onFilesSelected, accept, multiple = false
             validFiles = incomingFiles.slice(0, maxFiles - files.length);
         }
 
-        // 2. Max File Size Check (20MB)
-        const MAX_SIZE = 20 * 1024 * 1024; // 20MB in bytes
+        // 2. Max File Size Check (Default: 20MB)
+        const MAX_SIZE = maxSize || 20 * 1024 * 1024; // Use prop or default to 20MB
         const oversizeFiles = validFiles.filter(f => f.size > MAX_SIZE);
         if (oversizeFiles.length > 0) {
-            toast.error(`Some files are too large! Max file size is 20MB.`, {
+            const sizeInMB = Math.round(MAX_SIZE / (1024 * 1024));
+            toast.error(`Some files are too large! Max file size is ${sizeInMB}MB.`, {
                 description: `Skipped: ${oversizeFiles.map(f => f.name).join(', ')}`
             });
             validFiles = validFiles.filter(f => f.size <= MAX_SIZE);

@@ -16,6 +16,7 @@ interface ToolInterfaceProps {
     hideDropzone?: boolean;
     multiple?: boolean;
     maxFiles?: number;
+    maxSize?: number; // Added maxSize prop
     processingMode?: 'client' | 'server';
     optionsComponent?: React.ReactNode;
     optionsTitle?: string;
@@ -48,6 +49,7 @@ export default function ToolInterface({
     hideDropzone = false,
     multiple = false,
     maxFiles,
+    maxSize, // Destructure maxSize
     processingMode = 'server',
     optionsComponent,
     optionsTitle,
@@ -212,6 +214,7 @@ export default function ToolInterface({
                                     accept={accept || ""}
                                     multiple={multiple}
                                     maxFiles={maxFiles}
+                                    maxSize={maxSize}
                                 />
                             </div>
                         )}
