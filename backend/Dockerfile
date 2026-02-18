@@ -14,8 +14,9 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Install system dependencies with --no-install-recommends to reduce size
+# Install system dependencies with --no-install-recommends to reduce size
 # Note: We keep essential tools like LibreOffice and TeXLive but skip documentation/extras
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     zip \
     poppler-utils \
     tesseract-ocr \

@@ -7,7 +7,7 @@ from core.processor import save_upload_file, cleanup_file, UPLOAD_DIR
 router = APIRouter(prefix="/optimize", tags=["Optimize PDF"])
 
 @router.post("/compress")
-async def compress_pdf(background_tasks: BackgroundTasks, file: UploadFile = File(...), level: str = "ebook"):
+async def compress_pdf(background_tasks: BackgroundTasks, file: UploadFile = File(...), level: str = "ebook", target_size: float = None):
     """
     Compress PDF using Ghostscript.
     Levels: screen (lowest), ebook (medium), printer (high quality), prepress (highest)
@@ -18,9 +18,28 @@ async def compress_pdf(background_tasks: BackgroundTasks, file: UploadFile = Fil
     # Map friendly names to GS settings
     # /screen (72 dpi), /ebook (150 dpi), /printer (300 dpi), /prepress (300 dpi, color preserving)
     gs_setting = "/ebook"
-    if level == "screen": gs_setting = "/screen"
-    elif level == "printer": gs_setting = "/printer"
-    elif level == "prepress": gs_setting = "/prepress"
+    
+    if level == "screen": 
+        gs_setting = "/screen"
+    elif level == "printer": 
+        gs_setting = "/printer"
+    elif level == "prepress": 
+        gs_setting = "/prepress"
+    elif level == "target" and target_size:
+        # Calculate heuristics based on file size
+        original_size = os.path.getsize(temp_file)
+        target_bytes = float(target_size) * 1024 * 1024
+        
+        if original_size > 0:
+            ratio = target_bytes / original_size
+            if ratio < 0.1:
+                gs_setting = "/screen" # Aggressive
+            elif ratio < 0.5:
+                gs_setting = "/ebook"  # Moderate
+            else:
+                gs_setting = "/printer" # Light
+        else:
+            gs_setting = "/ebook" # Fallback
     
     try:
         cmd = [

@@ -28,12 +28,16 @@ export default function CompressPdfTool() {
             case 'strong': level = "strong"; break;
             case 'email': level = "email"; break;
             case 'preset': level = presetType; break;
-            case 'target': level = "strong"; break; // Fallback for now
+            case 'target': level = "target"; break;
         }
 
         const formData = new FormData();
         formData.append("file", file);
         formData.append("level", level);
+
+        if (mode === 'target') {
+            formData.append("target_size", targetSize);
+        }
 
         // Server-Side Processing
         const response = await fetch('/api/optimize/compress', {
