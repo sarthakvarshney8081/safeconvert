@@ -1,1 +1,5 @@
-ms26106735
+{
+  "Description": "Domain ownership verification file for Microsoft 365 - place in the website root",
+  "Domain": "safeconverts.com",
+  "Id": "9620e72c-6ec0-4f32-abb8-99c8c82bffe1"
+}
